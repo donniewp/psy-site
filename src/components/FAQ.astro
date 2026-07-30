@@ -1,0 +1,116 @@
+---
+import { faq, phone, phoneHref } from '../data/content';
+import Icon from './Icon.astro';
+---
+
+<section class="faq section" id="faq">
+  <div class="container faq-inner">
+    <div class="faq-copy" data-reveal>
+      <span class="eyebrow">Частые вопросы</span>
+      <h2>Отвечаем на то, что волнует родителей</h2>
+      <p>Не нашли свой вопрос? Позвоните — расскажем всё о программах и подберём удобное время.</p>
+      <a href={phoneHref} class="faq-phone">{phone}</a>
+    </div>
+
+    <div class="faq-list" data-reveal>
+      {faq.map((item, i) => (
+        <div class="faq-item" data-open={i === 0 ? 'true' : 'false'}>
+          <button class="faq-question" aria-expanded={i === 0 ? 'true' : 'false'}>
+            <span>{item.q}</span>
+            <span class="faq-icon-wrap">
+              <Icon name="svc-plus" class="icon-plus" />
+              <Icon name="svc-minus" class="icon-minus" />
+            </span>
+          </button>
+          <div class="faq-answer"><p>{item.a}</p></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-inner { display: grid; grid-template-columns: .8fr 1.2fr; gap: var(--space-7); align-items: start; }
+
+  .faq-copy { position: sticky; top: calc(86px + var(--space-6)); }
+
+  .faq-phone { display: inline-block; margin-top: var(--space-5); font: var(--text-h3); font-size: 22px; color: var(--color-ink); }
+
+  .faq-list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .faq-item {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-mist);
+    padding: var(--space-4) var(--space-5);
+    transition: background .2s ease-out, box-shadow .2s ease-out;
+  }
+
+  /* lime получает роль подсветки активного состояния, а не только волосяных подчёркиваний */
+  .faq-item[data-open="true"] {
+    background: color-mix(in srgb, var(--color-lime) 14%, var(--color-surface));
+    box-shadow: inset 0 0 0 var(--stroke-hairline) color-mix(in srgb, var(--color-lime) 55%, var(--color-mist));
+  }
+
+  .faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    font: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-ink);
+    text-align: left;
+  }
+
+  .faq-icon-wrap { position: relative; width: 24px; height: 24px; flex-shrink: 0; }
+
+  .faq-question :global(.icon-plus), .faq-question :global(.icon-minus) {
+    position: absolute;
+    inset: 0;
+    color: var(--color-moss);
+    transition: opacity .2s ease-out, rotate .2s ease-out;
+  }
+
+  .faq-question :global(.icon-minus) { opacity: 0; rotate: -90deg; }
+  .faq-item[data-open="true"] .faq-question :global(.icon-plus) { opacity: 0; rotate: 90deg; }
+  .faq-item[data-open="true"] .faq-question :global(.icon-minus) { opacity: 1; rotate: 0deg; }
+
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .3s ease-out;
+  }
+
+  .faq-item[data-open="true"] .faq-answer { grid-template-rows: 1fr; }
+
+  .faq-answer p {
+    overflow: hidden;
+    font: var(--text-meta);
+    color: var(--color-ink-soft);
+    padding-top: 0;
+  }
+
+  .faq-item[data-open="true"] .faq-answer p { padding-top: var(--space-3); }
+
+  .faq-answer > p { min-height: 0; }
+
+  @media (max-width: 900px) {
+    .faq-inner { grid-template-columns: 1fr; gap: var(--space-5); }
+    /* На одноколоночной раскладке sticky не нужен — иначе блок с телефоном
+       "прилипает" к верху и список вопросов скроллится под ним */
+    .faq-copy { position: static; top: auto; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.faq-item').forEach((item) => {
+    const btn = item.querySelector('.faq-question');
+    btn?.addEventListener('click', () => {
+      const isOpen = item.getAttribute('data-open') === 'true';
+      item.setAttribute('data-open', String(!isOpen));
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    });
+  });
+</script>

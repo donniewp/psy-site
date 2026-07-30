@@ -1,0 +1,89 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AnnouncementBar from '../components/AnnouncementBar.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Problems from '../components/Problems.astro';
+import Programs from '../components/Programs.astro';
+import Razvivayka from '../components/Razvivayka.astro';
+import Teacher from '../components/Teacher.astro';
+import WhyUs from '../components/WhyUs.astro';
+import Timeline from '../components/Timeline.astro';
+import Prices from '../components/Prices.astro';
+import Reviews from '../components/Reviews.astro';
+import VideoGallery from '../components/VideoGallery.astro';
+import FAQ from '../components/FAQ.astro';
+import Booking from '../components/Booking.astro';
+import Contacts from '../components/Contacts.astro';
+import Footer from '../components/Footer.astro';
+import TelegramButton from '../components/TelegramButton.astro';
+import StickyMobileCTA from '../components/StickyMobileCTA.astro';
+---
+
+<Layout
+  title="Сензитивность — детская студия развития Татьяны Петровой"
+  description="Занятия для детей от 1,5 до 10 лет: раннее развитие, подготовка к школе, нейропсихология и песочная терапия. Мини-группы, бережный подход, педагог-психолог с опытом более 20 лет."
+>
+  <div id="page">
+    <AnnouncementBar />
+    <Header />
+    <main id="main-content">
+      <Hero />
+      <Problems />
+      <Programs />
+      <Razvivayka />
+      <Teacher />
+      <WhyUs />
+      <Timeline />
+      <Prices />
+      <Reviews />
+      <VideoGallery />
+      <FAQ />
+      <Booking />
+      <Contacts />
+    </main>
+    <Footer />
+    <TelegramButton />
+    <StickyMobileCTA />
+  </div>
+</Layout>
+
+<script>
+  const revealTargets = document.querySelectorAll('[data-reveal]');
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.setAttribute('data-reveal', 'shown');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+  );
+  revealTargets.forEach((el) => revealObserver.observe(el));
+
+  const countTargets = document.querySelectorAll('[data-countup]');
+  const countObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target as HTMLElement;
+        const target = parseInt(el.getAttribute('data-countup') || '0', 10);
+        const duration = 1200;
+        const start = performance.now();
+
+        const step = (now: number) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = String(Math.round(target * eased));
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        countObserver.unobserve(el);
+      });
+    },
+    { threshold: 0.5 }
+  );
+  countTargets.forEach((el) => countObserver.observe(el));
+</script>

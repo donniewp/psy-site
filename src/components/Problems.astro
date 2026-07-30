@@ -1,0 +1,273 @@
+---
+import { problemTopics } from '../data/content';
+import FigmaAsset from './FigmaAsset.astro';
+---
+
+<section class="problems section" id="problems">
+  <div class="container">
+    <div class="section-head center" data-reveal>
+      <span class="eyebrow">С чем я работаю</span>
+      <h2>Что волнует родителей чаще всего</h2>
+      <p>Нажмите на карточку — расскажу, что стоит за проблемой и как мы с ней работаем.</p>
+    </div>
+
+    <div class="problems-grid" data-reveal>
+      {problemTopics.map((p) => (
+        <button
+          class="problem-tile"
+          data-hash={p.hash}
+          aria-haspopup="dialog"
+          aria-controls={`modal-${p.hash}`}
+        >
+          <span class="problem-tile-icon"><FigmaAsset src={p.icon} /></span>
+          <span class="problem-tile-title">{p.title}</span>
+        </button>
+      ))}
+    </div>
+
+    <div class="problems-outro" data-reveal>
+      <h3>Узнали своего ребёнка? Значит, вам к нам</h3>
+      <a href="#booking" class="btn btn-dark">Обсудить с педагогом</a>
+    </div>
+  </div>
+
+  {problemTopics.map((p) => (
+    <dialog class="problem-modal" id={`modal-${p.hash}`} data-hash={p.hash} aria-labelledby={`modal-title-${p.hash}`}>
+      <div class="problem-modal-inner">
+        <button class="problem-modal-close" aria-label="Закрыть">
+          <FigmaAsset src="icons/ui/plus.svg" />
+        </button>
+        <span class="problem-modal-icon"><FigmaAsset src={p.icon} /></span>
+        <h3 id={`modal-title-${p.hash}`}>{p.title}</h3>
+        <p class="problem-modal-intro">{p.intro}</p>
+        <p class="problem-modal-help">{p.help}</p>
+        <a href="#booking" class="btn btn-primary problem-modal-cta">Получить консультацию</a>
+      </div>
+    </dialog>
+  ))}
+</section>
+
+<style>
+  .section-head.center { text-align: center; margin-left: auto; margin-right: auto; }
+  .section-head.center p { margin-left: auto; margin-right: auto; }
+
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-7);
+  }
+
+  .problem-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-3);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-5) var(--space-3);
+    box-shadow: var(--shadow-sm);
+    transition: transform .2s ease-out, box-shadow .2s ease-out;
+  }
+
+  .problem-tile:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .problem-tile:active { transform: translateY(-1px) scale(.98); }
+
+  .problem-tile-icon { width: 56px; height: 56px; }
+  .problem-tile-icon :global(svg) { width: 100%; height: 100%; }
+
+  .problem-tile-title { font: var(--text-meta); font-weight: 600; font-size: 14px; color: var(--color-ink); }
+
+  .problems-outro {
+    margin-top: var(--space-8);
+    padding-top: var(--space-7);
+    border-top: 1px solid var(--color-mist);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+
+  .problems-outro h3 { font: var(--text-h3); font-size: 26px; color: var(--color-ink); }
+  .problems-outro .btn { flex-shrink: 0; }
+
+  @media (max-width: 1024px) {
+    .problems-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 720px) {
+    .problems-grid { grid-template-columns: repeat(2, 1fr); }
+    .problems-outro { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ===== Модалка ===== */
+  .problem-modal {
+    /* UA-стиль <dialog> навязывает свой max-width/max-height (напр. calc(100% - 6px))
+       поверх наших значений — сбрасываем явно, иначе width ниже обрезается браузером */
+    max-width: none;
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(560px, calc(100vw - 48px));
+    max-height: min(720px, calc(100vh - 48px));
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 0;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    transform: scale(.97) translateY(8px);
+    transition: opacity .2s ease-out, transform .2s ease-out, overlay .2s ease-out allow-discrete, display .2s ease-out allow-discrete;
+  }
+
+  .problem-modal[open] { opacity: 1; transform: none; }
+
+  @starting-style {
+    .problem-modal[open] { opacity: 0; transform: scale(.97) translateY(8px); }
+  }
+
+  .problem-modal::backdrop {
+    background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+    opacity: 0;
+    transition: opacity .2s ease-out, overlay .2s ease-out allow-discrete, display .2s ease-out allow-discrete;
+  }
+
+  .problem-modal[open]::backdrop { opacity: 1; }
+
+  @starting-style {
+    .problem-modal[open]::backdrop { opacity: 0; }
+  }
+
+  .problem-modal-inner {
+    position: relative;
+    padding: var(--space-7);
+    max-height: min(720px, calc(100vh - 48px));
+    overflow-y: auto;
+  }
+
+  .problem-modal-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--color-mist) 14%, var(--color-paper));
+    color: var(--color-ink-soft);
+    transition: background .2s ease-out, color .2s ease-out, transform .12s ease-out;
+  }
+
+  .problem-modal-close:hover { background: var(--color-mist); color: var(--color-ink); }
+  .problem-modal-close:active { transform: scale(.94); }
+  .problem-modal-close :global(svg) { width: 16px; height: 16px; transform: rotate(45deg); }
+
+  .problem-modal-icon { display: block; width: 64px; height: 64px; margin-bottom: var(--space-5); }
+  .problem-modal-icon :global(svg) { width: 100%; height: 100%; }
+
+  .problem-modal-inner h3 { font: var(--text-h3); font-size: 24px; padding-right: var(--space-7); }
+
+  .problem-modal-intro { margin-top: var(--space-4); font: var(--text-body); color: var(--color-ink); }
+  .problem-modal-help { margin-top: var(--space-3); font: var(--text-meta); color: var(--color-ink-soft); }
+
+  .problem-modal-cta { margin-top: var(--space-6); width: 100%; }
+
+  @media (max-width: 480px) {
+    .problem-modal {
+      inset: 0;
+      margin: 0;
+      width: 100vw;
+      max-height: 100dvh;
+      height: 100dvh;
+      border-radius: 0;
+    }
+    .problem-modal-inner { max-height: 100dvh; padding: var(--space-6) var(--space-5); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .problem-modal, .problem-modal::backdrop { transition: none; }
+  }
+</style>
+
+<script>
+  const tiles = Array.from(document.querySelectorAll<HTMLButtonElement>('.problem-tile'));
+  const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>('.problem-modal'));
+
+  const byHash = new Map(dialogs.map((d) => [d.dataset.hash, d]));
+  let lastFocused: HTMLElement | null = null;
+
+  function openByHash(hash: string, opener?: HTMLElement) {
+    const dialog = byHash.get(hash);
+    if (!dialog || dialog.open) return;
+    lastFocused = opener || (document.activeElement as HTMLElement) || null;
+    dialog.showModal();
+    history.pushState(null, '', `#${hash}`);
+  }
+
+  function closeDialog(dialog: HTMLDialogElement) {
+    // Хэш и фокус снимаются централизованно в обработчике 'close' ниже —
+    // он покрывает и этот путь, и Escape, и programmatic .close().
+    if (dialog.open) dialog.close();
+  }
+
+  tiles.forEach((tile) => {
+    tile.addEventListener('click', () => openByHash(tile.dataset.hash || '', tile));
+  });
+
+  dialogs.forEach((dialog) => {
+    const closeBtn = dialog.querySelector<HTMLButtonElement>('.problem-modal-close');
+    closeBtn?.addEventListener('click', () => closeDialog(dialog));
+
+    // Клик по подложке — закрыть (геометрическая проверка надёжнее event.target)
+    dialog.addEventListener('click', (e) => {
+      const rect = dialog.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom;
+      if (!inside) closeDialog(dialog);
+    });
+
+    // 'close' покрывает и Escape (через нативный 'cancel'), и programmatic .close() —
+    // единственное надёжное место снять хэш и вернуть фокус независимо от способа закрытия.
+    dialog.addEventListener('close', () => {
+      if (location.hash === `#${dialog.dataset.hash}`) {
+        history.pushState(null, '', location.pathname + location.search);
+      }
+      if (lastFocused && document.contains(lastFocused)) lastFocused.focus();
+    });
+
+    // Ручной focus trap: showModal() не гарантирует зацикливание Tab внутри диалога
+    // во всех браузерах (в частности в Chromium фокус уходит из диалога).
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+      ).filter((el) => el.offsetParent !== null);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  });
+
+  // Прямая ссылка с хэшем (объявления в Директе)
+  const initialHash = location.hash.replace('#', '');
+  if (initialHash && byHash.has(initialHash)) {
+    requestAnimationFrame(() => openByHash(initialHash));
+  }
+
+  window.addEventListener('popstate', () => {
+    const hash = location.hash.replace('#', '');
+    dialogs.forEach((d) => { if (d.open && d.dataset.hash !== hash) d.close(); });
+    if (hash && byHash.get(hash) && !byHash.get(hash)!.open) openByHash(hash);
+  });
+</script>

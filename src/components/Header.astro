@@ -1,0 +1,240 @@
+---
+import { nav, phone, phoneHref } from '../data/content';
+import FigmaAsset from './FigmaAsset.astro';
+---
+
+<header class="header" id="site-header">
+  <div class="container header-inner">
+    <a href="#top" class="logo">
+      <span class="logo-mark"><FigmaAsset src="logo/logo-sign.svg" /></span>
+      <span class="logo-text">
+        СЕНЗИТИВНОСТЬ
+        <span class="logo-sub">детская студия развития</span>
+      </span>
+    </a>
+
+    <nav class="nav-desktop">
+      {nav.map((item) => (
+        <a href={`#${item.id}`}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="header-right">
+      <a href={phoneHref} class="phone">{phone}</a>
+      <a href="#booking" class="btn btn-primary header-cta">Пробное занятие</a>
+      <button class="burger" id="burger-btn" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu">
+  <nav class="mobile-menu-nav">
+    {nav.map((item) => (
+      <a href={`#${item.id}`} class="mobile-menu-link">{item.label}</a>
+    ))}
+  </nav>
+  <div class="mobile-menu-footer">
+    <a href={phoneHref} class="phone">{phone}</a>
+    <a href="#booking" class="btn btn-primary">Пробное занятие</a>
+  </div>
+</div>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--color-paper) 90%, transparent);
+    backdrop-filter: blur(10px);
+    transition: box-shadow .3s ease-out;
+  }
+
+  .header.scrolled { box-shadow: var(--shadow-sm); }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    height: 86px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    white-space: nowrap;
+  }
+
+  .logo-mark {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    color: var(--color-moss);
+    transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), filter .35s ease-out;
+  }
+
+  .logo-mark :global(svg) { width: 100%; height: 100%; }
+
+  .logo:hover .logo-mark {
+    transform: rotate(-8deg) scale(1.12);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-lime) 70%, transparent));
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 21px;
+    letter-spacing: .04em;
+    color: var(--color-ink);
+  }
+
+  .logo-sub {
+    font-family: var(--font-text);
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0;
+    color: var(--color-ink-soft);
+  }
+
+  .nav-desktop { display: flex; gap: var(--space-5); flex: 1; justify-content: center; }
+
+  .nav-desktop a {
+    position: relative;
+    font: var(--text-meta);
+    color: var(--color-ink-soft);
+    white-space: nowrap;
+    transition: color .2s ease-out;
+  }
+
+  .nav-desktop a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 100%;
+    bottom: -4px;
+    height: var(--stroke-thin);
+    background: currentColor;
+    transition: right .2s ease-out, box-shadow .2s ease-out;
+  }
+
+  /* Фирменный приём: искорка-твинкл при наведении на пункт меню — тот же lime-акцент,
+     что используется как единственный "магический" цвет по всему сайту */
+  .nav-desktop a::before {
+    content: '';
+    position: absolute;
+    top: -9px;
+    right: -11px;
+    width: 9px;
+    height: 9px;
+    background: var(--color-lime);
+    clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+    opacity: 0;
+    transform: scale(.3) rotate(-30deg);
+    transition: opacity .25s ease-out, transform .35s cubic-bezier(.34, 1.56, .64, 1);
+    pointer-events: none;
+  }
+
+  .nav-desktop a:hover { color: var(--color-moss); }
+  .nav-desktop a:hover::after { right: 0; box-shadow: 0 0 6px color-mix(in srgb, var(--color-lime) 80%, transparent); }
+  .nav-desktop a:hover::before { opacity: 1; transform: scale(1) rotate(0deg); }
+
+  .header-right { display: flex; align-items: center; gap: var(--space-5); }
+
+  .phone {
+    position: relative;
+    font: var(--text-meta);
+    font-weight: 700;
+    color: var(--color-ink);
+    transition: color .2s ease-out;
+  }
+
+  .phone::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 100%;
+    bottom: -4px;
+    height: var(--stroke-thin);
+    background: currentColor;
+    transition: right .2s ease-out;
+  }
+
+  .phone:hover { color: var(--color-moss); }
+  .phone:hover::after { right: 0; }
+
+  .header-cta { white-space: nowrap; padding: var(--space-3) var(--space-5); }
+
+  .burger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 40px; height: 40px; }
+
+  .burger span { display: block; width: 22px; height: 1.5px; background: var(--color-ink); margin: 0 auto; }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--color-paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 100px var(--space-6) var(--space-7);
+    transform: translateX(100%);
+    transition: transform .35s ease-out;
+  }
+
+  .mobile-menu.open { transform: translateX(0); }
+
+  .mobile-menu-nav { display: flex; flex-direction: column; gap: var(--space-2); }
+
+  .mobile-menu-link {
+    font: var(--text-h3);
+    font-size: 24px;
+    color: var(--color-ink);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-mist);
+  }
+
+  .mobile-menu-footer { display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; }
+  .mobile-menu-footer .phone { font-size: 19px; }
+
+  @media (max-width: 1100px) {
+    .nav-desktop, .header-right .phone { display: none; }
+    .burger { display: flex; }
+    .header-cta { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-mark, .nav-desktop a::before { transition: opacity .15s ease-out; }
+    .logo:hover .logo-mark { transform: none; }
+    .nav-desktop a:hover::before { transform: none; }
+  }
+</style>
+
+<script>
+  const header = document.getElementById('site-header');
+  const burgerBtn = document.getElementById('burger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  const onScroll = () => header?.classList.toggle('scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const closeMenu = () => {
+    mobileMenu?.classList.remove('open');
+    burgerBtn?.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  };
+
+  burgerBtn?.addEventListener('click', () => {
+    const isOpen = mobileMenu?.classList.toggle('open');
+    burgerBtn.setAttribute('aria-expanded', String(!!isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+
+  mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+</script>

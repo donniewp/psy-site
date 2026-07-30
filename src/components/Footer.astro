@@ -1,0 +1,88 @@
+---
+import { nav, phone, phoneHref, location } from '../data/content';
+import Icon from './Icon.astro';
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-col">
+      <span class="logo">СЕНЗИТИВНОСТЬ</span>
+      <p>
+        Детская студия развития «Сензитивность» — мир, где детям хорошо. Занятия
+        для детей от 1,5 до 10 лет: раннее развитие, подготовка к школе,
+        нейропсихология, песочная терапия.
+      </p>
+    </div>
+
+    <nav class="footer-col footer-nav">
+      <span class="footer-heading">Разделы</span>
+      {nav.map((item) => <a href={`#${item.id}`}>{item.label}</a>)}
+    </nav>
+
+    <div class="footer-col footer-contact">
+      <span class="footer-heading">Контакты</span>
+      <a href={phoneHref} class="phone">{phone}</a>
+      <span>{location.address}</span>
+      <span>{location.hours}</span>
+      <div class="socials">
+        <a href="#top" aria-label="Telegram" class="social-icon"><Icon name="svc-telegram" /></a>
+        <a href={phoneHref} aria-label="Телефон" class="social-icon"><Icon name="svc-phone" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container footer-legal">
+    <span>Публичная оферта · Политика конфиденциальности</span>
+    <span>2026 · Сензитивность</span>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--color-moss-deep); color: rgba(255, 255, 255, .85); padding: var(--section-y-tight) 0 var(--space-6); }
+
+  .footer-inner { display: grid; grid-template-columns: 1.2fr .8fr 1fr; gap: var(--space-6); }
+  .footer-col { display: flex; flex-direction: column; gap: var(--space-3); }
+
+  .footer .logo { font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: .04em; color: #fff; }
+  .footer-col p { font: var(--text-meta); color: rgba(255, 255, 255, .85); }
+
+  /* Осветлённый lime — тот же приём, что у .eyebrow-light, для AA на moss-deep */
+  .footer-heading { font: var(--text-label); letter-spacing: var(--tracking-label); color: color-mix(in srgb, var(--color-lime) 85%, white); margin-bottom: var(--space-2); }
+
+  .footer-nav a { font: var(--text-meta); color: rgba(255, 255, 255, .85); }
+  .footer-nav a:hover { color: var(--color-lime); }
+
+  .footer-contact .phone { font: var(--text-h3); font-size: 18px; color: #fff; }
+  /* :not(.footer-heading) — иначе эта строка (выше по специфичности, чем .footer-heading)
+     случайно перекрашивала заголовок «Контакты» в белый вместо lime */
+  .footer-contact span:not(.footer-heading) { font: var(--text-meta); color: rgba(255, 255, 255, .85); }
+
+  .socials { display: flex; gap: var(--space-3); margin-top: var(--space-2); }
+
+  .social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .footer-legal {
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid rgba(255, 255, 255, .14);
+    display: flex;
+    justify-content: space-between;
+    font: var(--text-meta);
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, .85);
+  }
+
+  @media (max-width: 720px) {
+    .footer-inner { grid-template-columns: 1fr; gap: var(--space-5); }
+    .footer-legal { flex-direction: column; gap: var(--space-2); }
+  }
+</style>

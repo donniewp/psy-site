@@ -1,0 +1,78 @@
+---
+import { reviews } from '../data/content';
+---
+
+<section class="reviews section" id="reviews">
+  <div class="container">
+    <div class="section-head center" data-reveal>
+      <span class="eyebrow">Отзывы</span>
+      <h2>Родители ценят нас за бережный подход</h2>
+      <p class="reviews-link">Больше отзывов о студии на Яндекс</p>
+    </div>
+
+    <div class="reviews-grid" data-reveal>
+      {reviews.map((r) => (
+        <div class="review-card">
+          <div class="stars">★★★★★</div>
+          <p class="review-text">«{r.text}»</p>
+          <div class="review-author">
+            <img src={r.avatar} alt={r.name} />
+            <div>
+              <span class="review-name">{r.name}</span>
+              <span class="review-tag">{r.tag}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .reviews { background: var(--color-surface); }
+  .reviews-link { font-style: italic; }
+
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+
+  .review-card {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-paper);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* Деликатная фактура вместо плоской заливки — та же кавычка-«, что уже обрамляет текст отзыва */
+  .review-card::before {
+    content: '«';
+    position: absolute;
+    top: -.12em;
+    left: var(--space-4);
+    font-family: var(--font-display);
+    font-size: 96px;
+    line-height: 1;
+    color: var(--color-moss);
+    opacity: .07;
+    pointer-events: none;
+  }
+
+  .stars, .review-text, .review-author { position: relative; }
+
+  .stars { color: var(--color-lime); font-size: 16px; letter-spacing: 2px; filter: brightness(.6) saturate(2); }
+
+  .review-text { font: var(--text-meta); font-size: 15.5px; color: var(--color-ink-soft); flex: 1; }
+
+  .review-author { display: flex; align-items: center; gap: var(--space-3); }
+  .review-author img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+  .review-author div { display: flex; flex-direction: column; }
+  .review-name { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+  .review-tag { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
+
+  @media (max-width: 900px) {
+    .reviews-grid { grid-template-columns: 1fr; }
+  }
+</style>

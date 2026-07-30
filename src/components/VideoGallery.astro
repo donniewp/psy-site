@@ -1,0 +1,33 @@
+---
+import { videos } from '../data/content';
+---
+
+<section class="videos section" id="video">
+  <div class="container">
+    <div class="section-head center" data-reveal>
+      <span class="eyebrow">Занятия изнутри</span>
+      <h2>Смотрите, как проходят наши занятия</h2>
+    </div>
+
+    <div class="video-grid" data-reveal>
+      {videos.map((v) => (
+        <div class="video-thumb">
+          <img src={v} alt="Кадр с занятия в студии" loading="lazy" />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+
+  .video-thumb { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+
+  .video-thumb img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; transition: transform .3s ease-out; }
+  .video-thumb:hover img { transform: scale(1.05); }
+
+  @media (max-width: 900px) {
+    .video-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

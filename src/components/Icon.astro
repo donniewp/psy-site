@@ -1,0 +1,12 @@
+---
+export interface Props {
+  name: string;
+  class?: string;
+}
+
+const { name, class: className = '' } = Astro.props;
+---
+
+<svg class={`icon ${className}`} aria-hidden="true">
+  <use href={`${import.meta.env.BASE_URL}icons/sprite.svg#icon-${name}`} />
+</svg>

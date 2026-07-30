@@ -1,0 +1,38 @@
+---
+// Иконки (icons/problems|tabs|ui) — ссылка на общий спрайт public/figma/icons-sprite.svg
+// (та же схема, что у Icon.astro для остальных иконок сайта): currentColor работает через <use>,
+// а разметка не дублируется в HTML при повторном использовании (напр. иконка проблемы — в плитке и в её модалке).
+// Иллюстрации (illustrations/**) — многоцветные, самодостаточные, currentColor не нужен: отдаём
+// внешним <img>, чтобы не раздувать HTML SVG-путями (некоторые файлы 20-40 КБ) и дать браузеру
+// кэшировать/лениво грузить их отдельно.
+// Логотип (logo/**, components/**) — используется один раз на страницу (хедер), дублирования нет,
+// инлайним напрямую ради currentColor без лишнего файла-спрайта.
+export interface Props {
+  src: string;
+  class?: string;
+  alt?: string;
+}
+
+const { src, class: className = '', alt = '' } = Astro.props;
+const isIllustration = src.startsWith('illustrations/');
+const isInlineSingle = src.startsWith('logo/') || src.startsWith('components/');
+const iconId = src.replace(/^icons\/(?:problems|tabs|ui)\//, '').replace(/\.svg$/, '');
+
+let inlineSvg: string | null = null;
+if (isInlineSingle) {
+  const modules = import.meta.glob('/src/assets/figma/{logo,components}/**/*.svg', { query: '?raw', import: 'default', eager: true });
+  const raw = modules[`/src/assets/figma/${src}`] as string | undefined;
+  if (!raw) throw new Error(`FigmaAsset: no SVG found at src/assets/figma/${src}`);
+  inlineSvg = className ? raw.replace('<svg ', `<svg class="${className}" `) : raw;
+}
+---
+
+{isIllustration ? (
+  <img src={`${import.meta.env.BASE_URL}figma/${src}`} alt={alt} loading="lazy" decoding="async" class={className} />
+) : isInlineSingle ? (
+  <Fragment set:html={inlineSvg} />
+) : (
+  <svg class={className} aria-hidden="true">
+    <use href={`${import.meta.env.BASE_URL}figma/icons-sprite.svg#figma-${iconId}`} />
+  </svg>
+)}

@@ -1,0 +1,268 @@
+---
+import { programGroups, programs, programDirectionLabels } from '../data/content';
+import Icon from './Icon.astro';
+---
+
+<section class="programs section" id="programs">
+  <div class="container">
+    <div class="section-head center" data-reveal>
+      <span class="eyebrow">Программы</span>
+      <h2>Программы студии — от 1,5 лет до начальной школы</h2>
+      <p>Выберите возраст ребёнка — покажем подходящие программы и стоимость.</p>
+    </div>
+
+    <div class="prog-tabs" data-reveal role="tablist">
+      {programGroups.map((g, i) => (
+        <button
+          class="prog-tab"
+          class:list={[{ active: i === 0 }]}
+          data-group={g.key}
+          data-param={g.param}
+          role="tab"
+          aria-selected={i === 0 ? 'true' : 'false'}
+        >
+          <Icon name={g.icon} class="prog-tab-icon" />
+          <span class="prog-tab-text">
+            {g.label}
+            <em>{g.ageLabel}</em>
+          </span>
+        </button>
+      ))}
+    </div>
+
+    <div class="programs-grid" data-reveal>
+      {programs.map((p) => (
+        <article
+          class="program-card card"
+          class:list={[
+            { 'program-card--accent': p.slug === 'razvivayka' || p.slug === 'diagnostics' },
+            { 'program-card--clay': p.direction === 'psychological' },
+            { 'program-card--neuro': p.direction === 'neuropsychological' },
+          ]}
+          data-groups={p.groups.join(',')}
+        >
+          {p.img ? (
+            <img src={p.img} alt={p.title} loading="lazy" />
+          ) : (
+            <div class="program-photo-pending">
+              <Icon name="svc-clock" class="pending-icon" />
+              <span>Фото скоро</span>
+            </div>
+          )}
+          <div class="program-body">
+            <div class="program-top-row">
+              <span class="program-age">{p.ageLabel}</span>
+              <span class="program-direction" data-direction={p.direction}>{programDirectionLabels[p.direction]}</span>
+            </div>
+            <h3>{p.title}</h3>
+            <p class="program-desc">{p.desc}</p>
+            {p.bullets && (
+              <ul class="program-bullets">
+                {p.bullets.map((b) => <li>{b}</li>)}
+              </ul>
+            )}
+            <div class="program-meta">
+              <span class="program-session">{p.sessionInfo}</span>
+              {p.schedule && <span class="program-schedule">{p.schedule}</span>}
+              <span class="program-price">{p.price}</span>
+            </div>
+            <div class="program-actions">
+              <a href="#booking" class="btn btn-dark program-btn">Записаться на пробное</a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .prog-tabs { display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-7); }
+
+  .prog-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-mist);
+    transition: background .2s ease-out, box-shadow .2s ease-out;
+  }
+
+  .prog-tab :global(.prog-tab-icon) { color: var(--color-moss); }
+  .prog-tab.active :global(.prog-tab-icon) { color: #fff; }
+
+  .prog-tab-text { display: flex; flex-direction: column; align-items: flex-start; font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+  .prog-tab-text em { font-style: normal; font-weight: 500; font-size: 13px; color: var(--color-ink-soft); }
+  .prog-tab.active .prog-tab-text, .prog-tab.active .prog-tab-text em { color: #fff; }
+
+  .prog-tab.active {
+    background: var(--color-moss);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .programs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+
+  .program-card[hidden] { display: none; }
+
+  .program-card {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    transition: transform .2s ease-out, box-shadow .2s ease-out, opacity .18s ease-out, scale .18s ease-out;
+  }
+
+  .program-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+  /* Фирменный приём: 2 карточки из 9 (флагманская и экспертная) получают асимметричный
+     верхний радиус вместо унифицированного прямоугольника — не спецэффект, просто иной силуэт */
+  .program-card--accent { border-radius: 6px var(--radius-lg) var(--radius-md) var(--radius-md); }
+
+  .program-card.is-leaving,
+  .program-card.is-entering { opacity: 0; scale: .97; }
+
+  .program-card img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+
+  .program-photo-pending {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    background: color-mix(in srgb, var(--color-mist) 12%, var(--color-paper));
+  }
+
+  .program-photo-pending :global(.pending-icon) { color: var(--color-ink-soft); opacity: .6; }
+  .program-photo-pending span { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
+
+  .program-body { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
+
+  .program-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); }
+
+  .program-age {
+    font: var(--text-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-moss);
+  }
+
+  /* Направление программы: педагогика / нейропсихология / психология — три существующих
+     тона (moss / mist+ink / clay), без новых токенов */
+  .program-direction {
+    flex-shrink: 0;
+    font: var(--text-meta);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--color-moss) 10%, var(--color-paper));
+    color: var(--color-moss);
+  }
+
+  .program-direction[data-direction="neuropsychological"] {
+    background: color-mix(in srgb, var(--color-mist) 22%, var(--color-paper));
+    color: var(--color-ink);
+  }
+
+  .program-direction[data-direction="psychological"] {
+    background: color-mix(in srgb, var(--color-clay) 14%, var(--color-paper));
+    color: var(--color-clay);
+  }
+
+  /* Психология — тёплый нейтральный акцент вместо холодной зелени */
+  .program-card--clay { background: color-mix(in srgb, var(--color-clay) 7%, var(--color-surface)); }
+  .program-card--clay .program-age { color: var(--color-clay); }
+
+  /* Нейропсихология — прохладный сдержанный акцент */
+  .program-card--neuro { background: color-mix(in srgb, var(--color-mist) 9%, var(--color-surface)); }
+  .program-card--neuro .program-age { color: var(--color-ink); }
+
+  .program-body h3 { font: var(--text-lead); font-size: 17px; margin-top: 2px; }
+  .program-desc { font: var(--text-meta); color: var(--color-ink-soft); }
+
+  .program-bullets { margin: var(--space-2) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .program-bullets li { font: var(--text-meta); font-size: 13.5px; color: var(--color-ink-soft); padding-left: var(--space-4); position: relative; }
+  .program-bullets li::before { content: ''; position: absolute; left: 0; top: .65em; width: 8px; height: var(--stroke-thin); background: var(--color-mist); }
+
+  .program-meta {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-mist);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .program-session { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
+  .program-schedule { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
+  .program-price { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+
+  .program-actions { margin-top: var(--space-4); }
+  .program-btn { width: 100%; padding: var(--space-3); font-size: 14.5px; }
+
+  @media (max-width: 1024px) { .programs-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .programs-grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.prog-tab'));
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.program-card'));
+  const FADE_MS = 180;
+  let pendingHide: ReturnType<typeof window.setTimeout> | undefined;
+
+  function applyGroup(group: string) {
+    tabs.forEach((t) => {
+      const isActive = t.getAttribute('data-group') === group;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-selected', String(isActive));
+    });
+
+    const shouldShow = (card: HTMLElement) => {
+      if (group === 'all') return true;
+      const groups = (card.getAttribute('data-groups') || '').split(',');
+      return groups.includes(group);
+    };
+
+    if (pendingHide) window.clearTimeout(pendingHide);
+
+    cards.forEach((card) => {
+      card.classList.remove('is-leaving', 'is-entering');
+      if (shouldShow(card)) {
+        if (card.hidden) {
+          card.hidden = false;
+          card.classList.add('is-entering');
+          requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('is-entering')));
+        }
+      } else if (!card.hidden) {
+        card.classList.add('is-leaving');
+      }
+    });
+
+    pendingHide = window.setTimeout(() => {
+      cards.forEach((card) => {
+        if (card.classList.contains('is-leaving')) {
+          card.hidden = true;
+          card.classList.remove('is-leaving');
+        }
+      });
+    }, FADE_MS);
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => applyGroup(tab.getAttribute('data-group') || 'all'));
+  });
+
+  // Landing links from ads can preselect a group, e.g. ?age=4-6 — falls back to the
+  // server-rendered "Все программы" default (already correct pre-hydration) otherwise.
+  const ageParam = new URLSearchParams(location.search).get('age');
+  if (ageParam) {
+    const matchedTab = tabs.find((t) => t.getAttribute('data-param') === ageParam);
+    if (matchedTab) applyGroup(matchedTab.getAttribute('data-group') || 'all');
+  }
+</script>

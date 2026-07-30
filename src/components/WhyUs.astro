@@ -1,0 +1,211 @@
+---
+import { featureTabs } from '../data/content';
+import FigmaAsset from './FigmaAsset.astro';
+---
+
+<section class="whyus section" id="whyus">
+  <div class="whyus-band">
+    <div class="container whyus-band-inner" data-reveal>
+      <div class="whyus-band-copy">
+        <h3>Комплексный подход: развитие, нейропсихология и бережная поддержка</h3>
+        <p>
+          Программы активизируют внимание, память и мышление, развивают межполушарные
+          связи, снимают тревожность и помогают ребёнку чувствовать себя уверенно —
+          дома, в саду и в школе.
+        </p>
+      </div>
+      <span class="eyebrow eyebrow-light whyus-label">Почему выбирают нас</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="features-tab" data-reveal>
+      <div class="feat-tabs" role="tablist" aria-label="Преимущества студии">
+        {featureTabs.map((tab, i) => (
+          <button
+            class="feat-tab"
+            class:list={[{ active: i === 0 }]}
+            id={`feat-tab-${tab.key}`}
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-controls={`feat-panel-${tab.key}`}
+            tabindex={i === 0 ? '0' : '-1'}
+            data-key={tab.key}
+          >
+            <span class="feat-tab-icon"><FigmaAsset src={tab.icon} /></span>
+            <span class="feat-tab-label">{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {featureTabs.map((tab, i) => (
+        <div
+          class="feat-panel"
+          class:list={[{ active: i === 0 }]}
+          id={`feat-panel-${tab.key}`}
+          role="tabpanel"
+          aria-labelledby={`feat-tab-${tab.key}`}
+          tabindex="0"
+          hidden={i === 0 ? false : true}
+        >
+          <div class="feat-panel-copy">
+            <h3>{tab.label}</h3>
+            <p>{tab.description}</p>
+            <div class="feat-panel-tags">
+              {tab.tags.map((t) => <span class="feat-tag">{t}</span>)}
+            </div>
+          </div>
+          <div class="feat-panel-illustration">
+            <FigmaAsset src={tab.illustration} />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .whyus { padding-top: 0; padding-bottom: var(--section-y); }
+
+  .whyus-band { background: var(--color-moss-deep); padding: var(--space-9) 0; margin-bottom: calc(-1 * var(--space-6)); }
+
+  .whyus-band-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); }
+
+  .whyus-band-copy h3 { font: var(--text-h3); color: #fff; max-width: 620px; }
+  .whyus-band-copy p { margin-top: var(--space-4); color: rgba(255, 255, 255, .75); font: var(--text-body); max-width: 520px; }
+
+  .whyus-label { flex-shrink: 0; margin-bottom: 0; }
+
+  .features-tab { position: relative; z-index: 1; }
+
+  .feat-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+
+  .feat-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-mist);
+    text-align: left;
+    transition: background .2s ease-out, box-shadow .2s ease-out, transform .12s ease-out;
+  }
+
+  .feat-tab:active { transform: scale(.97); }
+
+  .feat-tab-icon { flex-shrink: 0; width: 40px; height: 40px; color: var(--color-moss); }
+  .feat-tab-icon :global(svg) { width: 100%; height: 100%; }
+
+  .feat-tab-label { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+
+  .feat-tab.active {
+    background: var(--color-moss);
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* Иконка несёт собственную белую подложку (rect fill="#fff" в самом SVG) —
+     не перекрашиваем glyph поверх нее, иначе currentColor становится белым по белому */
+  .feat-tab.active .feat-tab-label { color: #fff; }
+
+  .feat-panel {
+    display: none;
+    grid-template-columns: 1.1fr .9fr;
+    align-items: center;
+    gap: var(--space-6);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-7);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity .18s ease-out, transform .18s ease-out, display .18s ease-out allow-discrete;
+  }
+
+  .feat-panel.active { display: grid; opacity: 1; transform: none; }
+
+  @starting-style {
+    .feat-panel.active { opacity: 0; transform: translateY(6px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feat-panel { transition: display .01s allow-discrete; }
+  }
+
+  .feat-panel-copy h3 { font: var(--text-h3); font-size: 24px; }
+  .feat-panel-copy p { margin-top: var(--space-4); font: var(--text-body); color: var(--color-ink-soft); max-width: 46ch; }
+
+  .feat-panel-tags { margin-top: var(--space-5); display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+  .feat-tag {
+    font: var(--text-meta);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-moss);
+    background: color-mix(in srgb, var(--color-moss) 10%, var(--color-paper));
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+  }
+
+  .feat-panel-illustration { justify-self: center; width: 100%; max-width: 260px; }
+  .feat-panel-illustration :global(svg) { width: 100%; height: auto; }
+
+  @media (max-width: 780px) {
+    .whyus-band-inner { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 900px) {
+    .feat-panel { grid-template-columns: 1fr; text-align: center; }
+    .feat-panel-copy p { margin-left: auto; margin-right: auto; }
+    .feat-panel-tags { justify-content: center; }
+    .feat-panel-illustration { max-width: 200px; }
+  }
+
+  @media (max-width: 680px) {
+    .feat-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .feat-tab-label { font-size: 13.5px; }
+  }
+</style>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.feat-tab'));
+  const panels = Array.from(document.querySelectorAll<HTMLElement>('.feat-panel'));
+
+  function activate(key: string) {
+    tabs.forEach((t) => {
+      const isActive = t.dataset.key === key;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-selected', String(isActive));
+      t.tabIndex = isActive ? 0 : -1;
+    });
+    panels.forEach((p) => {
+      const isActive = p.id === `feat-panel-${key}`;
+      p.classList.toggle('active', isActive);
+      p.hidden = !isActive;
+    });
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => activate(tab.dataset.key || ''));
+
+    tab.addEventListener('keydown', (e) => {
+      let nextIndex: number | null = null;
+      if (e.key === 'ArrowRight') nextIndex = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') nextIndex = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') nextIndex = 0;
+      else if (e.key === 'End') nextIndex = tabs.length - 1;
+
+      if (nextIndex !== null) {
+        e.preventDefault();
+        const nextTab = tabs[nextIndex];
+        activate(nextTab.dataset.key || '');
+        nextTab.focus();
+      }
+    });
+  });
+</script>

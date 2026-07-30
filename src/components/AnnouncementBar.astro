@@ -1,0 +1,105 @@
+---
+import Icon from './Icon.astro';
+---
+
+<div class="announcement" id="announcement-bar">
+  <div class="container announcement-inner">
+    <p class="announcement-text">
+      <Icon name="svc-check" class="announcement-icon" />
+      Открыли новую студию — ведём набор в группы, первые занятия
+      <strong>с 23 августа</strong>.
+      <a href="#booking" class="announcement-cta">Записаться</a>
+    </p>
+    <button class="announcement-close" id="announcement-close" aria-label="Закрыть уведомление">
+      <Icon name="svc-plus" class="close-icon" />
+    </button>
+  </div>
+</div>
+
+<style>
+  .announcement {
+    position: relative;
+    background: var(--color-moss-deep);
+    color: #fff;
+  }
+
+  .announcement-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-6) var(--space-3) var(--space-5);
+    position: relative;
+  }
+
+  .announcement-text {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    font: var(--text-meta);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .announcement-text :global(.announcement-icon) {
+    width: 16px;
+    height: 16px;
+    color: var(--color-lime);
+    flex-shrink: 0;
+  }
+
+  .announcement-text strong { color: color-mix(in srgb, var(--color-lime) 85%, white); }
+
+  .announcement-cta {
+    font-weight: 700;
+    color: color-mix(in srgb, var(--color-lime) 85%, white);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color .2s ease-out;
+  }
+
+  .announcement-cta:hover { color: #fff; }
+
+  .announcement-close {
+    position: absolute;
+    right: var(--space-5);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: rgba(255, 255, 255, .7);
+    transition: background .2s ease-out, color .2s ease-out;
+  }
+
+  .announcement-close:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+  .announcement-close :global(.close-icon) { width: 12px; height: 12px; transform: rotate(45deg); }
+
+  .announcement.is-hidden { display: none; }
+
+  @media (max-width: 640px) {
+    .announcement-inner { padding: var(--space-3) var(--space-7) var(--space-3) var(--space-4); }
+    .announcement-text { font-size: 12.5px; justify-content: flex-start; text-align: left; }
+    .announcement-close { right: var(--space-3); }
+  }
+</style>
+
+<script>
+  const KEY = 'announcement-2026-08-dismissed';
+  const bar = document.getElementById('announcement-bar');
+  const closeBtn = document.getElementById('announcement-close');
+
+  if (bar && localStorage.getItem(KEY) === '1') {
+    bar.classList.add('is-hidden');
+  }
+
+  closeBtn?.addEventListener('click', () => {
+    bar?.classList.add('is-hidden');
+    localStorage.setItem(KEY, '1');
+  });
+</script>

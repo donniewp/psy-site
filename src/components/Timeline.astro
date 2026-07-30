@@ -1,0 +1,239 @@
+---
+import { timeline } from '../data/content';
+import Icon from './Icon.astro';
+import FigmaAsset from './FigmaAsset.astro';
+---
+
+<section class="timeline-section section" id="path">
+  <div class="container">
+    <div class="section-head center" data-reveal>
+      <span class="eyebrow">Путь развития</span>
+      <h2>Путь ребёнка в студии — от первых игр до уверенного школьника</h2>
+      <p>Четыре ступени развития, каждая со своей программой.</p>
+    </div>
+
+    <div class="tl-wrap" id="tl-wrap">
+      <div class="tl-track"></div>
+      <div class="tl-fill" id="tl-fill"></div>
+      <div class="tl-comet" id="tl-comet"></div>
+
+      {timeline.map((t, i) => (
+        <div class="tl-node-row" class:list={[i % 2 === 0 ? 'left' : 'right']} data-tl-node>
+          <div class="tl-content">
+            <div class="tl-head">
+              <span class="tl-stage">{t.stage}</span>
+              <span class="tl-age">{t.age}</span>
+            </div>
+            <div class="tl-body">
+              <div class="tl-icon-wrap"><Icon name={t.icon} class="tl-icon" /></div>
+              <div>
+                <h3>{t.title}</h3>
+                <p>{t.text}</p>
+                <div class="tl-foot">
+                  <span class="tl-skill">{t.skill}</span>
+                  <a class="tl-link" href={`?program=${encodeURIComponent(t.bookingOption)}#booking`}>
+                    Записаться
+                    <Icon name="svc-arrow" class="tl-link-icon" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tl-node">{t.n}</div>
+          <div class="tl-spacer" aria-hidden="true">
+            <FigmaAsset src={t.illustration} class="tl-illustration" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .tl-wrap { position: relative; padding: var(--space-5) 0; }
+
+  .tl-track, .tl-fill { position: absolute; left: 50%; top: 0; width: var(--stroke-bold); height: 100%; }
+
+  .tl-track { transform: translateX(-50%); background: var(--color-mist); opacity: .3; }
+
+  .tl-fill {
+    background: var(--color-moss);
+    transform-origin: top;
+    transform: translateX(-50%) scaleY(0);
+    transition: transform .1s linear;
+  }
+
+  .tl-comet {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: var(--color-lime);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-lime) 35%, transparent);
+    opacity: 0;
+    transform: translateY(0);
+    transition: transform .1s linear, opacity .3s ease-out;
+  }
+
+  .tl-node-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-6) 0;
+  }
+
+  .tl-node-row.right { direction: rtl; }
+  .tl-node-row.right .tl-content { direction: ltr; }
+
+  .tl-node {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 3px var(--color-mist);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--text-h3);
+    font-size: 20px;
+    color: var(--color-ink-soft);
+    transition: background .4s ease-out, box-shadow .4s ease-out, color .4s ease-out, transform .4s ease-out, border-radius .4s ease-out;
+  }
+
+  .tl-node-row[data-active] .tl-node {
+    background: var(--color-moss);
+    /* Тот же приём подсветки lime, что у кометы на линии маршрута, плюс едва заметный уход от идеального круга */
+    box-shadow: var(--shadow-lift), 0 0 0 6px color-mix(in srgb, var(--color-lime) 30%, transparent);
+    color: #fff;
+    border-radius: 46% 54% 52% 48% / 50% 46% 56% 50%;
+    transform: scale(1.1);
+  }
+
+  .tl-content { opacity: .35; transform: translateY(14px); transition: opacity .5s ease-out, transform .5s ease-out; }
+  .tl-node-row[data-active] .tl-content { opacity: 1; transform: translateY(0); }
+
+  .tl-head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+  .tl-stage { font: var(--text-label); background: var(--color-ink); color: var(--color-lime); padding: 4px 10px; border-radius: var(--radius-xs); }
+  .tl-age { font: var(--text-lead); font-style: italic; font-size: 16px; color: var(--color-moss); }
+
+  .tl-body { display: flex; gap: var(--space-4); align-items: flex-start; background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-5); box-shadow: var(--shadow-sm); }
+
+  .tl-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-moss) 10%, var(--color-paper));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .tl-icon-wrap :global(.tl-icon) { width: 28px; height: 28px; color: var(--color-moss); }
+  .tl-body h3 { font: var(--text-lead); font-size: 18px; }
+  .tl-body p { margin-top: var(--space-2); font: var(--text-meta); color: var(--color-ink-soft); }
+
+  .tl-foot {
+    margin-top: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .tl-skill {
+    display: inline-block;
+    font: var(--text-meta);
+    font-size: 13px;
+    color: var(--color-ink);
+    background: color-mix(in srgb, var(--color-lime) 35%, var(--color-paper));
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+  }
+
+  .tl-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font: var(--text-meta);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-moss);
+    transition: gap .2s ease-out;
+  }
+
+  .tl-link:hover { gap: 8px; }
+
+  .tl-link :global(.tl-link-icon) { width: 12px; height: 12px; }
+
+  .tl-spacer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .5;
+    transition: opacity .5s ease-out, transform .5s ease-out;
+    transform: translateY(14px);
+  }
+
+  .tl-node-row[data-active] .tl-spacer { opacity: 1; transform: translateY(0); }
+
+  .tl-spacer :global(.tl-illustration) { width: 140px; height: 140px; }
+
+  @media (max-width: 780px) {
+    .tl-track, .tl-fill, .tl-comet { left: 22px; }
+    .tl-node-row, .tl-node-row.right { direction: ltr; grid-template-columns: 44px 1fr; }
+    /* DOM-порядок — content, node, spacer, но в 2-колоночной мобильной сетке
+       кружок с номером должен идти первым (узкая колонка), а не текст */
+    .tl-node { order: -1; width: 44px; height: 44px; font-size: 16px; }
+    .tl-content { order: 1; }
+    .tl-spacer { display: none; }
+    .tl-body { flex-direction: row; }
+  }
+</style>
+
+<script>
+  const wrap = document.getElementById('tl-wrap');
+  const fill = document.getElementById('tl-fill');
+  const comet = document.getElementById('tl-comet');
+  const nodes = Array.from(document.querySelectorAll('[data-tl-node]'));
+
+  let ticking = false;
+
+  const update = () => {
+    ticking = false;
+    if (!wrap || !fill || !comet) return;
+
+    const rect = wrap.getBoundingClientRect();
+    const viewMid = window.innerHeight * 0.6;
+    const total = rect.height;
+    const progressPx = Math.min(Math.max(viewMid - rect.top, 0), total);
+    const progress = total > 0 ? progressPx / total : 0;
+
+    fill.style.transform = `translateX(-50%) scaleY(${progress})`;
+    comet.style.transform = `translateY(${progressPx}px)`;
+    comet.style.opacity = progress > 0.01 && progress < 0.995 ? '1' : '0';
+
+    nodes.forEach((node) => {
+      const nodeEl = node.querySelector('.tl-node');
+      if (!nodeEl) return;
+      const nodeRect = nodeEl.getBoundingClientRect();
+      const nodeMid = nodeRect.top + nodeRect.height / 2;
+      node.toggleAttribute('data-active', nodeMid <= viewMid);
+    });
+  };
+
+  const onScroll = () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  update();
+</script>

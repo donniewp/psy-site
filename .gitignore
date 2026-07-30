@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+screens/
+.codex/
+reference/
+
+# Raw Figma export staging — nothing in here is imported by any component; the
+# site actually serves optimized copies from public/img/ (367MB, 938 files)
+src/assets/photos/

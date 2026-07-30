@@ -1,0 +1,65 @@
+---
+import { location, phone, phoneHref } from '../data/content';
+import Icon from './Icon.astro';
+---
+
+<section class="contacts section-tight" id="contacts">
+  <div class="container contacts-inner">
+    <div class="map-wrap" data-reveal>
+      <img src={`${import.meta.env.BASE_URL}img/map.jpg`} alt="Карта — студия на Ленинградском шоссе" />
+    </div>
+
+    <div class="contacts-card" data-reveal>
+      <span class="eyebrow">Наши контакты</span>
+
+      <div class="contact-line">
+        <Icon name="svc-pin" class="icon" />
+        <div>
+          <strong>{location.address}</strong>
+          <span>{location.metro}</span>
+        </div>
+      </div>
+
+      <div class="contact-line">
+        <Icon name="svc-clock" class="icon" />
+        <span>{location.hours}</span>
+      </div>
+
+      <div class="contact-line">
+        <Icon name="svc-phone" class="icon" />
+        <a href={phoneHref} class="phone">{phone}</a>
+      </div>
+
+      <a href="#booking" class="btn btn-dark">Записаться на консультацию</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contacts-inner { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--space-6); align-items: stretch; }
+
+  .map-wrap { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+  .map-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+  .contacts-card {
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-mist);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .contact-line { display: flex; align-items: flex-start; gap: var(--space-3); font: var(--text-meta); color: var(--color-ink-soft); }
+  .contact-line :global(.icon) { color: var(--color-moss); flex-shrink: 0; margin-top: 2px; }
+  .contact-line strong { display: block; color: var(--color-ink); font-weight: 700; }
+  .contact-line .phone { font: var(--text-h3); font-size: 20px; color: var(--color-ink); }
+
+  .contacts-card .btn { margin-top: var(--space-3); align-self: flex-start; }
+
+  @media (max-width: 900px) {
+    .contacts-inner { grid-template-columns: 1fr; }
+    .map-wrap { aspect-ratio: 16 / 10; }
+  }
+</style>

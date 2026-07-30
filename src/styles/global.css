@@ -1,0 +1,287 @@
+@import './tokens.css';
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  margin: 0;
+  font: var(--text-body);
+  color: var(--color-ink-soft);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Фирменный приём: едва заметное зерно на фоне — вместо градиентов и плоской заливки */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+#page { position: relative; z-index: 1; }
+
+img { max-width: 100%; display: block; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  margin: 0;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+p { margin: 0; text-wrap: pretty; }
+
+a { color: inherit; text-decoration: none; }
+
+button {
+  font-family: var(--font-text);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: 12px;
+  z-index: 1000;
+  background: var(--color-ink);
+  color: #fff;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-xs);
+  font: var(--text-meta);
+  font-weight: 700;
+  transition: top .2s ease-out;
+}
+
+.skip-link:focus { top: 12px; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+
+/* Фирменный приём: надзаголовок = тик-марка + капс, без плашки-пилюли */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-moss);
+  margin-bottom: var(--space-3);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 16px;
+  height: var(--stroke-thin);
+  background: var(--color-moss);
+  flex-shrink: 0;
+}
+
+/* На тёмном moss-deep чистый lime даёт 4.33:1 на мелком капсе — ниже AA (4.5:1).
+   Слегка осветляем именно для этого случая, не трогая сам токен --color-lime. */
+.eyebrow-light { color: color-mix(in srgb, var(--color-lime) 85%, white); }
+.eyebrow-light::before { background: var(--color-lime); }
+
+.section {
+  padding: var(--section-y) 0;
+  position: relative;
+}
+
+.section-tight {
+  padding: var(--section-y-tight) 0;
+}
+
+.section + .section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-mist);
+  opacity: .18;
+}
+
+.section-head { max-width: 640px; margin: 0 0 var(--space-7); }
+.section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+
+.section-head h2 {
+  font: var(--text-h2);
+  letter-spacing: var(--tracking-display);
+}
+
+.section-head p {
+  margin-top: var(--space-3);
+  font: var(--text-lead);
+  font-weight: 400;
+  color: var(--color-ink-soft);
+  max-width: 62ch;
+}
+
+.section-head.center p { margin-left: auto; margin-right: auto; }
+
+/* Фирменный приём: маркеры списков — та же тик-марка, что у надзаголовков */
+.tick-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tick-list li {
+  position: relative;
+  padding-left: var(--space-5);
+  font: var(--text-body);
+  color: var(--color-ink-soft);
+}
+
+.tick-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .7em;
+  width: 12px;
+  height: var(--stroke-thin);
+  background: var(--color-moss);
+}
+
+/* Фирменный приём: кнопки — заливка moss, при hover moss-deep + врезное кольцо lime */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-pill);
+  font: var(--text-meta);
+  font-weight: 700;
+  transition: transform .2s ease-out, box-shadow .2s ease-out, background .2s ease-out;
+}
+
+.btn:active { transform: translateY(1px) scale(.98); }
+
+.btn-primary {
+  background: var(--color-moss);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--color-moss-deep);
+  box-shadow: var(--shadow-lift), inset 0 0 0 2px var(--color-lime);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 var(--stroke-thin) var(--color-mist);
+}
+
+.btn-secondary:hover {
+  box-shadow: inset 0 0 0 var(--stroke-thin) var(--color-moss);
+  color: var(--color-moss);
+  transform: translateY(-2px);
+}
+
+.btn-dark {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+.btn-dark:hover {
+  background: var(--color-moss-deep);
+  transform: translateY(-2px);
+}
+
+.icon { width: 24px; height: 24px; flex-shrink: 0; }
+
+/* Фирменный приём: подпись к фотографии — под кадром, не поверх */
+.photo-caption {
+  margin-top: var(--space-2);
+  font: var(--text-meta);
+  color: var(--color-ink-soft);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-mist);
+  border-image: linear-gradient(to right, var(--color-mist) 40px, transparent 40px) 1;
+}
+
+/* Фирменный приём: крупная цифра/статистика — display-цифра + тик под ней + подпись */
+.stat-figure {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.stat-figure .value {
+  font: var(--text-display);
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-variant-numeric: tabular-nums;
+  color: inherit;
+}
+
+.stat-figure .tick {
+  width: 28px;
+  height: var(--stroke-bold);
+  background: currentColor;
+  opacity: .55;
+}
+
+.stat-figure .label {
+  font: var(--text-meta);
+  color: inherit;
+  opacity: .8;
+}
+
+/* Reveal on scroll */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .5s ease-out, transform .5s ease-out;
+}
+
+[data-reveal="shown"] { opacity: 1; transform: translateY(0); }
+
+@keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes floatY2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes softpulse { 0%, 100% { opacity: .3; } 50% { opacity: .5; } }
+@keyframes kenburns { 0% { transform: scale(1); } 100% { transform: scale(1.06); } }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

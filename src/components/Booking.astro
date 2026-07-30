@@ -1,0 +1,204 @@
+---
+import { bookingSteps, bookingOptions, location, phone, phoneHref } from '../data/content';
+import Icon from './Icon.astro';
+---
+
+<section class="booking section" id="booking">
+  <div class="container booking-inner">
+    <div class="booking-copy" data-reveal>
+      <span class="eyebrow">Записаться</span>
+      <h2>Запишитесь на пробное занятие</h2>
+      <p>Оставьте имя и телефон — перезвоним в течение 15 минут, расскажем о программах и подберём группу по возрасту ребёнка.</p>
+
+      <ol class="booking-steps">
+        {bookingSteps.map((s) => (
+          <li>
+            <span class="step-n">{s.n}</span>
+            <div>
+              <strong>{s.title}</strong>
+              <span>{s.text}</span>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div class="booking-location">
+        <Icon name="svc-pin" class="icon" />
+        <span>{location.address} · {location.metro}</span>
+      </div>
+    </div>
+
+    <form class="booking-form" data-reveal id="booking-form">
+      <svg class="booking-blob" viewBox="0 0 300 300" aria-hidden="true" focusable="false">
+        <path d="M245,45 C280,85 285,150 260,205 C235,260 170,290 115,270 C60,250 20,195 30,140 C40,85 95,45 150,35 C190,28 220,15 245,45 Z" />
+      </svg>
+      <h3>Пробное занятие в студии</h3>
+      <p class="form-sub">Знакомство с педагогом, форматом занятий и пространством студии</p>
+
+      <label>
+        <span>Имя ребёнка и возраст</span>
+        <input type="text" name="name" required placeholder="Например, Максим, 5 лет" />
+      </label>
+      <label>
+        <span>Телефон</span>
+        <input type="tel" name="phone" required placeholder="+7 (___) ___-__-__" />
+      </label>
+      <label>
+        <span>Программа</span>
+        <select name="program">
+          <option value="">Выберите программу</option>
+          {bookingOptions.map((opt) => <option value={opt}>{opt}</option>)}
+        </select>
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" required />
+        <span>Я соглашаюсь с условиями обработки персональных данных</span>
+      </label>
+      <button type="submit" class="btn btn-primary form-submit">Записаться на пробное</button>
+      <p class="form-alt">Или позвоните: <a href={phoneHref}>{phone}</a></p>
+      <p class="form-success" id="form-success" hidden>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .booking { background: var(--color-surface); }
+
+  .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: stretch; }
+
+  .booking-copy { display: flex; flex-direction: column; }
+
+  .booking-steps { margin: var(--space-6) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-4); }
+  .booking-steps li { display: flex; gap: var(--space-4); align-items: flex-start; }
+
+  .step-n {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-moss);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--text-meta);
+    font-weight: 700;
+  }
+
+  .booking-steps strong { display: block; font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+  .booking-steps span { font: var(--text-meta); font-size: 13.5px; color: var(--color-ink-soft); }
+
+  .booking-location {
+    margin-top: auto;
+    padding-top: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font: var(--text-meta);
+    color: var(--color-ink-soft);
+  }
+
+  .booking-location :global(.icon) { color: var(--color-moss); flex-shrink: 0; }
+
+  .booking-form {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-paper);
+    /* Асимметричный радиус — один угол собран, а не одинаковый на всех четырёх */
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-xs);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .booking-blob {
+    position: absolute;
+    bottom: -12%;
+    left: -14%;
+    width: min(260px, 45%);
+    height: auto;
+    fill: color-mix(in srgb, var(--color-moss) 6%, transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .booking-form > * { position: relative; z-index: 1; }
+
+  .booking-form h3 { font: var(--text-h3); font-size: 21px; }
+  .form-sub { font: var(--text-meta); color: var(--color-ink-soft); margin-top: -4px; }
+
+  .booking-form label { display: flex; flex-direction: column; gap: 6px; font: var(--text-meta); font-weight: 600; color: var(--color-ink); }
+
+  .booking-form input[type="text"], .booking-form input[type="tel"], .booking-form select {
+    width: 100%;
+    min-width: 0;
+    font: var(--text-body);
+    font-size: 15.5px;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 0 0 1px var(--color-mist);
+    background: var(--color-surface);
+    color: var(--color-ink-soft);
+  }
+
+  .booking-form input:focus, .booking-form select:focus {
+    outline: 2px solid var(--color-moss);
+    outline-offset: 1px;
+  }
+
+  .checkbox { flex-direction: row; align-items: center; font-weight: 400; font-size: 14px; color: var(--color-ink-soft); }
+  .checkbox input { width: 16px; height: 16px; }
+
+  .form-submit { margin-top: var(--space-2); }
+  .form-alt { text-align: center; font: var(--text-meta); color: var(--color-ink-soft); }
+  .form-alt a { font-weight: 700; color: var(--color-moss); }
+
+  .form-success {
+    text-align: center;
+    color: var(--color-moss);
+    font-weight: 600;
+    font: var(--text-meta);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .22s ease-out, transform .22s ease-out;
+  }
+
+  .form-success.is-shown { opacity: 1; transform: translateY(0); }
+
+  .booking-form.is-submitting :is(input, select, .form-submit) {
+    opacity: .5;
+    transition: opacity .2s ease-out;
+  }
+
+  @media (max-width: 900px) {
+    .booking-inner { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .booking-blob { display: none; }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('booking-form');
+  const success = document.getElementById('form-success');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    form.classList.add('is-submitting');
+    form.querySelectorAll('input, select, button').forEach((el) => el.setAttribute('disabled', 'true'));
+    success?.removeAttribute('hidden');
+    requestAnimationFrame(() => success?.classList.add('is-shown'));
+  });
+
+  // Ссылки "Записаться" из блока "Путь развития" (и похожие) приходят с ?program=... —
+  // тот же приём, что ?age= у Programs.astro, только выбирает пункт select вместо таба.
+  const programParam = new URLSearchParams(location.search).get('program');
+  if (programParam) {
+    const select = form?.querySelector<HTMLSelectElement>('select[name="program"]');
+    const match = select && Array.from(select.options).find((o) => o.value === programParam);
+    if (select && match) select.value = programParam;
+  }
+</script>
