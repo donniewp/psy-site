@@ -16,7 +16,7 @@ import { reviews } from '../data/content';
           <div class="stars">★★★★★</div>
           <p class="review-text">«{r.text}»</p>
           <div class="review-author">
-            <img src={r.avatar} alt={r.name} />
+            <img src={`${import.meta.env.BASE_URL}${r.avatar.replace(/^\//, '')}`} alt={r.name} />
             <div>
               <span class="review-name">{r.name}</span>
               <span class="review-tag">{r.tag}</span>

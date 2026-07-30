@@ -42,7 +42,7 @@ import Icon from './Icon.astro';
           data-groups={p.groups.join(',')}
         >
           {p.img ? (
-            <img src={p.img} alt={p.title} loading="lazy" />
+            <img src={`${import.meta.env.BASE_URL}${p.img.replace(/^\//, '')}`} alt={p.title} loading="lazy" />
           ) : (
             <div class="program-photo-pending">
               <Icon name="svc-clock" class="pending-icon" />
