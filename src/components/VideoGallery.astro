@@ -11,8 +11,22 @@ import { videos } from '../data/content';
 
     <div class="video-grid" data-reveal>
       {videos.map((v) => (
-        <div class="video-thumb">
-          <img src={`${import.meta.env.BASE_URL}${v.replace(/^\//, '')}`} alt="Кадр с занятия в студии" loading="lazy" />
+        <div class="video-cell">
+          <video
+            class="video-el"
+            poster={`${import.meta.env.BASE_URL}${v.poster.replace(/^\//, '')}`}
+            data-src={`${import.meta.env.BASE_URL}${v.src.replace(/^\//, '')}`}
+            width="1080"
+            height="1920"
+            playsinline
+            preload="none"
+            aria-label={v.alt}
+          ></video>
+          <button type="button" class="video-play-btn" aria-label={`Смотреть видео: ${v.alt}`}>
+            <span class="video-play-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+            </span>
+          </button>
         </div>
       ))}
     </div>
@@ -20,14 +34,106 @@ import { videos } from '../data/content';
 </section>
 
 <style>
-  .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+  /* Высота, а не ширина, — ведущий размер: карточка вписывается в экран по высоте,
+     ширина у 9:16-видео сама следует из аспекта, без обрезки и без растягивания. */
+  .video-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: var(--space-4); }
 
-  .video-thumb { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+  .video-cell {
+    position: relative;
+    height: min(60vh, 560px);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    isolation: isolate;
+    background: color-mix(in srgb, var(--color-mist) 12%, var(--color-paper));
+    transition: box-shadow .3s ease-out;
+  }
 
-  .video-thumb img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; transition: transform .3s ease-out; }
-  .video-thumb:hover img { transform: scale(1.05); }
+  .video-cell:has(.video-play-btn:hover),
+  .video-cell:has(.video-play-btn:focus-visible) { box-shadow: var(--shadow-md); }
 
-  @media (max-width: 900px) {
-    .video-grid { grid-template-columns: repeat(2, 1fr); }
+  .video-el { height: 100%; width: auto; aspect-ratio: 9 / 16; object-fit: cover; display: block; background: var(--color-ink); }
+
+  .video-play-btn {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .video-play-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--color-ink) 55%, transparent));
+    transition: opacity .2s ease-out;
+  }
+
+  .video-play-icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+    transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+  }
+
+  .video-play-icon svg { width: 22px; height: 22px; color: var(--color-ink); transform: translateX(1px); }
+
+  .video-play-btn:hover .video-play-icon,
+  .video-play-btn:focus-visible .video-play-icon { transform: scale(1.1); }
+
+  .video-play-btn:focus-visible { outline: 2px solid var(--color-moss); outline-offset: -3px; border-radius: var(--radius-md); }
+
+  .video-cell.is-playing .video-play-btn { opacity: 0; pointer-events: none; }
+
+  @media (max-width: 640px) {
+    .video-cell { height: min(64vh, 480px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .video-play-icon, .video-play-btn::before { transition-duration: .01ms; }
+    .video-play-btn:hover .video-play-icon, .video-play-btn:focus-visible .video-play-icon { transform: none; }
   }
 </style>
+
+<script>
+  const cells = Array.from(document.querySelectorAll<HTMLElement>('.video-cell'));
+
+  cells.forEach((cell) => {
+    const video = cell.querySelector('video') as HTMLVideoElement | null;
+    const playBtn = cell.querySelector('.video-play-btn') as HTMLButtonElement | null;
+    if (!video || !playBtn) return;
+
+    const start = () => {
+      if (!video.src) {
+        const src = video.dataset.src;
+        if (src) video.src = src;
+      }
+      video.controls = true;
+      cell.classList.add('is-playing');
+      video.play().catch(() => {});
+      // Останавливаем остальные видео — на странице одновременно играет только одно
+      cells.forEach((other) => {
+        if (other === cell) return;
+        const otherVideo = other.querySelector('video') as HTMLVideoElement | null;
+        otherVideo?.pause();
+      });
+    };
+
+    playBtn.addEventListener('click', start);
+
+    video.addEventListener('ended', () => {
+      video.controls = false;
+      video.removeAttribute('src');
+      video.load();
+      cell.classList.remove('is-playing');
+    });
+  });
+</script>

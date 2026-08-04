@@ -3,15 +3,16 @@ import { razvivaykaBlocks, razvivaykaBenefits } from '../data/content';
 import Icon from './Icon.astro';
 import FigmaAsset from './FigmaAsset.astro';
 
-// Палитра-механика только для этой секции — сознательный яркий акцент по референсу
-// брошюры, не расширяется на остальной сайт. Контраст текст/фон проверен на AA.
+// Хью — только микро-акценты (точка станции, кольцо, подпись), не заливка крупных
+// поверхностей. Контраст accentDark на --color-surface/--color-paper проверен на AA.
 const blocks = razvivaykaBlocks.map((b, i) => ({
   ...b,
   slug: ['read', 'neuro', 'sand', 'draw', 'logic'][i],
-  bg: ['#DFF3D8', '#EDE3FA', '#FBE4CC', '#DCEEFB', '#D9F4EF'][i],
   accent: ['#1F7A34', '#6B3FB8', '#9C4F0E', '#1868A8', '#0B6C5D'][i],
   accentDark: ['#155C27', '#4E2C8C', '#7A3D0A', '#124E80', '#08544A'][i],
   hue: [108, 265, 30, 205, 168][i],
+  from: i * 30,
+  to: i * 30 + 30,
 }));
 ---
 
@@ -39,7 +40,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
           <span class="eyebrow">Флагманская программа · 4–6 лет</span>
           <span class="morning-badge"><Icon name="svc-clock" class="morning-icon" />Утренние занятия</span>
         </div>
-        <h2 class="razvivayka-h2">«Развивай-ка» — 5 развивающих блоков по 30 минут</h2>
+        <h2 class="razvivayka-h2">«Развивай-ка» — одно утро, 5 станций развития</h2>
         <p>
           Для ребят, чей маршрут — от дома к школе, но которым важно развиваться,
           получать знания, общаться со сверстниками и формировать важные умения
@@ -57,102 +58,113 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       />
     </div>
 
-    <div class="razvivayka-stats" data-raz-reveal="1">
-      <div class="price-callout">
-        <span class="price-value">1 900 ₽</span>
-        <span class="price-note">за одно занятие · 2,5 часа</span>
-      </div>
-      <div class="raz-timebar" id="raz-timebar" role="img" aria-label="150 минут занятия: 5 блоков по 30 минут">
+    <div class="raz-route" data-raz-reveal="1" id="raz-route">
+      <div class="raz-route-stops" role="tablist" aria-label={`Маршрут занятия «Развивай-ка»: 5 станций, 150 минут`}>
+        <span class="raz-route-line" aria-hidden="true"><span class="raz-route-line-fill" id="raz-route-line-fill"></span></span>
+
         {blocks.map((b, i) => (
-          <div class="raz-timebar-seg" data-index={i} style={`--seg-color: ${b.bg}; --seg-ring: ${b.accentDark};`}>
-            <span class="raz-timebar-fill"></span>
+          <div class="raz-stop-wrap">
+            <button
+              type="button"
+              class="raz-stop"
+              role="tab"
+              id={`raz-tab-${i}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              aria-controls={`raz-panel-${i} raz-panel-m-${i}`}
+              tabindex={i === 0 ? '0' : '-1'}
+              data-index={i}
+              style={`--stop-accent: ${b.accent}; --stop-accent-dark: ${b.accentDark};`}
+            >
+              <span class="raz-stop-dot" aria-hidden="true">
+                <span class="raz-stop-dot-icon">
+                {b.slug === 'read' && (
+                  <svg viewBox="0 0 200 200" class="raz-svg"><g><path d="M100 60 C70 50 45 55 30 65 L30 150 C45 140 70 138 100 148 Z" /><path d="M100 60 C130 50 155 55 170 65 L170 150 C155 140 130 138 100 148 Z" /><line x1="100" y1="60" x2="100" y2="148" /></g></svg>
+                )}
+                {b.slug === 'neuro' && (
+                  <svg viewBox="0 0 200 200" class="raz-svg"><path d="M100 100 L45 55" /><path d="M100 100 L155 50" /><path d="M100 100 L40 130" /><path d="M100 100 L160 135" /><path d="M100 100 L100 165" /><circle cx="100" cy="100" r="18" /></svg>
+                )}
+                {b.slug === 'sand' && (
+                  <svg viewBox="0 0 200 200" class="raz-svg"><circle cx="150" cy="55" r="30" /><path d="M0 140 Q50 110 100 135 T200 130 V200 H0 Z" /><path d="M0 165 Q60 140 110 160 T200 155 V200 H0 Z" /></svg>
+                )}
+                {b.slug === 'draw' && (
+                  <svg viewBox="0 0 200 200" class="raz-svg"><path fill="none" d="M40 150 C40 100 60 60 100 60 C140 60 140 100 100 100 C75 100 75 130 100 130 C125 130 130 90 160 80 C175 75 185 85 180 100" /><circle cx="180" cy="100" r="5" /></svg>
+                )}
+                {b.slug === 'logic' && (
+                  <svg viewBox="0 0 200 200" class="raz-svg"><path d="M40 60 H95 V80 A12 12 0 0 1 95 104 V120 H40 V104 A12 12 0 0 0 40 80 Z" /><path d="M105 60 H160 V120 H105 V104 A12 12 0 0 0 105 80 Z" /></svg>
+                )}
+                </span>
+              </span>
+              <span class="raz-stop-meta">
+                <span class="raz-stop-title">{b.title}</span>
+                <span class="raz-stop-range">{b.from}–{b.to} мин</span>
+              </span>
+            </button>
+
+            <div class="raz-panel-mobile" id={`raz-panel-m-${i}`} role="tabpanel" aria-labelledby={`raz-tab-${i}`} data-active={i === 0 ? 'true' : 'false'} aria-hidden={i === 0 ? 'false' : 'true'} data-slug={b.slug} style={`--stop-accent: ${b.accent}; --stop-accent-dark: ${b.accentDark};`}>
+              <div class="raz-panel-inner">
+                <span class="raz-panel-visual" aria-hidden="true">
+                  <span class="raz-panel-visual-scale">
+                  {b.slug === 'read' && (
+                    <svg viewBox="0 0 200 200" class="raz-svg raz-svg-read"><g class="read-book"><path class="read-page read-page-l" d="M100 60 C70 50 45 55 30 65 L30 150 C45 140 70 138 100 148 Z" /><path class="read-page read-page-r" d="M100 60 C130 50 155 55 170 65 L170 150 C155 140 130 138 100 148 Z" /><line class="read-spine" x1="100" y1="60" x2="100" y2="148" /></g><text class="read-letter read-letter-1" x="60" y="57">А</text><text class="read-letter read-letter-2" x="95" y="42">Б</text><text class="read-letter read-letter-3" x="130" y="54">В</text></svg>
+                  )}
+                  {b.slug === 'neuro' && (
+                    <svg viewBox="0 0 200 200" class="raz-svg raz-svg-neuro"><g class="neuro-dendrites"><path class="neuro-line" d="M100 100 L45 55" /><path class="neuro-line" d="M100 100 L155 50" /><path class="neuro-line" d="M100 100 L40 130" /><path class="neuro-line" d="M100 100 L160 135" /><path class="neuro-line" d="M100 100 L100 165" /></g><circle class="neuro-node" cx="45" cy="55" r="6" /><circle class="neuro-node" cx="155" cy="50" r="6" /><circle class="neuro-node" cx="40" cy="130" r="6" /><circle class="neuro-node" cx="160" cy="135" r="6" /><circle class="neuro-node" cx="100" cy="165" r="6" /><circle class="neuro-soma" cx="100" cy="100" r="18" /></svg>
+                  )}
+                  {b.slug === 'sand' && (
+                    <svg viewBox="0 0 200 200" class="raz-svg raz-svg-sand"><circle class="sand-sun" cx="150" cy="55" r="30" /><path class="sand-dune sand-dune-back" d="M0 140 Q50 110 100 135 T200 130 V200 H0 Z" /><path class="sand-dune sand-dune-front" d="M0 165 Q60 140 110 160 T200 155 V200 H0 Z" /><circle class="sand-grain" cx="55" cy="175" r="3" /><circle class="sand-grain" cx="80" cy="182" r="2.4" /><circle class="sand-grain" cx="120" cy="178" r="3.2" /><circle class="sand-grain" cx="145" cy="185" r="2.2" /></svg>
+                  )}
+                  {b.slug === 'draw' && (
+                    <svg viewBox="0 0 200 200" class="raz-svg raz-svg-draw"><path class="draw-line" pathLength="100" d="M40 150 C40 100 60 60 100 60 C140 60 140 100 100 100 C75 100 75 130 100 130 C125 130 130 90 160 80 C175 75 185 85 180 100" /><circle class="draw-tip" cx="180" cy="100" r="5" /></svg>
+                  )}
+                  {b.slug === 'logic' && (
+                    <svg viewBox="0 0 200 200" class="raz-svg raz-svg-logic"><path class="logic-piece logic-piece-a" d="M40 60 H95 V80 A12 12 0 0 1 95 104 V120 H40 V104 A12 12 0 0 0 40 80 Z" /><path class="logic-piece logic-piece-b" d="M105 60 H160 V120 H105 V104 A12 12 0 0 0 105 80 Z" /><g class="logic-rays"><line x1="100" y1="30" x2="100" y2="42" /><line x1="70" y1="40" x2="78" y2="48" /><line x1="130" y1="40" x2="122" y2="48" /></g></svg>
+                  )}
+                  </span>
+                </span>
+                <div class="raz-panel-text">
+                  <span class="raz-panel-badge">{b.title}</span>
+                  <p>{b.text}</p>
+                  <span class="raz-panel-duration"><Icon name="svc-clock" class="duration-icon" />{b.from}–{b.to} мин</span>
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
-      <span class="raz-timebar-total">150 минут</span>
-    </div>
 
-    <div class="blocks-list" id="raz-blocks">
-      {blocks.map((b, i) => (
-        <button
-          type="button"
-          class="block-row"
-          data-index={i}
-          data-raz-reveal={i + 2}
-          style={`--block-bg: ${b.bg}; --block-accent: ${b.accent}; --block-accent-dark: ${b.accentDark};`}
-          aria-expanded="false"
-        >
-          <span class="block-badge">{b.title}</span>
-
-          <span class="block-visual" aria-hidden="true">
-            <span class="block-visual-scale">
-            {b.slug === 'read' && (
-              <svg viewBox="0 0 200 200" class="raz-svg raz-svg-read">
-                <g class="read-book">
-                  <path class="read-page read-page-l" d="M100 60 C70 50 45 55 30 65 L30 150 C45 140 70 138 100 148 Z" />
-                  <path class="read-page read-page-r" d="M100 60 C130 50 155 55 170 65 L170 150 C155 140 130 138 100 148 Z" />
-                  <line class="read-spine" x1="100" y1="60" x2="100" y2="148" />
-                </g>
-                <text class="read-letter read-letter-1" x="60" y="57" font-family="var(--font-display)">А</text>
-                <text class="read-letter read-letter-2" x="95" y="42" font-family="var(--font-display)">Б</text>
-                <text class="read-letter read-letter-3" x="130" y="54" font-family="var(--font-display)">В</text>
-              </svg>
-            )}
-            {b.slug === 'neuro' && (
-              <svg viewBox="0 0 200 200" class="raz-svg raz-svg-neuro">
-                <g class="neuro-dendrites">
-                  <path class="neuro-line" d="M100 100 L45 55" />
-                  <path class="neuro-line" d="M100 100 L155 50" />
-                  <path class="neuro-line" d="M100 100 L40 130" />
-                  <path class="neuro-line" d="M100 100 L160 135" />
-                  <path class="neuro-line" d="M100 100 L100 165" />
-                </g>
-                <circle class="neuro-node" cx="45" cy="55" r="6" />
-                <circle class="neuro-node" cx="155" cy="50" r="6" />
-                <circle class="neuro-node" cx="40" cy="130" r="6" />
-                <circle class="neuro-node" cx="160" cy="135" r="6" />
-                <circle class="neuro-node" cx="100" cy="165" r="6" />
-                <circle class="neuro-soma" cx="100" cy="100" r="18" />
-              </svg>
-            )}
-            {b.slug === 'sand' && (
-              <svg viewBox="0 0 200 200" class="raz-svg raz-svg-sand">
-                <circle class="sand-sun" cx="150" cy="55" r="30" />
-                <path class="sand-dune sand-dune-back" d="M0 140 Q50 110 100 135 T200 130 V200 H0 Z" />
-                <path class="sand-dune sand-dune-front" d="M0 165 Q60 140 110 160 T200 155 V200 H0 Z" />
-                <circle class="sand-grain" cx="55" cy="175" r="3" />
-                <circle class="sand-grain" cx="80" cy="182" r="2.4" />
-                <circle class="sand-grain" cx="120" cy="178" r="3.2" />
-                <circle class="sand-grain" cx="145" cy="185" r="2.2" />
-              </svg>
-            )}
-            {b.slug === 'draw' && (
-              <svg viewBox="0 0 200 200" class="raz-svg raz-svg-draw">
-                <path class="draw-line" pathLength="100" d="M40 150 C40 100 60 60 100 60 C140 60 140 100 100 100 C75 100 75 130 100 130 C125 130 130 90 160 80 C175 75 185 85 180 100" />
-                <circle class="draw-tip" cx="180" cy="100" r="5" />
-              </svg>
-            )}
-            {b.slug === 'logic' && (
-              <svg viewBox="0 0 200 200" class="raz-svg raz-svg-logic">
-                <path class="logic-piece logic-piece-a" d="M40 60 H95 V80 A12 12 0 0 1 95 104 V120 H40 V104 A12 12 0 0 0 40 80 Z" />
-                <path class="logic-piece logic-piece-b" d="M105 60 H160 V120 H105 V104 A12 12 0 0 0 105 80 Z" />
-                <g class="logic-rays">
-                  <line x1="100" y1="30" x2="100" y2="42" />
-                  <line x1="70" y1="40" x2="78" y2="48" />
-                  <line x1="130" y1="40" x2="122" y2="48" />
-                </g>
-              </svg>
-            )}
+      <div class="raz-stage" id="raz-stage">
+        {blocks.map((b, i) => (
+          <div class="raz-panel" id={`raz-panel-${i}`} role="tabpanel" aria-labelledby={`raz-tab-${i}`} data-active={i === 0 ? 'true' : 'false'} aria-hidden={i === 0 ? 'false' : 'true'} data-slug={b.slug} style={`--stop-accent: ${b.accent}; --stop-accent-dark: ${b.accentDark};`}>
+            <span class="raz-panel-visual" aria-hidden="true">
+              <span class="raz-panel-visual-scale">
+              {b.slug === 'read' && (
+                <svg viewBox="0 0 200 200" class="raz-svg raz-svg-read"><g class="read-book"><path class="read-page read-page-l" d="M100 60 C70 50 45 55 30 65 L30 150 C45 140 70 138 100 148 Z" /><path class="read-page read-page-r" d="M100 60 C130 50 155 55 170 65 L170 150 C155 140 130 138 100 148 Z" /><line class="read-spine" x1="100" y1="60" x2="100" y2="148" /></g><text class="read-letter read-letter-1" x="60" y="57">А</text><text class="read-letter read-letter-2" x="95" y="42">Б</text><text class="read-letter read-letter-3" x="130" y="54">В</text></svg>
+              )}
+              {b.slug === 'neuro' && (
+                <svg viewBox="0 0 200 200" class="raz-svg raz-svg-neuro"><g class="neuro-dendrites"><path class="neuro-line" d="M100 100 L45 55" /><path class="neuro-line" d="M100 100 L155 50" /><path class="neuro-line" d="M100 100 L40 130" /><path class="neuro-line" d="M100 100 L160 135" /><path class="neuro-line" d="M100 100 L100 165" /></g><circle class="neuro-node" cx="45" cy="55" r="6" /><circle class="neuro-node" cx="155" cy="50" r="6" /><circle class="neuro-node" cx="40" cy="130" r="6" /><circle class="neuro-node" cx="160" cy="135" r="6" /><circle class="neuro-node" cx="100" cy="165" r="6" /><circle class="neuro-soma" cx="100" cy="100" r="18" /></svg>
+              )}
+              {b.slug === 'sand' && (
+                <svg viewBox="0 0 200 200" class="raz-svg raz-svg-sand"><circle class="sand-sun" cx="150" cy="55" r="30" /><path class="sand-dune sand-dune-back" d="M0 140 Q50 110 100 135 T200 130 V200 H0 Z" /><path class="sand-dune sand-dune-front" d="M0 165 Q60 140 110 160 T200 155 V200 H0 Z" /><circle class="sand-grain" cx="55" cy="175" r="3" /><circle class="sand-grain" cx="80" cy="182" r="2.4" /><circle class="sand-grain" cx="120" cy="178" r="3.2" /><circle class="sand-grain" cx="145" cy="185" r="2.2" /></svg>
+              )}
+              {b.slug === 'draw' && (
+                <svg viewBox="0 0 200 200" class="raz-svg raz-svg-draw"><path class="draw-line" pathLength="100" d="M40 150 C40 100 60 60 100 60 C140 60 140 100 100 100 C75 100 75 130 100 130 C125 130 130 90 160 80 C175 75 185 85 180 100" /><circle class="draw-tip" cx="180" cy="100" r="5" /></svg>
+              )}
+              {b.slug === 'logic' && (
+                <svg viewBox="0 0 200 200" class="raz-svg raz-svg-logic"><path class="logic-piece logic-piece-a" d="M40 60 H95 V80 A12 12 0 0 1 95 104 V120 H40 V104 A12 12 0 0 0 40 80 Z" /><path class="logic-piece logic-piece-b" d="M105 60 H160 V120 H105 V104 A12 12 0 0 0 105 80 Z" /><g class="logic-rays"><line x1="100" y1="30" x2="100" y2="42" /><line x1="70" y1="40" x2="78" y2="48" /><line x1="130" y1="40" x2="122" y2="48" /></g></svg>
+              )}
+              </span>
             </span>
-          </span>
-
-          <span class="block-text-wrap"><p class="block-text">{b.text}</p></span>
-          <span class="block-duration"><Icon name="svc-clock" class="duration-icon" />30 мин</span>
-        </button>
-      ))}
+            <div class="raz-panel-text">
+              <span class="raz-panel-badge">{b.title}</span>
+              <p>{b.text}</p>
+              <span class="raz-panel-duration"><Icon name="svc-clock" class="duration-icon" />{b.from}–{b.to} мин</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
 
-    <div class="razvivayka-footer" data-raz-reveal="7">
+    <div class="razvivayka-footer" data-raz-reveal="2">
       <div class="benefits">
         <h3>Программа помогает ребёнку</h3>
         <ul class="tick-list">
@@ -161,9 +173,9 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       </div>
 
       <div class="duration-card">
-        <span class="eyebrow">Длительность занятия</span>
-        <div class="duration-value">2 часа 30 минут</div>
-        <p>5 блоков по 30 минут · утром · мини-группа до 8–10 детей</p>
+        <span class="eyebrow">Стоимость</span>
+        <div class="duration-value">1 900 ₽</div>
+        <p>За одно занятие · мини-группа до 8–10 детей · утром</p>
         <a href="#booking" class="btn btn-primary">Узнать расписание и стоимость</a>
       </div>
     </div>
@@ -185,8 +197,8 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     position: absolute;
     border-radius: 50%;
     filter: blur(60px);
-    opacity: .35;
-    background: hsl(var(--active-hue) 65% 75%);
+    opacity: .3;
+    background: hsl(var(--active-hue) 60% 78%);
     transition: background .4s ease-out;
     will-change: transform;
   }
@@ -196,22 +208,14 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
 
   .raz-doodle { position: absolute; opacity: .4; width: 46px; height: 46px; color: var(--color-mist); will-change: transform; }
   .raz-doodle :global(svg) { width: 100%; height: 100%; }
-  /* top в px, не в % — сажаем облако в верхний паддинг секции (--section-y, от 72px и выше),
-     который всегда пуст независимо от ширины вьюпорта и переноса строк в заголовке. Процент
-     от высоты секции наезжал на h2, как только текст переносился на другое число строк. */
   .raz-doodle-cloud { top: 8px; left: 6%; width: 64px; height: 64px; }
   .raz-doodle-arrow { top: 22%; right: 14%; }
-  /* bottom в px, той же логикой, что и у облака выше: нижний паддинг секции (--section-y)
-     пуст на любой ширине вьюпорта. Было bottom:30% — плыло по строкам блоков и списку
-     пользы в подвале при любом изменении высоты секции (перенос текста, ширина иллюстрации). */
   .raz-doodle-clip { bottom: 8px; left: 16%; }
   .raz-doodle-q { bottom: 16%; right: 10%; }
 
   .razvivayka-sticker { position: absolute; pointer-events: none; opacity: .5; z-index: 1; }
   .razvivayka-sticker svg { width: 100%; height: 100%; }
   .razvivayka-star { top: 8%; right: 6%; width: 34px; height: 34px; color: #F4C542; animation: razSpin 9s linear infinite; }
-  /* bottom в px по той же причине, что у doodle-облака/скрепки: bottom:12% от полной высоты
-     секции на узких десктопах (1025–1280px, где иллюстрация уже) заезжало на список пользы. */
   .razvivayka-heart { bottom: 24px; left: 4%; width: 28px; height: 28px; color: #F0819A; animation: razFloat 5s ease-in-out infinite; }
 
   @keyframes razSpin { to { transform: rotate(360deg); } }
@@ -245,16 +249,8 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
 
   .morning-badge :global(.morning-icon) { width: 12px; height: 12px; }
 
-  .razvivayka-h2 {
-    background: linear-gradient(90deg, var(--color-ink) 55%, #6B3FB8);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+  .razvivayka-h2 { color: var(--color-ink); }
 
-  /* Глобальный .section-head в global.css задаёт max-width:640px для одноколоночных
-     заголовков — здесь макет двухколоночный (текст + иллюстрация), поэтому
-     ограничение снимаем, иначе текстовая колонка сжимается до ~350px. */
   .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); max-width: none; }
   .section-head-text { flex: 1; min-width: 0; }
 
@@ -265,169 +261,206 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     display: block;
   }
 
-  /* ===== Цена + таймлайн ===== */
-  .razvivayka-stats {
-    margin-top: var(--space-6);
+  /* ===== Маршрут: линия + станции + сцена — один объект ===== */
+  .raz-route { margin-top: var(--space-7); }
+
+  .raz-route-stops {
+    position: relative;
     display: flex;
-    align-items: center;
-    gap: var(--space-5);
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2);
   }
 
-  .price-callout {
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    background: var(--color-ink);
-    color: #fff;
-    border-radius: var(--radius-md);
-    padding: var(--space-3) var(--space-5);
-  }
-
-  .price-value { font: var(--text-h3); font-size: 24px; color: var(--color-lime); }
-  .price-note { font: var(--text-meta); font-size: 12px; color: rgba(255, 255, 255, .8); margin-top: 2px; }
-
-  .raz-timebar {
-    flex: 1;
-    min-width: 220px;
-    display: flex;
-    gap: 4px;
-    height: 14px;
-    border-radius: var(--radius-pill);
-    overflow: hidden;
-    background: color-mix(in srgb, var(--color-mist) 20%, var(--color-paper));
-  }
-
-  .raz-timebar-seg { flex: 1; position: relative; background: color-mix(in srgb, var(--seg-color) 55%, white); overflow: hidden; }
-
-  .raz-timebar-fill {
+  .raz-route-line {
     position: absolute;
-    inset: 0;
-    background: var(--seg-color);
+    left: 22px;
+    right: 22px;
+    top: 22px;
+    height: var(--stroke-bold);
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--color-mist) 30%, var(--color-paper));
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .raz-route-line-fill {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--color-moss);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform .5s cubic-bezier(.22, 1, .36, 1);
+    transition: transform .8s cubic-bezier(.22, 1, .36, 1);
   }
 
-  .raz-timebar.is-filled .raz-timebar-fill { transform: scaleX(1); }
-  .raz-timebar-seg[data-index="0"] .raz-timebar-fill { transition-delay: .05s; }
-  .raz-timebar-seg[data-index="1"] .raz-timebar-fill { transition-delay: .15s; }
-  .raz-timebar-seg[data-index="2"] .raz-timebar-fill { transition-delay: .25s; }
-  .raz-timebar-seg[data-index="3"] .raz-timebar-fill { transition-delay: .35s; }
-  .raz-timebar-seg[data-index="4"] .raz-timebar-fill { transition-delay: .45s; }
+  .raz-route.is-filled .raz-route-line-fill { transform: scaleX(1); }
 
-  .raz-timebar-total { font: var(--text-label); color: var(--color-ink-soft); flex-shrink: 0; }
+  .raz-stop-wrap { position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; min-width: 0; }
 
-  /* Сегмент обводится тем же тёмным оттенком, что и наведённый блок — связывает таймлайн со строками.
-     Заливка сегмента (--seg-color) взята из фона строки, а не из насыщенного акцента, чтобы глаз
-     считывал связь сегмента с блоком ниже. */
-  .raz-timebar-seg[data-active="true"] {
-    box-shadow: inset 0 0 0 2px var(--seg-ring);
-    z-index: 1;
-    transition: box-shadow .3s ease-out;
-  }
-
-  /* ===== Блоки ===== */
-  .blocks-list { margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); }
-
-  .block-row {
-    position: relative;
-    display: grid;
-    grid-template-columns: auto 72px 1fr auto;
+  .raz-stop {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--space-5);
-    width: 100%;
-    background: var(--block-bg);
-    border-radius: var(--radius-pill);
-    padding: var(--space-4) var(--space-6);
-    text-align: left;
+    gap: var(--space-3);
+    text-align: center;
     font-family: inherit;
-    isolation: isolate;
-    transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s ease-out;
+    padding: 0;
   }
 
-  .block-row:hover,
-  .block-row:focus-visible,
-  .block-row[data-active="true"] {
-    transform: translateY(-3px) scale(1.012);
-    box-shadow: 0 16px 34px color-mix(in srgb, var(--block-accent) 28%, transparent);
-    z-index: 3;
+  .raz-stop-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--stop-accent) 14%, var(--color-surface));
+    box-shadow: inset 0 0 0 var(--stroke-thin) color-mix(in srgb, var(--stop-accent) 40%, transparent);
+    transition: background-color .25s ease-out, box-shadow .25s ease-out, transform .3s cubic-bezier(.34, 1.56, .64, 1);
   }
 
-  .block-row:focus-visible { outline: 2px solid var(--block-accent-dark); outline-offset: 3px; }
+  .raz-stop-dot-icon { width: 22px; height: 22px; color: var(--stop-accent-dark); }
+  .raz-stop-dot-icon :global(svg) { width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-width: 8; stroke-linecap: round; }
+  .raz-stop-dot-icon :global(svg circle:not([r="18"])) { fill: currentColor; stroke: none; }
+  .raz-stop-dot-icon :global(svg circle[r="18"]) { fill: color-mix(in srgb, currentColor 25%, transparent); }
 
-  /* --- Пилюля названия: заливка цветом при активации --- */
-  .block-badge {
+  .raz-stop[aria-selected="true"] .raz-stop-dot {
+    background: var(--stop-accent);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--stop-accent) 45%, transparent);
+    transform: scale(1.08);
+  }
+
+  .raz-stop[aria-selected="true"] .raz-stop-dot-icon { color: #fff; }
+
+  .raz-stop:hover .raz-stop-dot,
+  .raz-stop:focus-visible .raz-stop-dot { transform: scale(1.08); }
+
+  .raz-stop:focus-visible { outline: 2px solid var(--stop-accent-dark); outline-offset: 4px; border-radius: var(--radius-xs); }
+
+  .raz-stop-meta { display: flex; flex-direction: column; gap: 2px; }
+  .raz-stop-title { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+  .raz-stop-range { font: var(--text-label); font-size: 11.5px; letter-spacing: var(--tracking-label); color: var(--color-ink-soft); }
+
+  /* ===== Мобильная inline-панель (по умолчанию видна, скрыта на десктопе) ===== */
+  .raz-panel-mobile {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows .4s cubic-bezier(.22, 1, .36, 1), opacity .3s ease-out;
+  }
+
+  .raz-panel-mobile[data-active="true"] { grid-template-rows: 1fr; opacity: 1; }
+
+  .raz-panel-inner { overflow: hidden; min-height: 0; }
+
+  .raz-panel-mobile .raz-panel-inner {
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+    padding: var(--space-4) 0 var(--space-2);
+  }
+
+  .raz-panel-mobile .raz-panel-visual { width: 88px; height: 88px; flex-shrink: 0; }
+
+  /* ===== Сцена: десктопная единая "стадия", все панели наложены друг на друга ===== */
+  .raz-stage {
+    display: none;
+    position: relative;
+    margin-top: var(--space-6);
+    min-height: clamp(260px, 26vw, 320px);
+  }
+
+  .raz-panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-7);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-7);
+    opacity: 0;
+    transform: scale(.97);
+    filter: blur(4px);
+    pointer-events: none;
+    transition: opacity .4s cubic-bezier(.22, 1, .36, 1), transform .4s cubic-bezier(.22, 1, .36, 1), filter .3s ease-out;
+  }
+
+  .raz-panel[data-active="true"] {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+    pointer-events: auto;
+    box-shadow: var(--shadow-md);
+  }
+
+  .raz-panel-visual {
+    position: relative;
+    flex-shrink: 0;
+    width: clamp(160px, 16vw, 200px);
+    height: clamp(160px, 16vw, 200px);
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--stop-accent) 8%, var(--color-paper));
+  }
+
+  .raz-panel-visual-scale { position: absolute; inset: 0; display: block; padding: 14%; }
+
+  .raz-svg { width: 100%; height: 100%; overflow: visible; }
+
+  .raz-panel-text { flex: 1; min-width: 0; }
+
+  .raz-panel-badge {
     display: inline-flex;
     font: var(--text-lead);
     font-size: 17px;
     font-weight: 700;
-    padding: var(--space-2) var(--space-4);
+    color: var(--stop-accent-dark);
+  }
+
+  .raz-panel-text p { margin-top: var(--space-2); font: var(--text-body); color: var(--color-ink-soft); max-width: 46ch; }
+
+  .raz-panel-duration {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--space-4);
+    font: var(--text-label);
+    color: var(--stop-accent-dark);
+    background: color-mix(in srgb, var(--stop-accent) 12%, var(--color-surface));
+    padding: 6px 14px;
     border-radius: var(--radius-pill);
-    box-shadow: inset 0 0 0 2px var(--block-accent);
-    color: var(--block-accent);
-    background: var(--color-surface);
     white-space: nowrap;
-    transition: background-color .3s ease-out, color .3s ease-out;
   }
 
-  .block-row:hover .block-badge,
-  .block-row:focus-visible .block-badge,
-  .block-row[data-active="true"] .block-badge { background: var(--block-accent); color: #fff; }
-
-  /* --- Визуал блока: неподвижная рамка-окно, внутри — увеличивающийся слой ---
-     Рамка не растёт и обрезает содержимое (overflow:hidden), поэтому zoom на
-     hover никогда не выходит за пределы своей 72×72 ячейки — ни на текст
-     строки, ни на соседние строки/таймлайн выше. */
-  .block-visual {
-    position: relative;
-    width: 72px;
-    height: 72px;
-    flex-shrink: 0;
-    overflow: hidden;
-    border-radius: var(--radius-sm);
-  }
-
-  .block-visual-scale {
-    position: absolute;
-    inset: 0;
-    display: block;
-    transition: transform .4s cubic-bezier(.34, 1.4, .64, 1);
-  }
-
-  .raz-svg { width: 100%; height: 100%; overflow: visible; }
-
-  @media (hover: hover) and (pointer: fine) {
-    .block-row[data-active="true"] .block-visual-scale {
-      transform: scale(1.18);
-    }
-  }
+  .raz-panel-duration :global(.duration-icon) { width: 13px; height: 13px; }
 
   /* Читай-ка */
-  .read-page { fill: color-mix(in srgb, var(--block-accent) 22%, white); stroke: var(--block-accent-dark); stroke-width: 3; }
-  .read-spine { stroke: var(--block-accent-dark); stroke-width: 3; }
-  .read-letter { font-size: 22px; font-weight: 700; fill: var(--block-accent-dark); opacity: 0; transform: translateY(6px); transition: opacity .3s ease-out, transform .3s ease-out; }
-  .block-row[data-active="true"] .read-letter { opacity: 1; transform: translateY(0); animation: readFloat 2.2s ease-in-out infinite; }
+  .read-page { fill: color-mix(in srgb, var(--stop-accent) 22%, white); stroke: var(--stop-accent-dark); stroke-width: 3; }
+  .read-spine { stroke: var(--stop-accent-dark); stroke-width: 3; }
+  .read-letter { font: 600 22px var(--font-display); fill: var(--stop-accent-dark); opacity: 0; transform: translateY(6px); transition: opacity .3s ease-out, transform .3s ease-out; }
+  [data-active="true"] .read-letter { opacity: 1; transform: translateY(0); animation: readFloat 2.2s ease-in-out infinite; }
   .read-letter-1 { animation-delay: 0s !important; }
   .read-letter-2 { animation-delay: .3s !important; }
   .read-letter-3 { animation-delay: .6s !important; }
   @keyframes readFloat { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-8px); opacity: .4; } }
 
   /* Нейрон-ка */
-  .neuro-line { stroke: var(--block-accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 6 18; stroke-dashoffset: 0; }
-  .neuro-node { fill: var(--block-accent); }
-  .neuro-soma { fill: var(--block-accent-dark); }
-  .block-row[data-active="true"] .neuro-line { animation: neuroPulse 1.1s linear infinite; }
+  .neuro-line { stroke: var(--stop-accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 6 18; }
+  .neuro-node { fill: var(--stop-accent); }
+  .neuro-soma { fill: var(--stop-accent-dark); }
+  [data-active="true"] .neuro-line { animation: neuroPulse 1.1s linear infinite; }
   @keyframes neuroPulse { to { stroke-dashoffset: -24; } }
-  .block-row[data-active="true"] .neuro-node { animation: neuroGlow 1.1s ease-in-out infinite; }
+  [data-active="true"] .neuro-node { animation: neuroGlow 1.1s ease-in-out infinite; }
   @keyframes neuroGlow { 0%, 100% { r: 6; opacity: .8; } 50% { r: 8.5; opacity: 1; } }
 
   /* Песчинка */
-  .sand-sun { fill: color-mix(in srgb, var(--block-accent) 55%, white); opacity: .8; }
-  .sand-dune-back { fill: color-mix(in srgb, var(--block-accent) 30%, white); }
-  .sand-dune-front { fill: var(--block-accent); }
-  .sand-grain { fill: var(--block-accent-dark); opacity: 0; transition: opacity .3s ease-out; }
-  .block-row[data-active="true"] .sand-grain { opacity: .7; animation: sandJitter 1.8s ease-in-out infinite; }
+  .sand-sun { fill: color-mix(in srgb, var(--stop-accent) 55%, white); opacity: .8; }
+  .sand-dune-back { fill: color-mix(in srgb, var(--stop-accent) 30%, white); }
+  .sand-dune-front { fill: var(--stop-accent); }
+  .sand-grain { fill: var(--stop-accent-dark); opacity: 0; transition: opacity .3s ease-out; }
+  [data-active="true"] .sand-grain { opacity: .7; animation: sandJitter 1.8s ease-in-out infinite; }
   .sand-grain:nth-of-type(1) { animation-delay: 0s !important; }
   .sand-grain:nth-of-type(2) { animation-delay: .2s !important; }
   .sand-grain:nth-of-type(3) { animation-delay: .4s !important; }
@@ -435,10 +468,9 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
   @keyframes sandJitter { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px) translateX(2px); } }
 
   /* Рисовалка */
-  /* В покое линия уже видна (бледно, тонко) — иначе слот пустой. При активации "дорисовывается" ярче и толще. */
   .draw-line {
     fill: none;
-    stroke: var(--block-accent-dark);
+    stroke: var(--stop-accent-dark);
     stroke-width: 3;
     stroke-linecap: round;
     stroke-dasharray: 100;
@@ -446,36 +478,20 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     opacity: .38;
     transition: opacity .4s ease-out, stroke-width .4s ease-out;
   }
-  .draw-tip { fill: var(--block-accent); opacity: 0; transition: opacity .3s ease-out; }
-  .block-row[data-active="true"] .draw-line { opacity: 1; stroke-width: 6; animation: drawRetrace 1s cubic-bezier(.22, 1, .36, 1); }
-  .block-row[data-active="true"] .draw-tip { opacity: 1; transition-delay: .8s; }
+  .draw-tip { fill: var(--stop-accent); opacity: 0; transition: opacity .3s ease-out; }
+  [data-active="true"] .draw-line { opacity: 1; stroke-width: 6; animation: drawRetrace 1s cubic-bezier(.22, 1, .36, 1); }
+  [data-active="true"] .draw-tip { opacity: 1; transition-delay: .8s; }
   @keyframes drawRetrace { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
 
   /* Разумей-ка */
-  .logic-piece { fill: color-mix(in srgb, var(--block-accent) 30%, white); stroke: var(--block-accent-dark); stroke-width: 3; transition: transform .5s cubic-bezier(.34, 1.56, .64, 1); }
+  .logic-piece { fill: color-mix(in srgb, var(--stop-accent) 30%, white); stroke: var(--stop-accent-dark); stroke-width: 3; transition: transform .5s cubic-bezier(.34, 1.56, .64, 1); }
   .logic-piece-a { transform: translate(-10px, -6px) rotate(-6deg); }
   .logic-piece-b { transform: translate(10px, 6px) rotate(5deg); }
-  .block-row[data-active="true"] .logic-piece-a,
-  .block-row[data-active="true"] .logic-piece-b { transform: translate(0, 0) rotate(0deg); }
-  .logic-rays { stroke: var(--block-accent); stroke-width: 3; stroke-linecap: round; opacity: 0; transition: opacity .3s ease-out .3s; }
-  .block-row[data-active="true"] .logic-rays { opacity: 1; animation: logicPulse 1.4s ease-in-out infinite .5s; }
+  [data-active="true"] .logic-piece-a,
+  [data-active="true"] .logic-piece-b { transform: translate(0, 0) rotate(0deg); }
+  .logic-rays { stroke: var(--stop-accent); stroke-width: 3; stroke-linecap: round; opacity: 0; transition: opacity .3s ease-out .3s; }
+  [data-active="true"] .logic-rays { opacity: 1; animation: logicPulse 1.4s ease-in-out infinite .5s; }
   @keyframes logicPulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
-
-  .block-text { font: var(--text-meta); color: var(--color-ink); }
-
-  .block-duration {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font: var(--text-label);
-    color: var(--block-accent);
-    background: var(--color-surface);
-    padding: 6px 14px;
-    border-radius: var(--radius-pill);
-    white-space: nowrap;
-  }
-
-  .block-duration :global(.duration-icon) { width: 13px; height: 13px; }
 
   /* ===== Подвал секции ===== */
   .razvivayka-footer {
@@ -504,117 +520,105 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     .section-head-illustration { display: none; }
   }
 
-  @media (max-width: 780px) {
-    .razvivayka-footer { grid-template-columns: 1fr; }
-    .razvivayka-stats { flex-direction: column; align-items: stretch; }
-    /* flex:1 бы схлопнул высоту до 0 в колонке — auto-height родитель не даёт main-axis
-       расти в вертикальном flex, поэтому здесь полосе нужна своя явная высота вместо flex:1 */
-    .raz-timebar { flex: none; width: 100%; }
+  @media (min-width: 901px) {
+    .raz-panel-mobile { display: none; }
+    .raz-stage { display: block; }
   }
 
-  @media (max-width: 680px) {
+  @media (max-width: 900px) {
+    .raz-route-stops { flex-direction: column; gap: 0; }
+    .raz-route-line { left: 22px; top: 22px; bottom: 22px; right: auto; width: var(--stroke-bold); height: auto; }
+    .raz-route-line-fill { width: 100%; height: 100%; transform: scaleY(0); transform-origin: top; transition: transform .8s cubic-bezier(.22, 1, .36, 1); }
+    .raz-route.is-filled .raz-route-line-fill { transform: scaleY(1); }
+
+    .raz-stop { flex-direction: row; align-items: center; text-align: left; gap: var(--space-4); padding: var(--space-3) 0; }
+    .raz-stop-meta { flex-direction: row; align-items: baseline; gap: var(--space-3); }
+
+    .raz-panel-mobile .raz-panel-inner { padding-left: 60px; }
+  }
+
+  @media (max-width: 780px) {
+    .razvivayka-footer { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
     .raz-blob { display: none; }
-
-    .block-row {
-      grid-template-columns: 56px 1fr;
-      grid-template-areas: "visual badge" "visual text" "duration duration";
-      border-radius: var(--radius-lg);
-      row-gap: var(--space-2);
-      transform: none !important;
-    }
-
-    .block-visual { grid-area: visual; width: 56px; height: 56px; }
-    .block-visual-scale { transform: none !important; }
-    .block-badge { grid-area: badge; justify-self: start; }
-    /* grid-template-rows 0fr→1fr вместо max-height — не триггерит layout reflow (тот же приём, что в FAQ) */
-    .block-text-wrap {
-      grid-area: text;
-      display: grid;
-      grid-template-rows: 0fr;
-      opacity: 0;
-      transition: grid-template-rows .35s ease-out, opacity .3s ease-out;
-    }
-    .block-text-wrap .block-text { overflow: hidden; min-height: 0; }
-    .block-duration { grid-area: duration; justify-self: start; margin-top: var(--space-2); }
-
-    .block-row[data-active="true"] .block-text-wrap { grid-template-rows: 1fr; opacity: 1; }
-    .block-row[data-active="true"] .raz-svg { animation-play-state: running; }
+    .raz-panel-mobile .raz-panel-inner { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+    .raz-panel-mobile .raz-panel-visual { width: 96px; height: 96px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     [data-raz-reveal] { transition: opacity .3s ease-out; transform: none; }
     .razvivayka-star, .razvivayka-heart, .raz-doodle { animation: none !important; }
-    .block-row, .block-visual-scale, .block-badge, .logic-piece { transition-duration: .15s !important; }
-    .block-row:hover, .block-row:focus-visible, .block-row[data-active="true"] { transform: none; }
+    .raz-stop-dot, .raz-panel, .raz-panel-mobile, .raz-route-line-fill { transition-duration: .15s !important; }
+    .raz-stop[aria-selected="true"] .raz-stop-dot { transform: none; }
+    .raz-panel { filter: none !important; transform: none !important; }
     .read-letter, .neuro-line, .neuro-node, .sand-grain, .logic-rays { animation: none !important; }
-    .block-row[data-active="true"] .read-letter { opacity: 1; transform: none; }
-    @media (hover: hover) and (pointer: fine) {
-      .block-row[data-active="true"] .block-visual-scale { transform: scale(1.1); }
-    }
+    [data-active="true"] .read-letter { opacity: 1; transform: none; }
   }
 </style>
 
 <script>
   const section = document.getElementById('razvivayka') as HTMLElement | null;
-  const blockEls = Array.from(document.querySelectorAll<HTMLButtonElement>('.block-row'));
-  const timebar = document.getElementById('raz-timebar');
+  const route = document.getElementById('raz-route') as HTMLElement | null;
   const bg = document.getElementById('raz-bg');
-  if (!section) throw new Error('razvivayka section missing');
+  if (!section || !route) throw new Error('razvivayka section missing');
 
   const hues = [108, 265, 30, 205, 168];
-  const defaultHue = hues[0];
-  // Единственный источник истины для модели взаимодействия — ширина вьюпорта, не hover-возможность
-  // устройства (узкое, но hover-способное окно десктопа не должно вести себя как мобильный тап,
-  // а playwright/десктоп-браузер на 390px репортит hover:hover, в отличие от настоящего телефона —
-  // смешение двух проверок ранее приводило к тому, что оба обработчика конфликтовали).
-  const isMobileLayout = () => window.matchMedia('(max-width: 680px)').matches;
+  const stops = Array.from(route.querySelectorAll<HTMLButtonElement>('.raz-stop'));
+  const desktopPanels = Array.from(route.querySelectorAll<HTMLElement>('.raz-panel'));
+  const mobilePanels = Array.from(route.querySelectorAll<HTMLElement>('.raz-panel-mobile'));
 
-  const timebarSegs = Array.from(document.querySelectorAll<HTMLElement>('.raz-timebar-seg'));
-
-  function setActive(index: number | null) {
-    blockEls.forEach((el, i) => {
+  function setActive(index: number) {
+    stops.forEach((el, i) => {
       const active = i === index;
-      el.dataset.active = String(active);
-      el.setAttribute('aria-expanded', String(active));
+      el.setAttribute('aria-selected', String(active));
+      el.setAttribute('tabindex', active ? '0' : '-1');
     });
-    timebarSegs.forEach((seg, i) => { seg.dataset.active = String(i === index); });
-    section!.style.setProperty('--active-hue', String(index !== null ? hues[index] : defaultHue));
+    desktopPanels.forEach((el, i) => {
+      el.dataset.active = String(i === index);
+      el.setAttribute('aria-hidden', String(i !== index));
+    });
+    mobilePanels.forEach((el, i) => {
+      el.dataset.active = String(i === index);
+      el.setAttribute('aria-hidden', String(i !== index));
+    });
+    section!.style.setProperty('--active-hue', String(hues[index]));
   }
 
-  blockEls.forEach((el, i) => {
-    el.addEventListener('mouseenter', () => { if (!isMobileLayout()) setActive(i); });
-    el.addEventListener('mouseleave', () => { if (!isMobileLayout()) setActive(null); });
+  stops.forEach((el, i) => {
+    el.addEventListener('mouseenter', () => setActive(i));
+    el.addEventListener('focusin', () => setActive(i));
+    el.addEventListener('click', () => setActive(i));
 
-    // focusin/focusout — только для клавиатурной навигации на десктопе. На мобильном клик по
-    // кнопке тоже вызывает focusin ДО click, и если не отфильтровать здесь, обработчики
-    // конфликтуют: focusin активирует блок, затем click видит "уже активен" и гасит его же клик.
-    el.addEventListener('focusin', () => { if (!isMobileLayout()) setActive(i); });
-    el.addEventListener('focusout', (e) => {
-      if (!isMobileLayout() && !el.contains(e.relatedTarget as Node)) setActive(null);
-    });
-
-    el.addEventListener('click', (e) => {
-      if (isMobileLayout()) {
-        e.preventDefault();
-        const alreadyActive = el.dataset.active === 'true';
-        setActive(alreadyActive ? null : i);
-      }
+    el.addEventListener('keydown', (e) => {
+      const key = e.key;
+      let next: number | null = null;
+      if (key === 'ArrowRight' || key === 'ArrowDown') next = (i + 1) % stops.length;
+      else if (key === 'ArrowLeft' || key === 'ArrowUp') next = (i - 1 + stops.length) % stops.length;
+      else if (key === 'Home') next = 0;
+      else if (key === 'End') next = stops.length - 1;
+      if (next === null) return;
+      e.preventDefault();
+      setActive(next);
+      stops[next].focus();
     });
   });
 
-  // Таймлайн: заливка по мере попадания секции во вьюпорт (та же механика, что в "Пути развития")
-  const timebarObserver = new IntersectionObserver(
+  // Линия маршрута заливается по мере попадания секции во вьюпорт (та же механика,
+  // что у остальных таймлайнов сайта)
+  const lineObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          timebar?.classList.add('is-filled');
-          timebarObserver.disconnect();
+          route!.classList.add('is-filled');
+          lineObserver.disconnect();
         }
       });
     },
     { threshold: 0.4 }
   );
-  if (timebar) timebarObserver.observe(timebar);
+  lineObserver.observe(route);
 
   // Стаггер-появление блоков
   const revealEls = Array.from(section.querySelectorAll<HTMLElement>('[data-raz-reveal]'));
@@ -624,7 +628,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
         if (!entry.isIntersecting) return;
         const el = entry.target as HTMLElement;
         const order = Number(el.dataset.razReveal || '0');
-        setTimeout(() => el.classList.add('is-shown'), order * 55);
+        setTimeout(() => el.classList.add('is-shown'), order * 70);
         revealObserver.unobserve(el);
       });
     },
@@ -634,7 +638,8 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
 
   // Лёгкий параллакс фона по курсору — только десктоп
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (bg && !isMobileLayout() && !reduceMotion) {
+  const isDesktopHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (bg && isDesktopHover && !reduceMotion) {
     let raf = 0;
     section.addEventListener('mousemove', (e) => {
       if (raf) return;

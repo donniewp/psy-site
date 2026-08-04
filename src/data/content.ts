@@ -431,7 +431,11 @@ export const reviews = [
   { name: 'Марина', tag: '«Песок и глина»', avatar: '/img/rev3.jpg', text: 'Заметили прогресс уже через месяц: сын стал спокойнее, легче переживает неудачи и охотнее общается с ребятами.' },
 ];
 
-export const videos = ['/img/vid1.jpg', '/img/vid2.jpg', '/img/vid3.jpg', '/img/vid4.jpg'];
+export const videos = [
+  { src: '/videos/clip-1.mp4', poster: '/img/clip-1-poster.jpg', alt: 'Педагог помогает ребёнку на индивидуальном занятии' },
+  { src: '/videos/clip-2.mp4', poster: '/img/clip-2-poster.jpg', alt: 'Дети занимаются за партами в студии' },
+  { src: '/videos/clip-3.mp4', poster: '/img/clip-3-poster.jpg', alt: 'Групповое занятие: дети пишут в тетрадях' },
+];
 
 export const faq = [
   { q: 'С какого возраста берёте детей?', a: 'С 1,5 лет — на раннее развитие через сенсорные игры. Дальше ребёнок переходит на «Развивай-ку», подготовку к школе и «Школьный навигатор» — программы есть до 10 лет.' },

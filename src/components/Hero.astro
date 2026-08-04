@@ -32,6 +32,13 @@ import Icon from './Icon.astro';
       </div>
 
       <p class="hero-microcopy">Ответим в течение 15 минут и подберём группу по возрасту ребёнка</p>
+
+      <a href="#video" class="hero-video-link">
+        <span class="hero-video-link-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+        </span>
+        Смотреть видео с занятий
+      </a>
     </div>
 
     <div class="hero-media" data-reveal>
@@ -49,7 +56,7 @@ import Icon from './Icon.astro';
 </section>
 
 <style>
-  .hero { position: relative; overflow: hidden; padding: var(--space-8) 0 var(--space-9); }
+  .hero { position: relative; overflow: hidden; padding: var(--space-8) 0 var(--space-7); }
 
   .hero-blob {
     position: absolute;
@@ -111,6 +118,36 @@ import Icon from './Icon.astro';
   .hero-ctas { display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-7); }
 
   .hero-microcopy { margin-top: var(--space-4); font: var(--text-meta); color: var(--color-ink-soft); }
+
+  .hero-video-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    font: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-moss);
+    transition: gap .2s ease-out;
+  }
+
+  .hero-video-link-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 var(--stroke-thin) var(--color-moss);
+    transition: background-color .2s ease-out, transform .2s ease-out;
+  }
+
+  .hero-video-link-icon svg { width: 11px; height: 11px; transform: translateX(1px); }
+
+  .hero-video-link:hover { gap: var(--space-3); }
+  .hero-video-link:hover .hero-video-link-icon,
+  .hero-video-link:focus-visible .hero-video-link-icon { background: var(--color-moss); color: #fff; transform: scale(1.08); }
+  .hero-video-link:focus-visible { outline: 2px solid var(--color-moss); outline-offset: 3px; border-radius: var(--radius-xs); }
 
   .hero-media { position: relative; }
 

@@ -64,14 +64,14 @@ import Icon from './Icon.astro';
 <style>
   .booking { background: var(--color-surface); }
 
-  .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: stretch; }
+  .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: start; }
 
   .booking-copy { display: flex; flex-direction: column; }
 
   .booking-steps { margin: var(--space-6) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-4); }
   .booking-steps li { display: flex; gap: var(--space-4); align-items: flex-start; }
 
-  .step-n {
+  .booking-steps .step-n {
     flex-shrink: 0;
     width: 32px;
     height: 32px;
@@ -89,7 +89,6 @@ import Icon from './Icon.astro';
   .booking-steps span { font: var(--text-meta); font-size: 13.5px; color: var(--color-ink-soft); }
 
   .booking-location {
-    margin-top: auto;
     padding-top: var(--space-6);
     display: flex;
     align-items: center;
@@ -124,7 +123,7 @@ import Icon from './Icon.astro';
     z-index: 0;
   }
 
-  .booking-form > * { position: relative; z-index: 1; }
+  .booking-form > *:not(.booking-blob) { position: relative; z-index: 1; }
 
   .booking-form h3 { font: var(--text-h3); font-size: 21px; }
   .form-sub { font: var(--text-meta); color: var(--color-ink-soft); margin-top: -4px; }
