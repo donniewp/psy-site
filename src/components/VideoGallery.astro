@@ -1,58 +1,117 @@
 ---
-import { videos } from '../data/content';
+import { videos, videoFeatures, videoAccentPhoto, videoBadge } from '../data/content';
+import Icon from './Icon.astro';
+
+const video = videos[0];
 ---
 
 <section class="videos section" id="video">
-  <div class="container">
-    <div class="section-head center" data-reveal>
-      <span class="eyebrow">Занятия изнутри</span>
-      <h2>Смотрите, как проходят наши занятия</h2>
+  <div class="container video-feature" data-reveal>
+    <div class="video-feature-media">
+      <div class="video-collage">
+        <div class="video-accent-photo">
+          <img
+            src={`${import.meta.env.BASE_URL}${videoAccentPhoto.src.replace(/^\//, '')}`}
+            alt={videoAccentPhoto.alt}
+            loading="lazy"
+          />
+        </div>
+
+        <div class="video-frame">
+          <div class="video-cell">
+            <video
+              class="video-el"
+              poster={`${import.meta.env.BASE_URL}${video.poster.replace(/^\//, '')}`}
+              data-src={`${import.meta.env.BASE_URL}${video.src.replace(/^\//, '')}`}
+              width="1080"
+              height="1920"
+              playsinline
+              preload="none"
+              aria-label={video.alt}
+            ></video>
+            <button type="button" class="video-play-btn" aria-label={`Смотреть видео: ${video.alt}`}>
+              <span class="video-play-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="video-float-badge">
+          <Icon name="svc-check" class="badge-icon" />
+          <span>{videoBadge}</span>
+        </div>
+      </div>
     </div>
 
-    <div class="video-grid" data-reveal>
-      {videos.map((v) => (
-        <div class="video-cell">
-          <video
-            class="video-el"
-            poster={`${import.meta.env.BASE_URL}${v.poster.replace(/^\//, '')}`}
-            data-src={`${import.meta.env.BASE_URL}${v.src.replace(/^\//, '')}`}
-            width="1080"
-            height="1920"
-            playsinline
-            preload="none"
-            aria-label={v.alt}
-          ></video>
-          <button type="button" class="video-play-btn" aria-label={`Смотреть видео: ${v.alt}`}>
-            <span class="video-play-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-            </span>
-          </button>
-        </div>
-      ))}
+    <div class="video-feature-copy">
+      <span class="eyebrow eyebrow-light">Занятия изнутри</span>
+      <h2>Посмотрите, как проходит занятие в мини-группе</h2>
+      <p>
+        Небольшая группа — это не просто цифра: педагог успевает заметить, кто устал,
+        кто отвлёкся, а кто уже готов к более сложному заданию. Занятие держит живой
+        темп и при этом остаётся бережным к каждому ребёнку.
+      </p>
+      <div class="video-tags">
+        {videoFeatures.map((f) => <span class="video-tag">{f}</span>)}
+      </div>
+      <a href="#booking" class="btn video-cta">Записаться на пробное занятие</a>
     </div>
   </div>
 </section>
 
 <style>
-  /* Высота, а не ширина, — ведущий размер: карточка вписывается в экран по высоте,
-     ширина у 9:16-видео сама следует из аспекта, без обрезки и без растягивания. */
-  .video-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: var(--space-4); }
+  .videos { background: var(--color-moss-deep); overflow: hidden; }
+
+  .video-feature {
+    display: grid;
+    grid-template-columns: minmax(0, 460px) 1fr;
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .video-feature-media { display: flex; justify-content: center; }
+
+  .video-collage { position: relative; width: 100%; max-width: 400px; padding: 36px 30px 26px 0; }
+
+  .video-accent-photo {
+    position: absolute;
+    left: -10px;
+    bottom: -6px;
+    width: 46%;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    transform: rotate(-7deg);
+    z-index: 1;
+  }
+
+  .video-accent-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+
+  .video-frame {
+    position: relative;
+    z-index: 2;
+    margin-left: auto;
+    width: 84%;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 10px;
+    box-shadow: var(--shadow-md);
+  }
 
   .video-cell {
     position: relative;
-    height: min(60vh, 560px);
+    width: 100%;
+    aspect-ratio: 3 / 4;
     border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
     isolation: isolate;
     background: color-mix(in srgb, var(--color-mist) 12%, var(--color-paper));
-    transition: box-shadow .3s ease-out;
   }
 
-  .video-cell:has(.video-play-btn:hover),
-  .video-cell:has(.video-play-btn:focus-visible) { box-shadow: var(--shadow-md); }
-
-  .video-el { height: 100%; width: auto; aspect-ratio: 9 / 16; object-fit: cover; display: block; background: var(--color-ink); }
+  .video-el { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; background: var(--color-ink); }
 
   .video-play-btn {
     position: absolute;
@@ -76,30 +135,85 @@ import { videos } from '../data/content';
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
+    width: 66px;
+    height: 66px;
     border-radius: 50%;
     background: var(--color-surface);
     box-shadow: var(--shadow-md);
     transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
   }
 
-  .video-play-icon svg { width: 22px; height: 22px; color: var(--color-ink); transform: translateX(1px); }
+  .video-play-icon svg { width: 26px; height: 26px; color: var(--color-ink); transform: translateX(1px); }
 
   .video-play-btn:hover .video-play-icon,
   .video-play-btn:focus-visible .video-play-icon { transform: scale(1.1); }
 
-  .video-play-btn:focus-visible { outline: 2px solid var(--color-moss); outline-offset: -3px; border-radius: var(--radius-md); }
+  .video-play-btn:focus-visible { outline: 2px solid var(--color-lime); outline-offset: -3px; border-radius: var(--radius-md); }
 
   .video-cell.is-playing .video-play-btn { opacity: 0; pointer-events: none; }
 
-  @media (max-width: 640px) {
-    .video-cell { height: min(64vh, 480px); }
+  .video-float-badge {
+    position: absolute;
+    top: 4px;
+    right: -8px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-surface);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    max-width: 172px;
+    font: var(--text-meta);
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--color-ink);
+    animation: floatY 5s ease-in-out infinite;
+  }
+
+  .video-float-badge :global(.badge-icon) { width: 18px; height: 18px; color: var(--color-moss); flex-shrink: 0; }
+
+  .video-feature-copy h2 { margin-top: var(--space-3); font: var(--text-h2); font-size: 34px; max-width: 20ch; color: #fff; }
+  .video-feature-copy p { margin-top: var(--space-4); font: var(--text-body); color: rgba(255, 255, 255, .75); max-width: 48ch; }
+
+  .video-tags { margin-top: var(--space-5); display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+  .video-tag {
+    font: var(--text-meta);
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(255, 255, 255, .12);
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+  }
+
+  .video-cta {
+    margin-top: var(--space-6);
+    background: var(--color-lime);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .video-cta:hover {
+    background: #fff;
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 900px) {
+    .video-feature { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+    .video-feature-copy h2,
+    .video-feature-copy p { margin-left: auto; margin-right: auto; }
+    .video-tags { justify-content: center; }
+    .video-collage { margin: 0 auto; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .video-play-icon, .video-play-btn::before { transition-duration: .01ms; }
     .video-play-btn:hover .video-play-icon, .video-play-btn:focus-visible .video-play-icon { transform: none; }
+    .video-float-badge { animation: none; }
   }
 </style>
 
@@ -119,12 +233,6 @@ import { videos } from '../data/content';
       video.controls = true;
       cell.classList.add('is-playing');
       video.play().catch(() => {});
-      // Останавливаем остальные видео — на странице одновременно играет только одно
-      cells.forEach((other) => {
-        if (other === cell) return;
-        const otherVideo = other.querySelector('video') as HTMLVideoElement | null;
-        otherVideo?.pause();
-      });
     };
 
     playBtn.addEventListener('click', start);
