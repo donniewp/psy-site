@@ -3,6 +3,9 @@ export const phoneHref = 'tel:+79858258730';
 export const whatsappHref = 'https://wa.me/79858258730';
 export const email = 'helppetrova@gmail.ru';
 
+// Cloudflare Worker, который пересылает заявки из формы в Telegram (см. worker/telegram-worker.js).
+export const bookingEndpoint = 'https://sensitivnost-booking.alexovhina20040819.workers.dev';
+
 export const location = {
   address: 'Ленинградское шоссе, д. 8, к. 3',
   metro: 'м. Войковская — 3 минуты пешком',
