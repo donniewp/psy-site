@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { yandexMetrikaId } from '../data/content';
 
 export interface Props {
   title: string;
@@ -11,6 +12,7 @@ export interface Props {
 const { title, description, path = '/', image = `${import.meta.env.BASE_URL}img/hero.jpg` } = Astro.props;
 const canonicalURL = new URL(path.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
 const ogImageURL = new URL(image.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
+const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
 ---
 
 <!doctype html>
@@ -47,9 +49,63 @@ const ogImageURL = new URL(image.replace(/^\//, import.meta.env.BASE_URL), Astro
     <noscript>
       <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,600&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
     </noscript>
+
+    {metrikaEnabled && (
+      <Fragment>
+        <script is:inline define:vars={{ id: yandexMetrikaId }}>
+          (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+          (window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+
+          ym(id, 'init', {
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: true,
+          });
+        </script>
+        <noscript>
+          <div><img src={`https://mc.yandex.ru/watch/${yandexMetrikaId}`} style="position:absolute; left:-9999px;" alt="" /></div>
+        </noscript>
+      </Fragment>
+    )}
   </head>
   <body>
     <a href="#main-content" class="skip-link">Перейти к содержимому</a>
     <slot />
+
+    {metrikaEnabled && (
+      <script is:inline define:vars={{ id: yandexMetrikaId }}>
+        // Цели: клик по телефону/Telegram — по всему сайту через делегирование,
+        // скролл до цен — как только секция #prices появляется в зоне видимости.
+        const ym = window.ym;
+        if (typeof ym === 'function') {
+          document.addEventListener('click', (e) => {
+            const link = e.target.closest && e.target.closest('a[href]');
+            if (!link) return;
+            if (link.href.startsWith('tel:')) {
+              ym(id, 'reachGoal', 'phone_click');
+            } else if (link.href.includes('t.me/') || link.href.includes('wa.me/')) {
+              ym(id, 'reachGoal', 'telegram_click');
+            }
+          });
+
+          const pricesEl = document.getElementById('prices');
+          if (pricesEl && 'IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries, obs) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  ym(id, 'reachGoal', 'scroll_to_prices');
+                  obs.disconnect();
+                }
+              });
+            }, { threshold: 0.3 });
+            observer.observe(pricesEl);
+          }
+        }
+      </script>
+    )}
   </body>
 </html>

@@ -1,5 +1,5 @@
 ---
-import { bookingSteps, bookingOptions, location, phone, phoneHref, bookingEndpoint } from '../data/content';
+import { bookingSteps, bookingOptions, location, phone, phoneHref, bookingEndpoint, yandexMetrikaId } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -28,7 +28,7 @@ import Icon from './Icon.astro';
       </div>
     </div>
 
-    <form class="booking-form" data-reveal id="booking-form" data-endpoint={bookingEndpoint}>
+    <form class="booking-form" data-reveal id="booking-form" data-endpoint={bookingEndpoint} data-metrika-id={yandexMetrikaId}>
       <svg class="booking-blob" viewBox="0 0 300 300" aria-hidden="true" focusable="false">
         <path d="M245,45 C280,85 285,150 260,205 C235,260 170,290 115,270 C60,250 20,195 30,140 C40,85 95,45 150,35 C190,28 220,15 245,45 Z" />
       </svg>
@@ -196,6 +196,7 @@ import Icon from './Icon.astro';
   const success = document.getElementById('form-success');
   const error = document.getElementById('form-error');
   const endpoint = form?.dataset.endpoint;
+  const metrikaId = form?.dataset.metrikaId;
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -218,6 +219,11 @@ import Icon from './Icon.astro';
 
       success?.removeAttribute('hidden');
       requestAnimationFrame(() => success?.classList.add('is-shown'));
+
+      const ym = (window as unknown as { ym?: (...args: unknown[]) => void }).ym;
+      if (typeof ym === 'function' && metrikaId && metrikaId !== 'REPLACE-ME') {
+        ym(Number(metrikaId), 'reachGoal', 'form_submit');
+      }
     } catch (err) {
       console.error('Booking form submit failed', err);
       form.classList.remove('is-submitting');

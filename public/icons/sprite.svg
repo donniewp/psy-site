@@ -111,6 +111,9 @@
       <path d="M4 12 L20 4.5 L14.5 20 L11 13 L4 12 Z" />
       <line x1="11" y1="13" x2="17" y2="8" />
     </symbol>
+  <symbol id="icon-svc-max" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6.5 a2 2 0 0 1 2 -2 h12 a2 2 0 0 1 2 2 v7 a2 2 0 0 1 -2 2 h-9 l-4 3.5 v-3.5 h-1 a2 2 0 0 1 -2 -2 Z" />
+    </symbol>
   <symbol id="icon-svc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <line x1="4" y1="12" x2="18" y2="12" />
       <path d="M13 7 l5 5 l-5 5" />

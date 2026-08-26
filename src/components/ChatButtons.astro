@@ -1,0 +1,56 @@
+---
+import { maxHref } from '../data/content';
+import Icon from './Icon.astro';
+---
+
+<div class="chat-buttons" id="chat-buttons">
+  <a href={maxHref} target="_blank" rel="noopener" class="chat-btn max-btn" aria-label="Написать в Max">
+    <Icon name="svc-max" class="chat-icon" />
+  </a>
+  <a href="https://t.me/+79858258730" target="_blank" rel="noopener" class="chat-btn tg-btn" aria-label="Написать в Telegram">
+    <Icon name="svc-telegram" class="chat-icon" />
+  </a>
+</div>
+
+<style>
+  .chat-buttons {
+    position: fixed;
+    right: 24px;
+    bottom: 96px;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-moss);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lift);
+    opacity: 0;
+    transform: translateY(16px) scale(.9);
+    pointer-events: none;
+    transition: opacity .3s ease-out, transform .3s ease-out;
+  }
+
+  .chat-buttons.visible .chat-btn { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+
+  .chat-btn :global(.chat-icon) { width: 26px; height: 26px; color: #fff; }
+
+  @media (max-width: 720px) {
+    .chat-buttons { bottom: 132px; right: 16px; gap: 10px; }
+    .chat-btn { width: 50px; height: 50px; }
+  }
+</style>
+
+<script>
+  const wrap = document.getElementById('chat-buttons');
+  const onScroll = () => wrap?.classList.toggle('visible', window.scrollY > 260);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

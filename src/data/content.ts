@@ -1,10 +1,15 @@
 export const phone = '+7 985 825-87-30';
 export const phoneHref = 'tel:+79858258730';
 export const whatsappHref = 'https://wa.me/79858258730';
+export const maxHref = 'https://max.ru/u/f9LHodD0cOJ1m90baT9vDHZ-caoaa7uy8zjR-g77k75JJGLWlUwNqnueYLU';
 export const email = 'helppetrova@gmail.ru';
 
 // Cloudflare Worker, который пересылает заявки из формы в Telegram (см. worker/telegram-worker.js).
 export const bookingEndpoint = 'https://sensitivnost-booking.alexovhina20040819.workers.dev';
+
+// ID счётчика Яндекс.Метрики (metrika.yandex.ru → «Добавить счётчик» → адрес senzitivnost.ru).
+// Пока REPLACE-ME — счётчик не подключён, скрипт в Layout.astro его не вставляет.
+export const yandexMetrikaId = 'REPLACE-ME';
 
 export const location = {
   address: 'Ленинградское шоссе, д. 8, к. 3',
