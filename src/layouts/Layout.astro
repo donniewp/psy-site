@@ -78,16 +78,20 @@ const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
 
     {metrikaEnabled && (
       <script is:inline define:vars={{ id: yandexMetrikaId }}>
-        // Цели: клик по телефону/Telegram — по всему сайту через делегирование,
-        // скролл до цен — как только секция #prices появляется в зоне видимости.
+        // Цели: клик по кнопке/телефону/мессенджеру — по всему сайту через
+        // делегирование, скролл до цен — как только секция #prices появляется
+        // в зоне видимости.
         const ym = window.ym;
         if (typeof ym === 'function') {
           document.addEventListener('click', (e) => {
+            const btn = e.target.closest && e.target.closest('.btn');
+            if (btn) ym(id, 'reachGoal', 'button_click');
+
             const link = e.target.closest && e.target.closest('a[href]');
             if (!link) return;
             if (link.href.startsWith('tel:')) {
               ym(id, 'reachGoal', 'phone_click');
-            } else if (link.href.includes('t.me/') || link.href.includes('wa.me/')) {
+            } else if (link.href.includes('t.me/') || link.href.includes('wa.me/') || link.href.includes('max.ru/')) {
               ym(id, 'reachGoal', 'telegram_click');
             }
           });
