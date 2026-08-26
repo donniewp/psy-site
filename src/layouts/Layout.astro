@@ -115,6 +115,38 @@ const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
             }, { threshold: 0.3 });
             observer.observe(pricesEl);
           }
+
+          // Цели глубины прокрутки — каждый порог отправляется один раз.
+          const scrollThresholds = [10, 25, 50, 75];
+          const reachedScroll = new Set();
+          let scrollRaf = 0;
+
+          const checkScrollDepth = () => {
+            scrollRaf = 0;
+            const doc = document.documentElement;
+            const scrollable = doc.scrollHeight - doc.clientHeight;
+            if (scrollable <= 0) return;
+            const percent = ((window.scrollY + doc.clientHeight) / doc.scrollHeight) * 100;
+
+            scrollThresholds.forEach((threshold) => {
+              if (percent >= threshold && !reachedScroll.has(threshold)) {
+                reachedScroll.add(threshold);
+                ym(id, 'reachGoal', `scroll_${threshold}`);
+              }
+            });
+
+            if (reachedScroll.size === scrollThresholds.length) {
+              window.removeEventListener('scroll', onScrollDepth);
+            }
+          };
+
+          const onScrollDepth = () => {
+            if (scrollRaf) return;
+            scrollRaf = requestAnimationFrame(checkScrollDepth);
+          };
+
+          window.addEventListener('scroll', onScrollDepth, { passive: true });
+          checkScrollDepth();
         }
       </script>
     )}
