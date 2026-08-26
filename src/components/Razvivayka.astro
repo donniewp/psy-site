@@ -59,6 +59,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     </div>
 
     <div class="raz-route" data-raz-reveal="1" id="raz-route">
+     <div class="raz-route-pin" id="raz-route-pin">
       <div class="raz-route-stops" role="tablist" aria-label={`Маршрут занятия «Развивай-ка»: 5 станций, 150 минут`}>
         <span class="raz-route-line" aria-hidden="true"><span class="raz-route-line-fill" id="raz-route-line-fill"></span></span>
 
@@ -162,6 +163,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
           </div>
         ))}
       </div>
+     </div>
     </div>
 
     <div class="razvivayka-footer" data-raz-reveal="2">
@@ -185,7 +187,10 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
 <style>
   .razvivayka {
     position: relative;
-    overflow: hidden;
+    /* Никакого overflow здесь: даже overflow-x:hidden заставляет браузер
+       выставить overflow-y:auto (так работает CSS для смешанных значений),
+       а auto ломает position:sticky у пина станций ниже точно так же, как
+       hidden. Обрезку от вылезающих блобов/доодлов даёт .razvivayka-bg сама. */
     --active-hue: 108;
     transition: background-color .4s ease-out;
   }
@@ -262,7 +267,14 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
   }
 
   /* ===== Маршрут: линия + станции + сцена — один объект ===== */
-  .raz-route { margin-top: var(--space-7); }
+  .raz-route { position: relative; margin-top: var(--space-7); }
+
+  /* На десктопе .raz-route растягивается JS-ом на несколько экранов, а этот
+     блок «прилипает» под хедером — станции листаются самим скроллом, без
+     таймера и без лишних кликов. */
+  @media (min-width: 901px) {
+    .raz-route-pin { position: sticky; top: 100px; }
+  }
 
   .raz-route-stops {
     position: relative;
@@ -570,14 +582,8 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
   const mobilePanels = Array.from(route.querySelectorAll<HTMLElement>('.raz-panel-mobile'));
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const AUTO_INTERVAL = 2400;
-  let autoTimer: number | undefined;
-  let currentIndex = 0;
-  let inView = false;
-  let hovering = false;
 
   function setActive(index: number) {
-    currentIndex = index;
     stops.forEach((el, i) => {
       const active = i === index;
       el.setAttribute('aria-selected', String(active));
@@ -592,24 +598,6 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       el.setAttribute('aria-hidden', String(i !== index));
     });
     section!.style.setProperty('--active-hue', String(hues[index]));
-
-    // Ручной выбор во время автопрогона не должен обрываться раньше времени —
-    // просто даём полный интервал на чтение с этой станции.
-    if (autoTimer) {
-      window.clearInterval(autoTimer);
-      autoTimer = window.setInterval(() => setActive((currentIndex + 1) % stops.length), AUTO_INTERVAL);
-    }
-  }
-
-  function startAuto() {
-    if (autoTimer || reduceMotion || hovering || !inView) return;
-    autoTimer = window.setInterval(() => setActive((currentIndex + 1) % stops.length), AUTO_INTERVAL);
-  }
-
-  function stopAuto() {
-    if (!autoTimer) return;
-    window.clearInterval(autoTimer);
-    autoTimer = undefined;
   }
 
   stops.forEach((el, i) => {
@@ -631,26 +619,84 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     });
   });
 
-  // Автопрогон станций, пока секция в зоне видимости — не нужно ничего кликать,
-  // чтобы увидеть все 5 станций. Останавливается при наведении/фокусе (уже
-  // переключает вручную через setActive выше) и вне вьюпорта, чтобы не крутиться
-  // впустую за кадром.
-  route.addEventListener('mouseenter', () => { hovering = true; stopAuto(); });
-  route.addEventListener('mouseleave', () => { hovering = false; startAuto(); });
-  route.addEventListener('focusin', () => { hovering = true; stopAuto(); });
-  route.addEventListener('focusout', () => { hovering = false; startAuto(); });
+  // Не нужно ничего кликать, чтобы увидеть все 5 станций — переключение
+  // привязано напрямую к скроллу.
+  //
+  // Десктоп: .raz-route-pin «прилипает» под хедером, пока .raz-route (у которого
+  // JS выставляет большую высоту — по одному «шагу» на станцию) прокручивается
+  // мимо. Прогресс скролла внутри этого шага и выбирает активную станцию —
+  // ровно как просил пользователь: «экран на месте, пока скролишь — открываются».
+  //
+  // Мобила: там станции и так идут одна под другой (обычный вертикальный
+  // список), поэтому вместо pin — каждая раскрывается сама, когда доезжает до
+  // средней трети экрана.
+  if (!reduceMotion) {
+    const pin = document.getElementById('raz-route-pin') as HTMLElement | null;
+    const desktopMql = window.matchMedia('(min-width: 901px)');
+    const PIN_OFFSET = 100; // должен совпадать с top в CSS у .raz-route-pin
+    const STEP_VH_RATIO = 0.62; // «протяжённость» одной станции в долях высоты экрана
 
-  const autoPlayObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        inView = entry.isIntersecting;
-        if (inView) startAuto();
-        else stopAuto();
-      });
-    },
-    { threshold: 0.35 }
-  );
-  autoPlayObserver.observe(route);
+    let mode: 'desktop' | 'mobile' | null = null;
+    let raf = 0;
+
+    function layoutDesktopTrack() {
+      if (!pin) return;
+      const step = window.innerHeight * STEP_VH_RATIO;
+      route!.style.height = `${pin.offsetHeight + step * stops.length}px`;
+    }
+
+    function updateFromScroll() {
+      raf = 0;
+      if (mode !== 'desktop' || !pin) return;
+      const rect = route!.getBoundingClientRect();
+      const scrollable = rect.height - pin.offsetHeight;
+      if (scrollable <= 0) return;
+      const traveled = PIN_OFFSET - rect.top;
+      const progress = Math.min(1, Math.max(0, traveled / scrollable));
+      setActive(Math.min(stops.length - 1, Math.floor(progress * stops.length)));
+    }
+
+    function onScroll() {
+      if (raf) return;
+      raf = requestAnimationFrame(updateFromScroll);
+    }
+
+    const mobileRevealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const idx = stops.indexOf(entry.target as HTMLButtonElement);
+          if (idx !== -1) setActive(idx);
+        });
+      },
+      { rootMargin: '-38% 0px -38% 0px', threshold: 0 }
+    );
+
+    function enterDesktopMode() {
+      mode = 'desktop';
+      mobileRevealObserver.disconnect();
+      layoutDesktopTrack();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', layoutDesktopTrack);
+      updateFromScroll();
+    }
+
+    function enterMobileMode() {
+      mode = 'mobile';
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', layoutDesktopTrack);
+      route!.style.height = '';
+      stops.forEach((el) => mobileRevealObserver.observe(el));
+    }
+
+    function applyMode() {
+      if (desktopMql.matches) enterDesktopMode();
+      else enterMobileMode();
+    }
+
+    applyMode();
+    desktopMql.addEventListener('change', applyMode);
+  }
 
   // Линия маршрута заливается по мере попадания секции во вьюпорт (та же механика,
   // что у остальных таймлайнов сайта)
