@@ -569,7 +569,15 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
   const desktopPanels = Array.from(route.querySelectorAll<HTMLElement>('.raz-panel'));
   const mobilePanels = Array.from(route.querySelectorAll<HTMLElement>('.raz-panel-mobile'));
 
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const AUTO_INTERVAL = 2400;
+  let autoTimer: number | undefined;
+  let currentIndex = 0;
+  let inView = false;
+  let hovering = false;
+
   function setActive(index: number) {
+    currentIndex = index;
     stops.forEach((el, i) => {
       const active = i === index;
       el.setAttribute('aria-selected', String(active));
@@ -584,6 +592,24 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       el.setAttribute('aria-hidden', String(i !== index));
     });
     section!.style.setProperty('--active-hue', String(hues[index]));
+
+    // Ручной выбор во время автопрогона не должен обрываться раньше времени —
+    // просто даём полный интервал на чтение с этой станции.
+    if (autoTimer) {
+      window.clearInterval(autoTimer);
+      autoTimer = window.setInterval(() => setActive((currentIndex + 1) % stops.length), AUTO_INTERVAL);
+    }
+  }
+
+  function startAuto() {
+    if (autoTimer || reduceMotion || hovering || !inView) return;
+    autoTimer = window.setInterval(() => setActive((currentIndex + 1) % stops.length), AUTO_INTERVAL);
+  }
+
+  function stopAuto() {
+    if (!autoTimer) return;
+    window.clearInterval(autoTimer);
+    autoTimer = undefined;
   }
 
   stops.forEach((el, i) => {
@@ -604,6 +630,27 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       stops[next].focus();
     });
   });
+
+  // Автопрогон станций, пока секция в зоне видимости — не нужно ничего кликать,
+  // чтобы увидеть все 5 станций. Останавливается при наведении/фокусе (уже
+  // переключает вручную через setActive выше) и вне вьюпорта, чтобы не крутиться
+  // впустую за кадром.
+  route.addEventListener('mouseenter', () => { hovering = true; stopAuto(); });
+  route.addEventListener('mouseleave', () => { hovering = false; startAuto(); });
+  route.addEventListener('focusin', () => { hovering = true; stopAuto(); });
+  route.addEventListener('focusout', () => { hovering = false; startAuto(); });
+
+  const autoPlayObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        inView = entry.isIntersecting;
+        if (inView) startAuto();
+        else stopAuto();
+      });
+    },
+    { threshold: 0.35 }
+  );
+  autoPlayObserver.observe(route);
 
   // Линия маршрута заливается по мере попадания секции во вьюпорт (та же механика,
   // что у остальных таймлайнов сайта)
@@ -637,7 +684,6 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
   revealEls.forEach((el) => revealObserver.observe(el));
 
   // Лёгкий параллакс фона по курсору — только десктоп
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isDesktopHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (bg && isDesktopHover && !reduceMotion) {
     let raf = 0;
