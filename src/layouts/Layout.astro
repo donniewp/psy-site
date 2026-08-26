@@ -91,8 +91,12 @@ const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
             if (!link) return;
             if (link.href.startsWith('tel:')) {
               ym(id, 'reachGoal', 'phone_click');
-            } else if (link.href.includes('t.me/') || link.href.includes('wa.me/') || link.href.includes('max.ru/')) {
+            } else if (link.href.includes('t.me/')) {
               ym(id, 'reachGoal', 'telegram_click');
+            } else if (link.href.includes('max.ru/')) {
+              ym(id, 'reachGoal', 'max_click');
+            } else if (link.href.includes('wa.me/')) {
+              ym(id, 'reachGoal', 'whatsapp_click');
             }
           });
 
