@@ -201,10 +201,14 @@ import Icon from './Icon.astro';
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     error?.setAttribute('hidden', 'true');
+
+    // Важно: сначала читаем FormData, потом блокируем поля — disabled-инпуты
+    // исключаются из FormData спецификацией HTML, так что в обратном порядке
+    // на сервер уходило бы пустое тело запроса.
+    const data = Object.fromEntries(new FormData(form).entries());
+
     form.classList.add('is-submitting');
     form.querySelectorAll('input, select, button').forEach((el) => el.setAttribute('disabled', 'true'));
-
-    const data = Object.fromEntries(new FormData(form).entries());
 
     try {
       if (!endpoint || endpoint.includes('REPLACE-ME')) {
