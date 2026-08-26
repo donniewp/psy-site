@@ -22,7 +22,7 @@ A named, credentialed practitioner (Петрова Татьяна Анатоль
 
 ## Operating Context
 
-- Two physical locations in Moscow, each tied to a metro station: м. Красные ворота (Мясницкая, 46) and м. Войковская (**Ленинградское шоссе, д. 8, к. 3** — corrected 2026-07-27, see Capabilities and Constraints).
+- One physical location in Moscow, м. Войковская (**Ленинградское шоссе, д. 8, к. 3** — corrected 2026-07-27, see Capabilities and Constraints). The м. Красные ворота / Мясницкая, 46 address is no longer current (confirmed 2026-08-26) — the studio no longer operates there; do not use it in copy, ad targeting, or geo-targeting.
 - Phone contact (+7 985 825-87-30 / 8 985 825-87-30 — same number appears in both the design canvas and the real brochures) with stated hours "Ежедневно 10:00–19:00," plus WhatsApp/Telegram for messaging.
 - Primary conversion is a lead form; on submit it should notify the practice via Telegram Bot API (serverless function, no third-party form service, token in env vars). Secondary conversion: direct Telegram message or phone call.
 - Third-party social proof lives on Yandex (reviews/ratings) and is linked from the site rather than fully hosted on it.
