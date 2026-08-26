@@ -147,6 +147,11 @@ const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
 
           window.addEventListener('scroll', onScrollDepth, { passive: true });
           checkScrollDepth();
+
+          // Цели времени на сайте — таймеры, каждый срабатывает один раз.
+          [30, 60, 90, 120, 180].forEach((seconds) => {
+            setTimeout(() => ym(id, 'reachGoal', `time_${seconds}`), seconds * 1000);
+          });
         }
       </script>
     )}
