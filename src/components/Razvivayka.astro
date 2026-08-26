@@ -635,6 +635,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     const desktopMql = window.matchMedia('(min-width: 901px)');
     const PIN_OFFSET = 100; // должен совпадать с top в CSS у .raz-route-pin
     const STEP_VH_RATIO = 0.62; // «протяжённость» одной станции в долях высоты экрана
+    const MOBILE_FOCUS_RATIO = 0.4; // линия во вьюпорте, к которой «магнитится» ближайшая станция
 
     let mode: 'desktop' | 'mobile' | null = null;
     let raf = 0;
@@ -645,9 +646,8 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       route!.style.height = `${pin.offsetHeight + step * stops.length}px`;
     }
 
-    function updateFromScroll() {
-      raf = 0;
-      if (mode !== 'desktop' || !pin) return;
+    function updateDesktop() {
+      if (!pin) return;
       const rect = route!.getBoundingClientRect();
       const scrollable = rect.height - pin.offsetHeight;
       if (scrollable <= 0) return;
@@ -656,37 +656,48 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       setActive(Math.min(stops.length - 1, Math.floor(progress * stops.length)));
     }
 
-    function onScroll() {
-      if (raf) return;
-      raf = requestAnimationFrame(updateFromScroll);
+    // Раньше тут был IntersectionObserver по каждой кнопке — но при обычном
+    // быстром свайпе несколько станций пересекают его зону почти одновременно
+    // одним пакетом событий, и «побеждала» не та, что реально в фокусе, а
+    // последняя по DOM-порядку — отсюда хаотичное поведение на телефоне.
+    // Вместо этого на каждый скролл просто берём одну станцию, чья кнопка
+    // ближе всего к «линии фокуса» — детерминированно, без гонки состояний.
+    function updateMobile() {
+      const line = window.innerHeight * MOBILE_FOCUS_RATIO;
+      let bestIndex = 0;
+      let bestDist = Infinity;
+      stops.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const dist = Math.abs(r.top + r.height / 2 - line);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestIndex = i;
+        }
+      });
+      setActive(bestIndex);
     }
 
-    const mobileRevealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const idx = stops.indexOf(entry.target as HTMLButtonElement);
-          if (idx !== -1) setActive(idx);
-        });
-      },
-      { rootMargin: '-38% 0px -38% 0px', threshold: 0 }
-    );
+    function onScroll() {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        if (mode === 'desktop') updateDesktop();
+        else if (mode === 'mobile') updateMobile();
+      });
+    }
 
     function enterDesktopMode() {
       mode = 'desktop';
-      mobileRevealObserver.disconnect();
       layoutDesktopTrack();
-      window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', layoutDesktopTrack);
-      updateFromScroll();
+      updateDesktop();
     }
 
     function enterMobileMode() {
       mode = 'mobile';
-      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', layoutDesktopTrack);
       route!.style.height = '';
-      stops.forEach((el) => mobileRevealObserver.observe(el));
+      updateMobile();
     }
 
     function applyMode() {
@@ -694,6 +705,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       else enterMobileMode();
     }
 
+    window.addEventListener('scroll', onScroll, { passive: true });
     applyMode();
     desktopMql.addEventListener('change', applyMode);
   }
