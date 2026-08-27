@@ -1,14 +1,13 @@
 ---
 import { maxHref } from '../data/content';
-import Icon from './Icon.astro';
 ---
 
 <div class="chat-buttons" id="chat-buttons">
   <a href={maxHref} target="_blank" rel="noopener" class="chat-btn max-btn" aria-label="Написать в Max">
-    <Icon name="svc-max" class="chat-icon" />
+    <img src={`${import.meta.env.BASE_URL}icons/brand-max.svg`} alt="" class="chat-icon" width="56" height="56" />
   </a>
   <a href="https://t.me/+79858258730" target="_blank" rel="noopener" class="chat-btn tg-btn" aria-label="Написать в Telegram">
-    <Icon name="svc-telegram" class="chat-icon" />
+    <img src={`${import.meta.env.BASE_URL}icons/brand-telegram.svg`} alt="" class="chat-icon" width="56" height="56" />
   </a>
 </div>
 
@@ -27,7 +26,7 @@ import Icon from './Icon.astro';
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--color-moss);
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,12 +34,19 @@ import Icon from './Icon.astro';
     opacity: 0;
     transform: translateY(16px) scale(.9);
     pointer-events: none;
-    transition: opacity .3s ease-out, transform .3s ease-out;
+    transition: opacity .3s ease-out, transform .3s ease-out, box-shadow .2s ease-out, filter .2s ease-out;
   }
 
   .chat-buttons.visible .chat-btn { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 
-  .chat-btn :global(.chat-icon) { width: 26px; height: 26px; color: #fff; }
+  .chat-buttons.visible .chat-btn:hover { filter: brightness(1.08); transform: translateY(0) scale(1.06); }
+
+  /* Официальные иконки мессенджеров (свой фон и фирменный цвет уже внутри
+     SVG) — раньше кружок был в цвет var(--color-moss) и сливался с зелёным
+     фоном сайта. У MAX сама иконка — скруглённый квадрат чуть крупнее круга
+     кнопки, поэтому она немного увеличена и обрезана по кругу через overflow. */
+  .chat-icon { width: 100%; height: 100%; display: block; }
+  .max-btn .chat-icon { width: 120%; height: 120%; }
 
   @media (max-width: 720px) {
     .chat-buttons { bottom: 132px; right: 16px; gap: 10px; }

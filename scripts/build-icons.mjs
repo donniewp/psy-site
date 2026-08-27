@@ -218,6 +218,13 @@ const icons = {
       <line x1="11" y1="13" x2="17" y2="8" />
     `,
   },
+  'svc-max': {
+    label: 'Макс',
+    group: 'Служебные',
+    body: `
+      <path d="M4 6.5 a2 2 0 0 1 2 -2 h12 a2 2 0 0 1 2 2 v7 a2 2 0 0 1 -2 2 h-9 l-4 3.5 v-3.5 h-1 a2 2 0 0 1 -2 -2 Z" />
+    `,
+  },
   'svc-arrow': {
     label: 'Стрелка',
     group: 'Служебные',
@@ -290,13 +297,13 @@ fs.mkdirSync(iconsDir, { recursive: true });
 const svgWrap = (body) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${STROKE}" stroke-linecap="round" stroke-linejoin="round">${body}</svg>\n`;
 
-for (const [, def] of Object.entries(icons)) {
+for (const [name, def] of Object.entries(icons)) {
   fs.writeFileSync(path.join(iconsDir, `${name}.svg`), svgWrap(def.body));
 }
 
 // sprite: symbol-based, id = icon name
 let sprite = '<svg xmlns="http://www.w3.org/2000/svg" style="display:none">\n';
-for (const [, def] of Object.entries(icons)) {
+for (const [name, def] of Object.entries(icons)) {
   sprite += `  <symbol id="icon-${name}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${STROKE}" stroke-linecap="round" stroke-linejoin="round">${def.body}</symbol>\n`;
 }
 sprite += '</svg>\n';
