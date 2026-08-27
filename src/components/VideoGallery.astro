@@ -60,6 +60,23 @@ const video = videos[0];
   </div>
 </section>
 
+<dialog class="video-dialog" id="video-modal" aria-label={video.alt}>
+  <button type="button" class="video-dialog-close" id="video-modal-close" aria-label="Закрыть">
+    <Icon name="svc-cross" class="icon" />
+  </button>
+  <video
+    class="video-dialog-el"
+    poster={`${import.meta.env.BASE_URL}${video.poster.replace(/^\//, '')}`}
+    data-src={`${import.meta.env.BASE_URL}${video.src.replace(/^\//, '')}`}
+    width="1080"
+    height="1920"
+    playsinline
+    controls
+    preload="none"
+    aria-label={video.alt}
+  ></video>
+</dialog>
+
 <style>
   .videos { background: var(--color-moss-deep); overflow: hidden; }
 
@@ -215,6 +232,55 @@ const video = videos[0];
     .video-play-btn:hover .video-play-icon, .video-play-btn:focus-visible .video-play-icon { transform: none; }
     .video-float-badge { animation: none; }
   }
+
+  /* Попап видео из ссылки "Смотреть видео с занятий" в Hero — тот же приём,
+     что у формы записи: не скроллить вниз, а открыть окно поверх страницы. */
+  .video-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-lg);
+    background: var(--color-ink);
+    box-shadow: var(--shadow-lift);
+    height: min(85vh, 960px);
+    aspect-ratio: 9 / 16;
+    max-width: calc(100vw - var(--space-5) * 2);
+  }
+
+  .video-dialog[open] { display: block; }
+
+  .video-dialog::backdrop {
+    background: color-mix(in srgb, var(--color-ink) 70%, transparent);
+    backdrop-filter: blur(2px);
+  }
+
+  .video-dialog-el { width: 100%; height: 100%; display: block; object-fit: contain; background: var(--color-ink); }
+
+  .video-dialog-close {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .16);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    transition: background .2s ease-out, transform .2s ease-out;
+  }
+
+  .video-dialog-close:hover { background: rgba(255, 255, 255, .28); transform: scale(1.06); }
+  .video-dialog-close :global(.icon) { width: 14px; height: 14px; }
+
+  @media (max-width: 480px) {
+    .video-dialog { height: auto; width: calc(100vw - var(--space-5) * 2); }
+  }
 </style>
 
 <script>
@@ -243,5 +309,46 @@ const video = videos[0];
       video.load();
       cell.classList.remove('is-playing');
     });
+  });
+
+  // Ссылка "Смотреть видео с занятий" в Hero раньше просто скроллила к этой
+  // секции — теперь открывает видео сразу попапом, без прыжка по странице.
+  const videoDialog = document.getElementById('video-modal') as HTMLDialogElement | null;
+  const videoDialogEl = videoDialog?.querySelector('video') as HTMLVideoElement | null;
+  const videoDialogClose = document.getElementById('video-modal-close');
+
+  const openVideoModal = () => {
+    if (!videoDialog || !videoDialogEl) return;
+    if (!videoDialogEl.src) {
+      const src = videoDialogEl.dataset.src;
+      if (src) videoDialogEl.src = src;
+    }
+    videoDialog.showModal();
+    videoDialogEl.currentTime = 0;
+    videoDialogEl.play().catch(() => {});
+    document.body.style.overflow = 'hidden';
+  };
+
+  document.querySelectorAll<HTMLAnchorElement>('a[href="#video"]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      openVideoModal();
+    });
+  });
+
+  videoDialogClose?.addEventListener('click', () => videoDialog?.close());
+
+  videoDialog?.addEventListener('click', (e) => {
+    if (e.target === videoDialog) videoDialog.close();
+  });
+
+  videoDialog?.addEventListener('close', () => {
+    videoDialogEl?.pause();
+    if (videoDialogEl) {
+      videoDialogEl.currentTime = 0;
+      videoDialogEl.removeAttribute('src');
+      videoDialogEl.load();
+    }
+    document.body.style.overflow = '';
   });
 </script>
