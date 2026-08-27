@@ -7,7 +7,7 @@ import Icon from './Icon.astro';
   <div class="container">
     <div class="section-head center" data-reveal>
       <span class="eyebrow">Программы</span>
-      <h2>Программы студии — от 1,5 лет до начальной школы</h2>
+      <h2>Программы студии — для детей и подростков</h2>
       <p>Выберите возраст ребёнка — покажем подходящие программы и стоимость.</p>
     </div>
 
@@ -51,7 +51,7 @@ import Icon from './Icon.astro';
           )}
           <div class="program-body">
             <div class="program-top-row">
-              <span class="program-age">{p.ageLabel}</span>
+              {p.ageLabel && <span class="program-age">{p.ageLabel}</span>}
               <span class="program-direction" data-direction={p.direction}>{programDirectionLabels[p.direction]}</span>
             </div>
             <h3>{p.title}</h3>
