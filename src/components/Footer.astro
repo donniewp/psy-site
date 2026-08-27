@@ -33,7 +33,7 @@ import Icon from './Icon.astro';
   </div>
 
   <div class="container footer-legal">
-    <span>Публичная оферта · Политика конфиденциальности</span>
+    <span>Публичная оферта · <a href="/privacy">Политика конфиденциальности</a></span>
     <span>2026 · Сензитивность</span>
   </div>
 </footer>
@@ -81,6 +81,9 @@ import Icon from './Icon.astro';
     font-size: 13.5px;
     color: rgba(255, 255, 255, .85);
   }
+
+  .footer-legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .footer-legal a:hover { color: var(--color-lime); }
 
   @media (max-width: 720px) {
     .footer-inner { grid-template-columns: 1fr; gap: var(--space-5); }

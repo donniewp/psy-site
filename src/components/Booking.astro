@@ -56,7 +56,7 @@ import Icon from './Icon.astro';
       </label>
       <label class="checkbox">
         <input type="checkbox" required />
-        <span>Я соглашаюсь с условиями обработки персональных данных</span>
+        <span>Я соглашаюсь с <a href="/privacy" target="_blank" rel="noopener">условиями обработки персональных данных</a></span>
       </label>
 
       {/* Honeypot: скрыто от людей, но боты часто заполняют все поля подряд.
@@ -222,6 +222,8 @@ import Icon from './Icon.astro';
 
   .checkbox { flex-direction: row; align-items: center; font-weight: 400; font-size: 14px; color: var(--color-ink-soft); }
   .checkbox input { width: 16px; height: 16px; }
+  .checkbox a { color: var(--color-moss); text-decoration: underline; text-underline-offset: 2px; }
+  .checkbox a:hover { color: var(--color-moss-deep); }
 
   .form-submit { margin-top: var(--space-2); }
   .form-alt { text-align: center; font: var(--text-meta); color: var(--color-ink-soft); }
