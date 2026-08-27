@@ -34,6 +34,7 @@ export default {
 
     // Honeypot: настоящие посетители это поле не видят и не заполняют.
     if (data.hp_check) {
+      console.log('Honeypot triggered, submission dropped');
       return new Response('OK', { status: 200, headers: corsHeaders });
     }
 
@@ -60,9 +61,11 @@ export default {
     });
 
     if (!tgResponse.ok) {
+      console.error('Telegram send failed', tgResponse.status, await tgResponse.text());
       return new Response('Failed to send', { status: 502, headers: corsHeaders });
     }
 
+    console.log('Telegram message sent');
     return new Response('OK', { status: 200, headers: corsHeaders });
   },
 };
