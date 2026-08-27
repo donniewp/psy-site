@@ -33,7 +33,7 @@ export default {
     }
 
     // Honeypot: настоящие посетители это поле не видят и не заполняют.
-    if (data.website) {
+    if (data.hp_check) {
       return new Response('OK', { status: 200, headers: corsHeaders });
     }
 

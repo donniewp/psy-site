@@ -55,10 +55,12 @@ import Icon from './Icon.astro';
         <span>Я соглашаюсь с условиями обработки персональных данных</span>
       </label>
 
-      {/* Honeypot: скрыто от людей, но боты часто заполняют все поля подряд */}
+      {/* Honeypot: скрыто от людей, но боты часто заполняют все поля подряд.
+          Имя поля намеренно не похоже на website/email/phone — иначе браузерный
+          автозаполнитель может подставить туда значение и заявка молча потеряется. */}
       <label class="visually-hidden" aria-hidden="true">
         <span>Оставьте это поле пустым</span>
-        <input type="text" name="website" tabindex="-1" autocomplete="off" />
+        <input type="text" name="hp_check" tabindex="-1" autocomplete="off" />
       </label>
 
       <button type="submit" class="btn btn-primary form-submit">Записаться на пробное</button>
