@@ -1,5 +1,5 @@
 ---
-import { location, phone, phoneHref } from '../data/content';
+import { location, phone, phoneHref, yandexMapsUrl } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -12,6 +12,10 @@ import Icon from './Icon.astro';
         loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
       ></iframe>
+      <a href={yandexMapsUrl} target="_blank" rel="noopener" class="map-open-link">
+        <Icon name="svc-pin" class="icon" />
+        Открыть в Яндекс Картах
+      </a>
     </div>
 
     <div class="contacts-card" data-reveal>
@@ -36,6 +40,7 @@ import Icon from './Icon.astro';
       </div>
 
       <a href="#booking" class="btn btn-dark">Записаться на консультацию</a>
+      <a href={yandexMapsUrl} target="_blank" rel="noopener" class="yandex-org-link">Страница студии на Яндекс Картах</a>
     </div>
   </div>
 </section>
@@ -43,8 +48,32 @@ import Icon from './Icon.astro';
 <style>
   .contacts-inner { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--space-6); align-items: stretch; }
 
-  .map-wrap { border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+  .map-wrap { position: relative; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
   .map-wrap iframe { width: 100%; height: 100%; min-height: 360px; border: 0; display: block; }
+
+  /* Заметная ссылка на Я.Карты поверх виджета — у самого виджета в углу есть
+     своя мелкая надпись "Открыть в Яндекс Картах", но её легко не заметить. */
+  .map-open-link {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font: var(--text-meta);
+    font-weight: 700;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-md);
+    transition: background .2s ease-out, transform .2s ease-out;
+  }
+
+  .map-open-link :global(.icon) { width: 15px; height: 15px; color: var(--color-moss); flex-shrink: 0; }
+  .map-open-link:hover { background: var(--color-moss); color: #fff; transform: translateY(-1px); }
+  .map-open-link:hover :global(.icon) { color: #fff; }
 
   .contacts-card {
     background: var(--color-surface);
@@ -62,6 +91,19 @@ import Icon from './Icon.astro';
   .contact-line .phone { font: var(--text-h3); font-size: 20px; color: var(--color-ink); }
 
   .contacts-card .btn { margin-top: var(--space-3); align-self: flex-start; }
+
+  .yandex-org-link {
+    align-self: flex-start;
+    font: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-moss);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--color-moss) 40%, transparent);
+    transition: text-decoration-color .2s ease-out;
+  }
+
+  .yandex-org-link:hover { text-decoration-color: currentColor; }
 
   @media (max-width: 900px) {
     .contacts-inner { grid-template-columns: 1fr; }

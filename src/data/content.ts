@@ -16,6 +16,9 @@ export const location = {
   hours: 'с 8:30 до 19:30, без выходных',
 };
 
+// Карточка организации «Сензитивность» на Яндекс.Картах (отзывы, фото, часы работы).
+export const yandexMapsUrl = 'https://yandex.ru/maps/-/CTDXBA90';
+
 export const nav = [
   { label: 'Программы', id: 'programs' },
   { label: 'Развивай-ка', id: 'razvivayka' },

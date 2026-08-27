@@ -1,5 +1,5 @@
 ---
-import { reviews } from '../data/content';
+import { reviews, yandexMapsUrl } from '../data/content';
 ---
 
 <section class="reviews section" id="reviews">
@@ -7,7 +7,7 @@ import { reviews } from '../data/content';
     <div class="section-head center" data-reveal>
       <span class="eyebrow">Отзывы</span>
       <h2>Родители ценят нас за бережный подход</h2>
-      <p class="reviews-link">Больше отзывов о студии на Яндекс</p>
+      <a href={yandexMapsUrl} target="_blank" rel="noopener" class="reviews-link">Больше отзывов о студии на Яндекс</a>
     </div>
 
     <div class="reviews-grid" data-reveal>
@@ -30,7 +30,17 @@ import { reviews } from '../data/content';
 
 <style>
   .reviews { background: var(--color-surface); }
-  .reviews-link { font-style: italic; }
+
+  .reviews-link {
+    display: inline-block;
+    font-style: italic;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--color-ink-soft) 40%, transparent);
+    transition: color .2s ease-out, text-decoration-color .2s ease-out;
+  }
+
+  .reviews-link:hover { color: var(--color-moss); text-decoration-color: currentColor; }
 
   .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
 
