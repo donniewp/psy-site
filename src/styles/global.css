@@ -1,7 +1,17 @@
 @import './tokens.css';
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+
+/* Страховка от горизонтального скролла: на очень узких экранах (~320px)
+   отдельные блоки могут на пару пикселей вылезать за край вьюпорта — вместо
+   охоты за каждым таким случаем режем горизонтальный скролл на уровне корня.
+   Важно: именно overflow-x:clip, а не hidden — hidden молча промотирует
+   overflow-y в auto (так работает CSS для смешанных значений overflow), из-за
+   чего html/body превращаются в отдельный скролл-контейнер и ломают
+   position:sticky у вложенных элементов (например, пин станций «Развивай-ка»
+   отклеивался и оставлял пустой экран при скролле). clip не создаёт скролл-
+   контейнер и такого побочного эффекта не даёт. */
+html { scroll-behavior: smooth; overflow-x: clip; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -20,6 +30,7 @@ body {
   background: var(--color-paper);
   -webkit-font-smoothing: antialiased;
   position: relative;
+  overflow-x: clip;
 }
 
 /* Фирменный приём: едва заметное зерно на фоне — вместо градиентов и плоской заливки */
