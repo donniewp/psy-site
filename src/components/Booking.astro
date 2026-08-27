@@ -3,11 +3,15 @@ import { bookingSteps, bookingOptions, location, phone, phoneHref, bookingEndpoi
 import Icon from './Icon.astro';
 ---
 
-<section class="booking section" id="booking">
+<dialog class="booking-dialog" id="booking-modal" aria-labelledby="booking-modal-title">
+  <button type="button" class="booking-dialog-close" id="booking-modal-close" aria-label="Закрыть">
+    <Icon name="svc-cross" class="icon" />
+  </button>
+  <div class="booking-dialog-scroll">
   <div class="container booking-inner">
-    <div class="booking-copy" data-reveal>
+    <div class="booking-copy">
       <span class="eyebrow">Записаться</span>
-      <h2>Запишитесь на пробное занятие</h2>
+      <h2 id="booking-modal-title">Запишитесь на пробное занятие</h2>
       <p>Оставьте имя и телефон — перезвоним в течение 15 минут, расскажем о программах и подберём группу по возрасту ребёнка.</p>
 
       <ol class="booking-steps">
@@ -28,7 +32,7 @@ import Icon from './Icon.astro';
       </div>
     </div>
 
-    <form class="booking-form" data-reveal id="booking-form" data-endpoint={bookingEndpoint} data-metrika-id={yandexMetrikaId}>
+    <form class="booking-form" id="booking-form" data-endpoint={bookingEndpoint} data-metrika-id={yandexMetrikaId}>
       <svg class="booking-blob" viewBox="0 0 300 300" aria-hidden="true" focusable="false">
         <path d="M245,45 C280,85 285,150 260,205 C235,260 170,290 115,270 C60,250 20,195 30,140 C40,85 95,45 150,35 C190,28 220,15 245,45 Z" />
       </svg>
@@ -63,18 +67,77 @@ import Icon from './Icon.astro';
         <input type="text" name="hp_check" tabindex="-1" autocomplete="off" />
       </label>
 
+      {/* Атрибуция заявки: заполняются скриптом ниже из URL / Метрики,
+          человек их не видит и не трогает. */}
+      <input type="hidden" name="ym_client_id" />
+      <input type="hidden" name="yclid" />
+      <input type="hidden" name="utm_source" />
+      <input type="hidden" name="utm_medium" />
+      <input type="hidden" name="utm_campaign" />
+      <input type="hidden" name="utm_content" />
+      <input type="hidden" name="utm_term" />
+      <input type="hidden" name="landing_url" />
+
       <button type="submit" class="btn btn-primary form-submit">Записаться на пробное</button>
       <p class="form-alt">Или позвоните: <a href={phoneHref}>{phone}</a></p>
       <p class="form-success" id="form-success" hidden>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
       <p class="form-error" id="form-error" hidden>Не получилось отправить заявку. Позвоните нам: <a href={phoneHref}>{phone}</a></p>
     </form>
   </div>
-</section>
+  </div>
+</dialog>
 
 <style>
-  .booking { background: var(--color-surface); }
+  /* Форма записи теперь не секция в потоке страницы, а всплывающее окно —
+     по всем CTA сайта клиент попросил не скроллить вниз, а открывать попап. */
+  .booking-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    padding: 0;
+    max-width: min(920px, calc(100vw - var(--space-5) * 2));
+    max-height: min(720px, calc(100vh - var(--space-5) * 2));
+    border: none;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lift);
+  }
 
-  .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: start; }
+  /* dialog:not([open]) в UA-стилях даёт display:none, но правило пользовательской
+     таблицы стилей всегда перебивает UA независимо от специфичности — поэтому
+     display вешаем только на открытое состояние, а не на .booking-dialog целиком */
+  .booking-dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .booking-dialog::backdrop {
+    background: color-mix(in srgb, var(--color-ink) 55%, transparent);
+    backdrop-filter: blur(2px);
+  }
+
+  .booking-dialog-close {
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin: var(--space-4) var(--space-4) 0 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--color-paper);
+    box-shadow: var(--shadow-sm);
+    color: var(--color-ink);
+    transition: background .2s ease-out, transform .2s ease-out;
+  }
+
+  .booking-dialog-close:hover { background: var(--color-mist); transform: scale(1.06); }
+  .booking-dialog-close :global(.icon) { width: 14px; height: 14px; }
+
+  .booking-dialog-scroll { overflow-y: auto; min-height: 0; }
+
+  .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: start; padding: var(--space-6); }
 
   .booking-copy { display: flex; flex-direction: column; }
 
@@ -200,6 +263,54 @@ import Icon from './Icon.astro';
   const endpoint = form?.dataset.endpoint;
   const metrikaId = form?.dataset.metrikaId;
 
+  // Атрибуция заявки: utm-метки и yclid берём из URL, а если человек зашёл на
+  // сайт по рекламной ссылке и потом просто прокрутил страницу до формы (без
+  // повторного визита с теми же метками), подставляем то, что сохранили при
+  // первом заходе в этой сессии.
+  const ATTRIBUTION_STORAGE_KEY = 'attribution_params';
+  const attributionFields = ['yclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+
+  const params = new URLSearchParams(location.search);
+  let storedAttribution: Record<string, string> = {};
+  try {
+    storedAttribution = JSON.parse(sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY) || '{}');
+  } catch {
+    storedAttribution = {};
+  }
+
+  const attribution: Record<string, string> = { ...storedAttribution };
+  attributionFields.forEach((key) => {
+    const value = params.get(key);
+    if (value) attribution[key] = value;
+  });
+  sessionStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(attribution));
+
+  attributionFields.forEach((key) => {
+    const input = form?.querySelector<HTMLInputElement>(`[name="${key}"]`);
+    if (input && attribution[key]) input.value = attribution[key];
+  });
+
+  // landing_url — страница, на которую человек попал изначально, а не текущий
+  // якорь (#booking), поэтому фиксируем её один раз за сессию.
+  const LANDING_URL_STORAGE_KEY = 'landing_url';
+  const landingUrlInput = form?.querySelector<HTMLInputElement>('[name="landing_url"]');
+  if (landingUrlInput) {
+    const landingUrl = sessionStorage.getItem(LANDING_URL_STORAGE_KEY) || location.href;
+    sessionStorage.setItem(LANDING_URL_STORAGE_KEY, landingUrl);
+    landingUrlInput.value = landingUrl;
+  }
+
+  // ym_client_id — Метрика рекомендует именно его для импорта офлайн-конверсий.
+  // ym() — это очередь вызовов, так что колбэк отработает и в случае, если
+  // счётчик к этому моменту ещё не успел догрузиться.
+  const clientIdInput = form?.querySelector<HTMLInputElement>('[name="ym_client_id"]');
+  const ymQueue = (window as unknown as { ym?: (...args: unknown[]) => void }).ym;
+  if (clientIdInput && typeof ymQueue === 'function' && metrikaId && metrikaId !== 'REPLACE-ME') {
+    ymQueue(Number(metrikaId), 'getClientID', (clientID: string) => {
+      clientIdInput.value = clientID;
+    });
+  }
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     error?.setAttribute('hidden', 'true');
@@ -240,10 +351,53 @@ import Icon from './Icon.astro';
 
   // Ссылки "Записаться" из блока "Путь развития" (и похожие) приходят с ?program=... —
   // тот же приём, что ?age= у Programs.astro, только выбирает пункт select вместо таба.
-  const programParam = new URLSearchParams(location.search).get('program');
-  if (programParam) {
+  function applyProgramParam(programValue: string | null) {
+    if (!programValue) return;
     const select = form?.querySelector<HTMLSelectElement>('select[name="program"]');
-    const match = select && Array.from(select.options).find((o) => o.value === programParam);
-    if (select && match) select.value = programParam;
+    const match = select && Array.from(select.options).find((o) => o.value === programValue);
+    if (select && match) select.value = programValue;
+  }
+
+  // Попап вместо перехода: клиент попросил, чтобы все CTA-кнопки сайта
+  // (их около полутора десятков, во всех секциях) открывали форму записи
+  // окном поверх страницы, а не скроллили вниз. Вместо правки каждой кнопки
+  // в отдельности — один делегированный обработчик клика по всему документу,
+  // ловит любую ссылку на #booking (включая варианты с ?program=...#booking).
+  const dialog = document.getElementById('booking-modal') as HTMLDialogElement | null;
+  const closeBtn = document.getElementById('booking-modal-close');
+
+  const openBookingModal = (programValue: string | null = null) => {
+    applyProgramParam(programValue);
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const trigger = target?.closest<HTMLAnchorElement>('a[href*="#booking"]');
+    if (!trigger) return;
+    e.preventDefault();
+    const url = new URL(trigger.href, location.href);
+    openBookingModal(url.searchParams.get('program'));
+  });
+
+  closeBtn?.addEventListener('click', () => dialog?.close());
+
+  // Клик по подложке (::backdrop landet на сам <dialog>, а не на его контент) закрывает попап.
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  dialog?.addEventListener('close', () => {
+    document.body.style.overflow = '';
+  });
+
+  // Прямые переходы по ссылке вида /?program=...#booking (например, если JS
+  // выше почему-то не успел перехватить клик) — открываем попап и на полной
+  // загрузке страницы.
+  if (location.hash === '#booking') {
+    openBookingModal(new URLSearchParams(location.search).get('program'));
   }
 </script>

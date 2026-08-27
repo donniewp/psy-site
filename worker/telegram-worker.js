@@ -46,13 +46,31 @@ export default {
       return new Response('Missing fields', { status: 400, headers: corsHeaders });
     }
 
+    // Атрибуция: не блокирует отправку заявки, если чего-то из этого нет
+    // (например, JS не успел получить ym_client_id или человек пришёл без меток).
+    const field = (key, max) => (data[key] || '').toString().trim().slice(0, max);
+    const ymClientId = field('ym_client_id', 50);
+    const yclid = field('yclid', 50);
+    const utmSource = field('utm_source', 100);
+    const utmMedium = field('utm_medium', 100);
+    const utmCampaign = field('utm_campaign', 100);
+    const utmContent = field('utm_content', 100);
+    const utmTerm = field('utm_term', 100);
+    const landingUrl = field('landing_url', 500);
+
     const text = [
       'Новая заявка с сайта «Сензитивность»',
       '',
       `Имя ребёнка: ${name}`,
       `Телефон: ${phone}`,
       `Программа: ${program}`,
-    ].join('\n');
+      '',
+      `ClientID Метрики: ${ymClientId || 'не получен'}`,
+      yclid && `yclid: ${yclid}`,
+      (utmSource || utmMedium || utmCampaign || utmContent || utmTerm) &&
+        `UTM: ${[utmSource, utmMedium, utmCampaign, utmContent, utmTerm].filter(Boolean).join(' / ')}`,
+      landingUrl && `Страница входа: ${landingUrl}`,
+    ].filter(Boolean).join('\n');
 
     const tgResponse = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
