@@ -102,7 +102,11 @@ const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
 
             const link = e.target.closest && e.target.closest('a[href]');
             if (!link) return;
-            if (link.href.startsWith('tel:')) {
+            // Явная цель на ссылке важнее домена: телеграм из формы и телеграм
+            // плавающей кнопкой — разные двери, и сравнивать их надо порознь.
+            if (link.dataset && link.dataset.goal) {
+              ym(id, 'reachGoal', link.dataset.goal);
+            } else if (link.href.startsWith('tel:')) {
               ym(id, 'reachGoal', 'phone_click');
             } else if (link.href.includes('t.me/')) {
               ym(id, 'reachGoal', 'telegram_click');

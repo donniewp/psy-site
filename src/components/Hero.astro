@@ -1,44 +1,51 @@
 ---
-import { location, heroBadges } from '../data/content';
+import { location, heroBadges, trialOffer } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
 <section class="hero" id="top">
   <div class="hero-blob" aria-hidden="true"></div>
   <div class="container hero-inner">
+    {/* Текст разбит на заголовочную часть и остальное ради телефона: там фото
+        встаёт между ними, сразу под h1, а не за экраном текста внизу.
+        На десктопе обе части идут подряд обычным потоком, как и раньше. */}
     <div class="hero-copy">
-      <div class="hero-locations">
-        <span class="loc-pill"><Icon name="svc-pin" class="loc-icon" />{location.address}</span>
-        <span class="loc-pill"><Icon name="svc-metro" class="loc-icon" />{location.metro}</span>
+      <div class="hero-copy-head">
+        <div class="hero-locations">
+          <span class="loc-pill"><Icon name="svc-pin" class="loc-icon" />{location.address}</span>
+          <span class="loc-pill"><Icon name="svc-metro" class="loc-icon" />{location.metro}</span>
+        </div>
+
+        <h1>Детская студия развития «Сензитивность»</h1>
       </div>
 
-      <h1>Детская студия развития «Сензитивность»</h1>
+      <div class="hero-copy-rest">
+        <p class="hero-sub">
+          Занятия для детей и подростков: раннее развитие, подготовка к школе,
+          нейропсихология и песочная терапия. Мини-группы, бережный подход,
+          педагог-психолог с опытом более 20 лет.
+        </p>
 
-      <p class="hero-sub">
-        Занятия для детей и подростков: раннее развитие, подготовка к школе,
-        нейропсихология и песочная терапия. Мини-группы, бережный подход,
-        педагог-психолог с опытом более 20 лет.
-      </p>
+        <div class="hero-tags">
+          <span class="tag">Группы до 6 детей</span>
+          <span class="tag">Психолог · нейропсихолог</span>
+          <span class="tag tag-offer">{trialOffer.tag}</span>
+        </div>
 
-      <div class="hero-tags">
-        <span class="tag">Группы до 6 детей</span>
-        <span class="tag">Психолог · нейропсихолог</span>
-        <span class="tag">Запись открыта</span>
+        <div class="hero-ctas">
+          <a href="#booking" class="btn btn-primary">Записаться на пробное занятие</a>
+          <a href="#prices" class="btn btn-secondary">Программы и цены</a>
+        </div>
+
+        <p class="hero-microcopy">{trialOffer.short} · {trialOffer.timing} · ответим за 15 минут</p>
+
+        <a href="#video" class="hero-video-link">
+          <span class="hero-video-link-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+          </span>
+          Смотреть видео с занятий
+        </a>
       </div>
-
-      <div class="hero-ctas">
-        <a href="#booking" class="btn btn-primary">Записаться на пробное занятие</a>
-        <a href="#prices" class="btn btn-secondary">Программы и цены</a>
-      </div>
-
-      <p class="hero-microcopy">Ответим в течение 15 минут и подберём группу по возрасту ребёнка</p>
-
-      <a href="#video" class="hero-video-link">
-        <span class="hero-video-link-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-        </span>
-        Смотреть видео с занятий
-      </a>
     </div>
 
     <div class="hero-media" data-reveal>
@@ -117,6 +124,13 @@ import Icon from './Icon.astro';
 
   .hero-ctas { display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-7); }
 
+  .tag-offer {
+    background: var(--color-lime);
+    box-shadow: none;
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+
   .hero-microcopy { margin-top: var(--space-4); font: var(--text-meta); color: var(--color-ink-soft); }
 
   .hero-video-link {
@@ -184,5 +198,16 @@ import Icon from './Icon.astro';
 
   @media (max-width: 900px) {
     .hero-inner { grid-template-columns: 1fr; gap: var(--space-6); }
+
+    /* Фото сразу под заголовком. display:contents поднимает обе половины
+       .hero-copy на уровень сетки, и тогда картинку можно вставить между ними
+       через order — она уезжает с 1224px на ~500px, то есть на первый экран. */
+    .hero-copy { display: contents; }
+    .hero-copy-head { order: 1; }
+    .hero-media { order: 2; }
+    .hero-copy-rest { order: 3; }
+
+    /* Отступ до лида теперь задаёт gap сетки, собственный margin только удваивал бы его. */
+    .hero-sub { margin-top: 0; }
   }
 </style>

@@ -1,5 +1,5 @@
 ---
-import { prices } from '../data/content';
+import { prices, trialOffer } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -8,7 +8,7 @@ import Icon from './Icon.astro';
     <div class="section-head center" data-reveal>
       <span class="eyebrow">Цены</span>
       <h2>Прайс студии «Сензитивность»</h2>
-      <p>Прозрачные цены без скрытых платежей · оплата абонементом.</p>
+      <p>Прозрачные цены без скрытых платежей · оплата абонементом.<br /><strong>{trialOffer.short}</strong> — знакомство ничего не стоит.</p>
     </div>
 
     <div class="prices-grid" data-reveal>

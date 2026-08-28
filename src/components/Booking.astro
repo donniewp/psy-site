@@ -1,5 +1,5 @@
 ---
-import { bookingSteps, bookingOptions, location, phone, phoneHref, bookingEndpoint, yandexMetrikaId } from '../data/content';
+import { bookingSteps, bookingOptions, location, phone, phoneHref, telegramHref, maxHref, trialOffer, bookingEndpoint, yandexMetrikaId } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -9,26 +9,35 @@ import Icon from './Icon.astro';
   </button>
   <div class="booking-dialog-scroll">
   <div class="container booking-inner">
+    {/* Текст слева разбит на две части не ради вёрстки десктопа (там он читается
+        одной колонкой, как раньше), а ради телефона: на узком экране заголовок
+        остаётся сверху, а всё остальное уезжает под форму — иначе до первого
+        поля приходилось листать целый экран. См. медиазапрос ниже. */}
     <div class="booking-copy">
-      <span class="eyebrow">Записаться</span>
-      <h2 id="booking-modal-title">Запишитесь на пробное занятие</h2>
-      <p>Оставьте имя и телефон — перезвоним в течение 15 минут, расскажем о программах и подберём группу по возрасту ребёнка.</p>
+      <div class="booking-copy-head">
+        <span class="eyebrow">Записаться</span>
+        <h2 id="booking-modal-title">Запишитесь на пробное занятие</h2>
+      </div>
 
-      <ol class="booking-steps">
-        {bookingSteps.map((s) => (
-          <li>
-            <span class="step-n">{s.n}</span>
-            <div>
-              <strong>{s.title}</strong>
-              <span>{s.text}</span>
-            </div>
-          </li>
-        ))}
-      </ol>
+      <div class="booking-copy-detail">
+        <p>Пробное занятие бесплатное. Оставьте имя и телефон — перезвоним в течение 15 минут, расскажем о программах и подберём время под ваш график.</p>
 
-      <div class="booking-location">
-        <Icon name="svc-pin" class="icon" />
-        <span>{location.address} · {location.metro}</span>
+        <ol class="booking-steps">
+          {bookingSteps.map((s) => (
+            <li>
+              <span class="step-n">{s.n}</span>
+              <div>
+                <strong>{s.title}</strong>
+                <span>{s.text}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div class="booking-location">
+          <Icon name="svc-pin" class="icon" />
+          <span>{location.address} · {location.metro}</span>
+        </div>
       </div>
     </div>
 
@@ -36,23 +45,37 @@ import Icon from './Icon.astro';
       <svg class="booking-blob" viewBox="0 0 300 300" aria-hidden="true" focusable="false">
         <path d="M245,45 C280,85 285,150 260,205 C235,260 170,290 115,270 C60,250 20,195 30,140 C40,85 95,45 150,35 C190,28 220,15 245,45 Z" />
       </svg>
-      <h3>Пробное занятие в студии</h3>
+      <h3>Пробное занятие в студии <span class="form-free">{trialOffer.badge}</span></h3>
       <p class="form-sub">Знакомство с педагогом, форматом занятий и пространством студии</p>
 
+      {/* Спрашиваем имя родителя, а не ребёнка: перезваниваем именно взрослому,
+          и во всех проверенных детских центрах Москвы в лид-форме стоит имя
+          родителя. Возраст ребёнка больше не отдельное обязательное поле —
+          он и так закодирован в выборе программы, а уточнить можно в
+          комментарии. Обязательны только имя и телефон. */}
       <label>
-        <span>Имя ребёнка и возраст</span>
-        <input type="text" name="name" required placeholder="Например, Максим, 5 лет" />
+        <span>Ваше имя</span>
+        <input type="text" name="name" required autocomplete="name" placeholder="Как к вам обращаться" />
       </label>
       <label>
         <span>Телефон</span>
-        <input type="tel" name="phone" required placeholder="+7 (___) ___-__-__" />
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="+7 (___) ___-__-__" />
       </label>
       <label>
-        <span>Программа</span>
+        <span>Программа <span class="field-optional">необязательно</span></span>
         <select name="program">
           <option value="">Выберите программу</option>
           {bookingOptions.map((opt) => <option value={opt}>{opt}</option>)}
         </select>
+      </label>
+      <label>
+        <span>Комментарий <span class="field-optional">необязательно</span></span>
+        <textarea
+          name="comment"
+          rows="3"
+          maxlength="1000"
+          placeholder="Возраст ребёнка, удобное время для звонка, с чем хотите разобраться"
+        ></textarea>
       </label>
       <label class="checkbox">
         <input type="checkbox" required />
@@ -80,9 +103,30 @@ import Icon from './Icon.astro';
 
       <button type="submit" class="btn btn-primary form-submit">Записаться на пробное</button>
       <p class="form-alt">Или позвоните: <a href={phoneHref}>{phone}</a></p>
-      <p class="form-success" id="form-success" hidden>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+      {/* Вторая дверь для тех, кто не оставляет телефон из-за нежелания говорить.
+          Обе цели с суффиксом _form, чтобы не смешаться с плавающими кнопками
+          сбоку: иначе не понять, какой канал сработал именно здесь. */}
+      <p class="form-alt form-alt-msg">Не любите звонки? Напишите нам:</p>
+      <div class="form-messengers">
+        <a href={maxHref} target="_blank" rel="noopener" data-goal="max_form" class="msg-btn">
+          <Icon name="svc-max" class="msg-icon" />Max
+        </a>
+        <a href={telegramHref} target="_blank" rel="noopener" data-goal="telegram_form" class="msg-btn">
+          <Icon name="svc-telegram" class="msg-icon" />Телеграм
+        </a>
+      </div>
       <p class="form-error" id="form-error" hidden>Не получилось отправить заявку. Позвоните нам: <a href={phoneHref}>{phone}</a></p>
     </form>
+  </div>
+
+  {/* Подтверждение: после успешной отправки попап целиком переключается на этот
+      экран вместо строчки под кнопкой — её на длинной форме легко не заметить. */}
+  <div class="booking-success" id="booking-success" role="status" tabindex="-1">
+    <span class="booking-success-mark"><Icon name="svc-check" /></span>
+    <h2>Заявка отправлена</h2>
+    <p>Спасибо! Перезвоним в течение 15 минут — расскажем о программах и подберём время пробного занятия.</p>
+    <p class="booking-success-alt">Не дождались звонка? Наберите сами: <a href={phoneHref}>{phone}</a></p>
+    <button type="button" class="btn btn-primary" id="booking-success-close">Хорошо</button>
   </div>
   </div>
 </dialog>
@@ -140,6 +184,11 @@ import Icon from './Icon.astro';
   .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: start; padding: var(--space-6); }
 
   .booking-copy { display: flex; flex-direction: column; }
+
+  /* Половинки — тоже flex-колонки: .eyebrow объявлен inline-flex, и в обычном
+     блочном контейнере его margin-bottom считался бы по правилам строки, а не
+     как у флекс-элемента. Так вложенность не меняет отступы. */
+  .booking-copy-head, .booking-copy-detail { display: flex; flex-direction: column; }
 
   .booking-steps { margin: var(--space-6) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-4); }
   .booking-steps li { display: flex; gap: var(--space-4); align-items: flex-start; }
@@ -203,7 +252,7 @@ import Icon from './Icon.astro';
 
   .booking-form label { display: flex; flex-direction: column; gap: 6px; font: var(--text-meta); font-weight: 600; color: var(--color-ink); }
 
-  .booking-form input[type="text"], .booking-form input[type="tel"], .booking-form select {
+  .booking-form input[type="text"], .booking-form input[type="tel"], .booking-form select, .booking-form textarea {
     width: 100%;
     min-width: 0;
     font: var(--text-body);
@@ -215,42 +264,171 @@ import Icon from './Icon.astro';
     color: var(--color-ink-soft);
   }
 
-  .booking-form input:focus, .booking-form select:focus {
+  .booking-form input:focus, .booking-form select:focus, .booking-form textarea:focus {
     outline: 2px solid var(--color-moss);
     outline-offset: 1px;
   }
 
-  .checkbox { flex-direction: row; align-items: center; font-weight: 400; font-size: 14px; color: var(--color-ink-soft); }
-  .checkbox input { width: 16px; height: 16px; }
+  .booking-form textarea { resize: vertical; min-height: 84px; font-family: var(--font-text); }
+
+  /* Помечаем необязательные поля, а не обязательные: из четырёх полей формы
+     обязательны только два, и звёздочка у большинства читалась бы как «тут
+     много работы». Явное «необязательно» наоборот снижает порог. */
+  .field-optional {
+    margin-left: var(--space-2);
+    font-weight: 400;
+    font-size: 12.5px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink-soft);
+  }
+
+  /* label.checkbox, а не просто .checkbox: у правила `.booking-form label`
+     специфичность выше, и flex-direction:column перебивал row — галочка
+     вставала над текстом по центру вместо строки рядом с ним. */
+  .booking-form label.checkbox {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--color-ink-soft);
+  }
+
+  .checkbox input { flex-shrink: 0; width: 16px; height: 16px; margin-top: 2px; }
   .checkbox a { color: var(--color-moss); text-decoration: underline; text-underline-offset: 2px; }
   .checkbox a:hover { color: var(--color-moss-deep); }
+
+  .form-free {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: var(--space-2);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--color-lime);
+    color: var(--color-ink);
+    font: var(--text-label);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-label);
+  }
 
   .form-submit { margin-top: var(--space-2); }
   .form-alt { text-align: center; font: var(--text-meta); color: var(--color-ink-soft); }
   .form-alt a { font-weight: 700; color: var(--color-moss); }
+  .form-alt-msg { margin-top: calc(var(--space-4) * -1 + var(--space-1)); }
 
-  .form-success {
-    text-align: center;
-    color: var(--color-moss);
-    font-weight: 600;
-    font: var(--text-meta);
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity .22s ease-out, transform .22s ease-out;
+  .form-messengers {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: calc(var(--space-4) * -1 + var(--space-2));
   }
 
-  .form-success.is-shown { opacity: 1; transform: translateY(0); }
+  /* Ссылки, а не текст в строку: на телефоне два соседних инлайновых линка
+     дают слишком мелкие цели для пальца. */
+  .msg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    /* 44px — минимальная цель для пальца; своей высоты пилюле не хватало. */
+    min-height: 44px;
+    border-radius: var(--radius-pill);
+    box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-mist);
+    background: var(--color-surface);
+    font: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-moss);
+    transition: box-shadow .2s ease-out, background .2s ease-out;
+  }
+
+  .msg-btn:hover { background: var(--color-paper); box-shadow: inset 0 0 0 var(--stroke-thin) var(--color-moss); }
+  .msg-btn :global(.msg-icon) { width: 16px; height: 16px; flex-shrink: 0; }
 
   .form-error { text-align: center; color: var(--color-ink); font-weight: 600; font: var(--text-meta); }
   .form-error a { color: var(--color-moss); text-decoration: underline; }
 
-  .booking-form.is-submitting :is(input, select, .form-submit) {
+  .booking-form.is-submitting :is(input, select, textarea, .form-submit) {
     opacity: .5;
     transition: opacity .2s ease-out;
   }
 
+  /* ===== Экран «Заявка отправлена» ===== */
+  .booking-success { display: none; }
+
+  .booking-dialog.is-sent .booking-inner { display: none; }
+
+  .booking-dialog.is-sent .booking-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-6) var(--space-8);
+    animation: booking-success-in .28s ease-out both;
+  }
+
+  .booking-success:focus { outline: none; }
+
+  .booking-success-mark {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--color-lime);
+    color: var(--color-moss-deep);
+    animation: booking-success-pop .32s .1s ease-out both;
+  }
+
+  .booking-success-mark :global(svg) { width: 28px; height: 28px; }
+
+  .booking-success h2 { font: var(--text-h3); color: var(--color-ink); }
+  .booking-success p { max-width: 46ch; font: var(--text-body); color: var(--color-ink-soft); }
+
+  .booking-success-alt { font: var(--text-meta); }
+  /* nowrap: на узких экранах номер иначе рвётся посреди цифр. */
+  .booking-success-alt a { font-weight: 700; color: var(--color-moss); white-space: nowrap; }
+
+  .booking-success .btn { margin-top: var(--space-2); }
+
+  @keyframes booking-success-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  @keyframes booking-success-pop {
+    from { opacity: 0; transform: scale(.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
   @media (max-width: 900px) {
     .booking-inner { grid-template-columns: 1fr; }
+
+    /* Форма сразу под заголовком, а не через экран текста. display:contents
+       поднимает обе половины .booking-copy на уровень сетки, и тогда их можно
+       расставить вокруг формы через order. */
+    .booking-copy { display: contents; }
+    .booking-copy-head { order: 1; }
+    .booking-form { order: 2; }
+    .booking-copy-detail { order: 3; }
+
+    /* Крестик выводим из потока: в колонке он занимал целую строку в 56px
+       чистой пустоты над заголовком. Справа сверху текста нет, наезжать не на что. */
+    .booking-dialog-close {
+      position: absolute;
+      top: var(--space-2);
+      right: var(--space-2);
+      z-index: 2;
+      margin: 0;
+    }
+
+    .booking-inner { padding: var(--space-5); }
+
+    /* Подзаголовок формы на телефоне только повторяет заголовок попапа
+       в двух сантиметрах выше и отодвигает поля вниз. */
+    .form-sub { display: none; }
   }
 
   @media (max-width: 768px) {
@@ -260,7 +438,7 @@ import Icon from './Icon.astro';
 
 <script>
   const form = document.getElementById('booking-form') as HTMLFormElement | null;
-  const success = document.getElementById('form-success');
+  const successPanel = document.getElementById('booking-success');
   const error = document.getElementById('form-error');
   const endpoint = form?.dataset.endpoint;
   const metrikaId = form?.dataset.metrikaId;
@@ -323,7 +501,7 @@ import Icon from './Icon.astro';
     const data = Object.fromEntries(new FormData(form).entries());
 
     form.classList.add('is-submitting');
-    form.querySelectorAll('input, select, button').forEach((el) => el.setAttribute('disabled', 'true'));
+    form.querySelectorAll('input, select, textarea, button').forEach((el) => el.setAttribute('disabled', 'true'));
 
     try {
       if (!endpoint || endpoint.includes('REPLACE-ME')) {
@@ -336,8 +514,10 @@ import Icon from './Icon.astro';
       });
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-      success?.removeAttribute('hidden');
-      requestAnimationFrame(() => success?.classList.add('is-shown'));
+      dialog?.classList.add('is-sent');
+      // Форма могла быть прокручена — иначе подтверждение окажется вне вида.
+      dialogScroll?.scrollTo({ top: 0 });
+      successPanel?.focus();
 
       const ym = (window as unknown as { ym?: (...args: unknown[]) => void }).ym;
       if (typeof ym === 'function' && metrikaId && metrikaId !== 'REPLACE-ME') {
@@ -346,7 +526,7 @@ import Icon from './Icon.astro';
     } catch (err) {
       console.error('Booking form submit failed', err);
       form.classList.remove('is-submitting');
-      form.querySelectorAll('input, select, button').forEach((el) => el.removeAttribute('disabled'));
+      form.querySelectorAll('input, select, textarea, button').forEach((el) => el.removeAttribute('disabled'));
       error?.removeAttribute('hidden');
     }
   });
@@ -369,6 +549,7 @@ import Icon from './Icon.astro';
   const closeBtn = document.getElementById('booking-modal-close');
 
   const openBookingModal = (programValue: string | null = null) => {
+    resetAfterSend();
     applyProgramParam(programValue);
     if (dialog && !dialog.open) {
       dialog.showModal();
@@ -392,9 +573,39 @@ import Icon from './Icon.astro';
     if (e.target === dialog) dialog.close();
   });
 
+  const dialogScroll = dialog?.querySelector<HTMLElement>('.booking-dialog-scroll');
+
+  // Возвращаем попап от подтверждения обратно к форме — иначе человек, который
+  // уже записался и открыл окно второй раз, увидит «Заявка отправлена» вместо
+  // полей. Срабатывает только после реальной отправки: если человек просто
+  // закрыл окно на полпути, набранное сохраняем.
+  //
+  // Поля чистим поимённо, а не form.reset(): reset вернул бы к пустым значениям
+  // и скрытые поля атрибуции, которые заполняются скриптом, а не разметкой.
+  const resetAfterSend = () => {
+    if (!dialog?.classList.contains('is-sent')) return;
+    dialog.classList.remove('is-sent');
+    form?.classList.remove('is-submitting');
+    form?.querySelectorAll('input, select, textarea, button').forEach((el) => el.removeAttribute('disabled'));
+    error?.setAttribute('hidden', 'true');
+    form?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+      'input[name="name"], input[name="phone"], textarea[name="comment"]'
+    ).forEach((el) => { el.value = ''; });
+    const programSelect = form?.querySelector<HTMLSelectElement>('select[name="program"]');
+    if (programSelect) programSelect.value = '';
+    const consent = form?.querySelector<HTMLInputElement>('.checkbox input[type="checkbox"]');
+    if (consent) consent.checked = false;
+  };
+
+  // Сбрасываем и на закрытии, и на открытии: закрыть окно можно мимо нашего
+  // кода — Escape, клик по подложке, кнопка «назад», — а сброс на открытии
+  // гарантирует форму в чистом состоянии, каким бы путём окно ни закрыли.
   dialog?.addEventListener('close', () => {
     document.body.style.overflow = '';
+    resetAfterSend();
   });
+
+  document.getElementById('booking-success-close')?.addEventListener('click', () => dialog?.close());
 
   // Прямые переходы по ссылке вида /?program=...#booking (например, если JS
   // выше почему-то не успел перехватить клик) — открываем попап и на полной

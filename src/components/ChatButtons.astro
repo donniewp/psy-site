@@ -1,12 +1,12 @@
 ---
-import { maxHref } from '../data/content';
+import { maxHref, telegramHref } from '../data/content';
 ---
 
 <div class="chat-buttons" id="chat-buttons">
   <a href={maxHref} target="_blank" rel="noopener" class="chat-btn max-btn" aria-label="Написать в Max">
     <img src={`${import.meta.env.BASE_URL}icons/brand-max.svg`} alt="" class="chat-icon" width="56" height="56" />
   </a>
-  <a href="https://t.me/+79858258730" target="_blank" rel="noopener" class="chat-btn tg-btn" aria-label="Написать в Telegram">
+  <a href={telegramHref} target="_blank" rel="noopener" class="chat-btn tg-btn" aria-label="Написать в Telegram">
     <img src={`${import.meta.env.BASE_URL}icons/brand-telegram.svg`} alt="" class="chat-icon" width="56" height="56" />
   </a>
 </div>

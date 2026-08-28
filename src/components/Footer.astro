@@ -1,5 +1,5 @@
 ---
-import { nav, phone, phoneHref, location, maxHref } from '../data/content';
+import { nav, phone, phoneHref, location, maxHref, telegramHref } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -25,7 +25,7 @@ import Icon from './Icon.astro';
       <span>{location.address}</span>
       <span>{location.hours}</span>
       <div class="socials">
-        <a href="https://t.me/+79858258730" target="_blank" rel="noopener" aria-label="Telegram" class="social-icon"><Icon name="svc-telegram" /></a>
+        <a href={telegramHref} target="_blank" rel="noopener" aria-label="Telegram" class="social-icon"><Icon name="svc-telegram" /></a>
         <a href={maxHref} target="_blank" rel="noopener" aria-label="Max" class="social-icon"><Icon name="svc-max" /></a>
         <a href={phoneHref} aria-label="Телефон" class="social-icon"><Icon name="svc-phone" /></a>
       </div>
