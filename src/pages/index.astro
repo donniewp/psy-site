@@ -50,18 +50,35 @@ import StickyMobileCTA from '../components/StickyMobileCTA.astro';
 
 <script>
   const revealTargets = document.querySelectorAll('[data-reveal]');
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.setAttribute('data-reveal', 'shown');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
-  );
-  revealTargets.forEach((el) => revealObserver.observe(el));
+
+  // Показать всё разом — страховка на случай, когда наблюдатель недоступен.
+  // Блоки в CSS стоят с opacity:0, так что без этой ветки старый браузер
+  // (или упавший скрипт) оставил бы половину страницы пустой навсегда.
+  const revealAll = () => revealTargets.forEach((el) => el.setAttribute('data-reveal', 'shown'));
+
+  if (!('IntersectionObserver' in window)) {
+    revealAll();
+  } else {
+    // threshold:0, а не доля площади. Порог считается от размера самого блока,
+    // и высокий блок физически не может показать заметную свою долю: на телефоне
+    // .programs-grid вырастает до ~5600px, и в окно 640px помещается максимум
+    // 10% его площади — с прежним порогом 0.12 сетка программ не появлялась
+    // никогда, а на экране 812px проскакивала окно всего в ~78px прокрутки и
+    // терялась при быстром пролистывании. Момент появления теперь задаёт только
+    // нижний rootMargin и он одинаков для блоков любой высоты.
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.setAttribute('data-reveal', 'shown');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0, rootMargin: '0px 0px -60px 0px' }
+    );
+    revealTargets.forEach((el) => revealObserver.observe(el));
+  }
 
   const countTargets = document.querySelectorAll('[data-countup]');
   const countObserver = new IntersectionObserver(
