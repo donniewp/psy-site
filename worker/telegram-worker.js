@@ -41,6 +41,8 @@ export default {
     const name = (data.name || '').toString().trim().slice(0, 200);
     const phone = (data.phone || '').toString().trim().slice(0, 50);
     const program = (data.program || '').toString().trim().slice(0, 200) || 'не указана';
+    // Необязательное поле: возраст ребёнка, удобное время звонка, суть запроса.
+    const comment = (data.comment || '').toString().trim().slice(0, 1000);
 
     if (!name || !phone) {
       return new Response('Missing fields', { status: 400, headers: corsHeaders });
@@ -61,9 +63,10 @@ export default {
     const text = [
       'Новая заявка с сайта «Сензитивность»',
       '',
-      `Имя ребёнка: ${name}`,
+      `Имя: ${name}`,
       `Телефон: ${phone}`,
       `Программа: ${program}`,
+      comment && `Комментарий: ${comment}`,
       '',
       `ClientID Метрики: ${ymClientId || 'не получен'}`,
       yclid && `yclid: ${yclid}`,
