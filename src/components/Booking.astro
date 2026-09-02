@@ -46,7 +46,6 @@ import Icon from './Icon.astro';
         <path d="M245,45 C280,85 285,150 260,205 C235,260 170,290 115,270 C60,250 20,195 30,140 C40,85 95,45 150,35 C190,28 220,15 245,45 Z" />
       </svg>
       <h3>Пробное занятие в студии <span class="form-free">{trialOffer.badge}</span></h3>
-      <p class="form-sub">Знакомство с педагогом, форматом занятий и пространством студии</p>
 
       {/* Спрашиваем имя родителя, а не ребёнка: перезваниваем именно взрослому,
           и во всех проверенных детских центрах Москвы в лид-форме стоит имя
@@ -72,9 +71,9 @@ import Icon from './Icon.astro';
         <span>Комментарий <span class="field-optional">необязательно</span></span>
         <textarea
           name="comment"
-          rows="3"
+          rows="2"
           maxlength="1000"
-          placeholder="Возраст ребёнка, удобное время для звонка, с чем хотите разобраться"
+          placeholder="Возраст ребёнка, удобное время для звонка"
         ></textarea>
       </label>
       <label class="checkbox">
@@ -140,7 +139,7 @@ import Icon from './Icon.astro';
     margin: auto;
     padding: 0;
     max-width: min(920px, calc(100vw - var(--space-5) * 2));
-    max-height: min(720px, calc(100vh - var(--space-5) * 2));
+    max-height: min(880px, calc(100vh - var(--space-5) * 2));
     border: none;
     border-radius: var(--radius-lg);
     background: var(--color-surface);
@@ -163,9 +162,9 @@ import Icon from './Icon.astro';
   .booking-dialog-close {
     flex-shrink: 0;
     align-self: flex-end;
-    margin: var(--space-4) var(--space-4) 0 0;
-    width: 40px;
-    height: 40px;
+    margin: var(--space-3) var(--space-3) 0 0;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -181,7 +180,7 @@ import Icon from './Icon.astro';
 
   .booking-dialog-scroll { overflow-y: auto; min-height: 0; }
 
-  .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: start; padding: var(--space-6); }
+  .booking-inner { display: grid; grid-template-columns: .95fr 1.05fr; gap: var(--space-6); align-items: stretch; padding: var(--space-4) var(--space-6) var(--space-6); }
 
   .booking-copy { display: flex; flex-direction: column; }
 
@@ -211,7 +210,8 @@ import Icon from './Icon.astro';
   .booking-steps span { font: var(--text-meta); font-size: 13.5px; color: var(--color-ink-soft); }
 
   .booking-location {
-    padding-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: var(--stroke-hairline) solid color-mix(in srgb, var(--color-mist) 55%, transparent);
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -227,11 +227,11 @@ import Icon from './Icon.astro';
     background: var(--color-paper);
     /* Асимметричный радиус — один угол собран, а не одинаковый на всех четырёх */
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-xs);
-    padding: var(--space-6);
+    padding: var(--space-5);
     box-shadow: var(--shadow-md);
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .booking-blob {
@@ -248,16 +248,15 @@ import Icon from './Icon.astro';
   .booking-form > *:not(.booking-blob) { position: relative; z-index: 1; }
 
   .booking-form h3 { font: var(--text-h3); font-size: 21px; }
-  .form-sub { font: var(--text-meta); color: var(--color-ink-soft); margin-top: -4px; }
 
-  .booking-form label { display: flex; flex-direction: column; gap: 6px; font: var(--text-meta); font-weight: 600; color: var(--color-ink); }
+  .booking-form label { display: flex; flex-direction: column; gap: 5px; font: var(--text-meta); font-weight: 600; color: var(--color-ink); }
 
   .booking-form input[type="text"], .booking-form input[type="tel"], .booking-form select, .booking-form textarea {
     width: 100%;
     min-width: 0;
     font: var(--text-body);
     font-size: 15.5px;
-    padding: var(--space-3) var(--space-4);
+    padding: 10px var(--space-4);
     border-radius: var(--radius-sm);
     box-shadow: inset 0 0 0 1px var(--color-mist);
     background: var(--color-surface);
@@ -269,7 +268,7 @@ import Icon from './Icon.astro';
     outline-offset: 1px;
   }
 
-  .booking-form textarea { resize: vertical; min-height: 84px; font-family: var(--font-text); }
+  .booking-form textarea { resize: vertical; min-height: 66px; font-family: var(--font-text); }
 
   /* Помечаем необязательные поля, а не обязательные: из четырёх полей формы
      обязательны только два, и звёздочка у большинства читалась бы как «тут
@@ -315,13 +314,13 @@ import Icon from './Icon.astro';
   .form-submit { margin-top: var(--space-2); }
   .form-alt { text-align: center; font: var(--text-meta); color: var(--color-ink-soft); }
   .form-alt a { font-weight: 700; color: var(--color-moss); }
-  .form-alt-msg { margin-top: calc(var(--space-4) * -1 + var(--space-1)); }
+  .form-alt-msg { margin-top: calc(var(--space-3) * -1 + var(--space-1)); }
 
   .form-messengers {
     display: flex;
     justify-content: center;
     gap: var(--space-3);
-    margin-top: calc(var(--space-4) * -1 + var(--space-2));
+    margin-top: calc(var(--space-3) * -1 + var(--space-2));
   }
 
   /* Ссылки, а не текст в строку: на телефоне два соседних инлайновых линка
@@ -403,6 +402,16 @@ import Icon from './Icon.astro';
     to   { opacity: 1; transform: scale(1); }
   }
 
+  /* Форма справа всегда выше списка шагов слева, и под шагами остаётся пустое
+     место. Прижимаем адрес к низу колонки — с линией сверху он читается как
+     подпись колонки, и обе колонки заканчиваются на одной высоте. Но только
+     когда попап помещается в экран целиком: на низком окне низ колонки уже за
+     кромкой видимой области, и прижатый адрес просто уехал бы из виду. */
+  @media (min-width: 901px) and (min-height: 880px) {
+    .booking-copy-detail { flex: 1; }
+    .booking-location { margin-top: auto; }
+  }
+
   @media (max-width: 900px) {
     .booking-inner { grid-template-columns: 1fr; }
 
@@ -426,13 +435,45 @@ import Icon from './Icon.astro';
 
     .booking-inner { padding: var(--space-5); }
 
-    /* Подзаголовок формы на телефоне только повторяет заголовок попапа
-       в двух сантиметрах выше и отодвигает поля вниз. */
-    .form-sub { display: none; }
+    /* В одну колонку текст и форма идут друг за другом, прижимать адрес не к
+       чему — возвращаем ему обычный отступ без линии. */
+    .booking-location { margin-top: 0; border-top: none; padding-top: var(--space-6); }
   }
 
+  /* Телефоны. Кнопка «Записаться» должна попадать в первый экран попапа, а до
+     неё семь блоков — поэтому здесь всё плотнее десктопа. Отступы попапа и
+     карточки на шаг меньше: строка становится шире на 48px, и согласие с
+     заголовком карточки перестают переноситься лишний раз. */
   @media (max-width: 768px) {
     .booking-blob { display: none; }
+
+    .booking-dialog {
+      max-width: calc(100vw - var(--space-4) * 2);
+      max-height: calc(100vh - var(--space-4) * 2);
+    }
+
+    .booking-inner { row-gap: var(--space-5); padding: var(--space-4); }
+    .booking-form { padding: var(--space-4); }
+    .booking-form h3 { font-size: 19px; }
+    .booking-form textarea { min-height: 78px; }
+
+    /* Даже в самой плотной вёрстке заголовок, четыре поля, согласие и кнопка не
+       умещаются в экран телефона на 667px — а кнопку человек должен видеть с
+       первого кадра. Поэтому на телефонах она липнет к низу окна и опускается
+       на своё место в потоке, когда до него доскроллили.
+       overflow у формы снимаем: hidden делает её самостоятельным контейнером
+       прокрутки, и sticky прилипал бы к её собственному низу, то есть никуда.
+       Кляксу, ради которой стоял hidden, на телефоне и так не показываем. */
+    .booking-form { overflow: visible; }
+
+    .booking-form > .form-submit {
+      position: sticky;
+      bottom: var(--space-3);
+      z-index: 2;
+      /* Ореол цветом карточки: кнопка проплывает над полями, и без него строки
+         подходили бы к ней вплотную. */
+      box-shadow: 0 0 16px 10px color-mix(in srgb, var(--color-paper) 85%, transparent), var(--shadow-lift);
+    }
   }
 </style>
 
@@ -490,6 +531,27 @@ import Icon from './Icon.astro';
       clientIdInput.value = clientID;
     });
   }
+
+  // На телефоне кнопка отправки липнет к низу окна и может оказаться поверх
+  // поля, на котором браузер показал «заполните это поле» — например, поверх
+  // галочки согласия прямо над ней. Тогда тап по кнопке выглядит так, будто
+  // ничего не произошло. Подтягиваем первое невалидное поле к середине окна.
+  //
+  // Событие invalid не всплывает, поэтому слушаем на фазе перехвата; браузер
+  // шлёт его по всем невалидным полям подряд, а нужное — первое, поэтому
+  // остальные в этой же попытке отправки пропускаем.
+  let invalidHandled = false;
+  form?.addEventListener('invalid', (e) => {
+    if (invalidHandled) return;
+    invalidHandled = true;
+    const field = e.target as HTMLElement;
+    // Кадром позже и без smooth: браузер сам подводит невалидное поле к краю
+    // окна уже после события invalid и отменил бы плавную прокрутку на полпути.
+    requestAnimationFrame(() => {
+      invalidHandled = false;
+      field.scrollIntoView({ block: 'center' });
+    });
+  }, true);
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
