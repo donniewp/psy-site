@@ -45,8 +45,8 @@
   --space-9: 96px;
 
   /* ===== Вертикальный ритм секций ===== */
-  --section-y:       clamp(72px, 7vw, 128px); /* основные секции */
-  --section-y-tight: clamp(48px, 4vw, 80px);  /* компактные: stats, contacts, footer */
+  --section-y:       clamp(56px, 5vw, 96px);  /* основные секции */
+  --section-y-tight: clamp(40px, 3.2vw, 64px); /* компактные: stats, contacts, footer */
 
   /* ===== Радиусы ===== */
   --radius-xs:    8px;   /* мелкие теги, чекбоксы */

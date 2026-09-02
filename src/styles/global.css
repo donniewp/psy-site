@@ -140,7 +140,7 @@ button {
   opacity: .18;
 }
 
-.section-head { max-width: 640px; margin: 0 0 var(--space-7); }
+.section-head { max-width: 640px; margin: 0 0 var(--space-6); }
 .section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
 
 .section-head h2 {
