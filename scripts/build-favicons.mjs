@@ -49,33 +49,77 @@ for (const size of SIZES) {
   console.log(`  ${nameFor(size)}  (${png[size].length} b)`);
 }
 
-await browser.close();
+// --- favicon.ico ----------------------------------------------------------
+/* favicon.ico — намеренно самый консервативный файл на сайте.
 
-// --- favicon.ico: контейнер из PNG-кадров 16/32/48 -------------------------
-// ICO разрешает PNG внутри — так понимают все браузеры от IE11 и краулеры.
-const frames = [16, 32, 48].map((s) => ({ size: s, data: png[s] }));
+   Яндекс требует от фавиконки размер 16×16, 32×32 или 120×120 и чтобы она была
+   ОДНОСЛОЙНОЙ; прежний ico был контейнером из трёх кадров (16/32/48), причём
+   каждый кадр — PNG внутри ico. Из-за этого робот выдачи её не забирал.
+   Поэтому здесь один кадр 32×32 и классический несжатый DIB, как в 1995-м:
+   такой ico читает вообще любой декодер. Браузерам крупные варианты приходят
+   ссылками на PNG и SVG, им ico уже давно нужен только как запасной. */
+const ICO_SIZE = 32;
+
+const rgba = await page.evaluate(async ({ uri, size }) => {
+  const img = new Image();
+  img.src = uri;
+  await img.decode();
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, size, size);
+  return Array.from(ctx.getImageData(0, 0, size, size).data);
+}, { uri: svgDataUri, size: ICO_SIZE });
+
+// DIB внутри ico: строки идут снизу вверх и в порядке BGRA, а высота в
+// заголовке удвоена — за картинкой следует маска прозрачности.
+const stride = ICO_SIZE * 4;
+const pixels = Buffer.alloc(stride * ICO_SIZE);
+for (let y = 0; y < ICO_SIZE; y++) {
+  const src = (ICO_SIZE - 1 - y) * stride;
+  const dst = y * stride;
+  for (let x = 0; x < ICO_SIZE; x++) {
+    pixels[dst + x * 4] = rgba[src + x * 4 + 2];     // B
+    pixels[dst + x * 4 + 1] = rgba[src + x * 4 + 1]; // G
+    pixels[dst + x * 4 + 2] = rgba[src + x * 4];     // R
+    pixels[dst + x * 4 + 3] = rgba[src + x * 4 + 3]; // A
+  }
+}
+
+// Маска: у 32-битного кадра прозрачность берётся из альфы, поэтому маска
+// нулевая — но занимать место в файле она обязана, иначе кадр невалиден.
+const maskStride = Math.ceil(ICO_SIZE / 32) * 4;
+const mask = Buffer.alloc(maskStride * ICO_SIZE);
+
+const dib = Buffer.alloc(40);
+dib.writeUInt32LE(40, 0);              // размер заголовка
+dib.writeInt32LE(ICO_SIZE, 4);         // ширина
+dib.writeInt32LE(ICO_SIZE * 2, 8);     // высота: кадр + маска
+dib.writeUInt16LE(1, 12);              // плоскости
+dib.writeUInt16LE(32, 14);             // бит на пиксель
+dib.writeUInt32LE(0, 16);              // без сжатия
+dib.writeUInt32LE(pixels.length + mask.length, 20);
+
+const frame = Buffer.concat([dib, pixels, mask]);
 
 const header = Buffer.alloc(6);
 header.writeUInt16LE(0, 0); // reserved
 header.writeUInt16LE(1, 2); // type: icon
-header.writeUInt16LE(frames.length, 4);
+header.writeUInt16LE(1, 4); // ровно один кадр
 
-let offset = 6 + frames.length * 16;
-const dir = [];
-for (const f of frames) {
-  const e = Buffer.alloc(16);
-  e.writeUInt8(f.size === 256 ? 0 : f.size, 0); // width
-  e.writeUInt8(f.size === 256 ? 0 : f.size, 1); // height
-  e.writeUInt8(0, 2); // palette
-  e.writeUInt8(0, 3); // reserved
-  e.writeUInt16LE(1, 4); // color planes
-  e.writeUInt16LE(32, 6); // bits per pixel
-  e.writeUInt32LE(f.data.length, 8);
-  e.writeUInt32LE(offset, 12);
-  offset += f.data.length;
-  dir.push(e);
-}
+const entry = Buffer.alloc(16);
+entry.writeUInt8(ICO_SIZE, 0);
+entry.writeUInt8(ICO_SIZE, 1);
+entry.writeUInt8(0, 2);  // палитры нет
+entry.writeUInt8(0, 3);  // reserved
+entry.writeUInt16LE(1, 4);
+entry.writeUInt16LE(32, 6);
+entry.writeUInt32LE(frame.length, 8);
+entry.writeUInt32LE(22, 12); // 6 байт заголовка + 16 байт записи
 
-const ico = Buffer.concat([header, ...dir, ...frames.map((f) => f.data)]);
+await browser.close();
+
+const ico = Buffer.concat([header, entry, frame]);
 fs.writeFileSync(path.join(OUT, 'favicon.ico'), ico);
-console.log(`  favicon.ico  (${frames.map((f) => f.size).join('/')}, ${ico.length} b)`);
+console.log(`  favicon.ico  (${ICO_SIZE}x${ICO_SIZE}, однослойный DIB, ${ico.length} b)`);
