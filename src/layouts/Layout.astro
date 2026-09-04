@@ -1,18 +1,46 @@
 ---
 import '../styles/global.css';
-import { yandexMetrikaId } from '../data/content';
+import { yandexMetrikaId, phone, location as loc, yandexMapsUrl, telegramHref, maxHref } from '../data/content';
 
 export interface Props {
   title: string;
   description: string;
   path?: string;
   image?: string;
+  /* Разметка организации нужна только на главной: это карточка студии,
+     а не описание каждой страницы сайта. */
+  localBusiness?: boolean;
 }
 
-const { title, description, path = '/', image = `${import.meta.env.BASE_URL}img/hero.jpg` } = Astro.props;
+const { title, description, path = '/', image = `${import.meta.env.BASE_URL}img/hero.jpg`, localBusiness = false } = Astro.props;
 const canonicalURL = new URL(path.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
 const ogImageURL = new URL(image.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
 const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
+
+/* Часы работы одни и те же все семь дней — студия без выходных. */
+const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['EducationalOrganization', 'LocalBusiness'],
+  name: 'Сензитивность',
+  alternateName: 'Детская студия развития «Сензитивность»',
+  description,
+  url: canonicalURL.href,
+  image: ogImageURL.href,
+  telephone: phone.replace(/[^\d+]/g, ''),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: loc.address,
+    addressLocality: 'Москва',
+    addressCountry: 'RU',
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: weekdays, opens: '08:30', closes: '19:30' },
+  ],
+  priceRange: '1900–7500 ₽',
+  areaServed: { '@type': 'City', name: 'Москва' },
+  sameAs: [yandexMapsUrl, telegramHref, maxHref],
+};
 ---
 
 <!doctype html>
@@ -52,6 +80,10 @@ const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
+
+    {localBusiness && (
+      <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    )}
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -100,8 +132,13 @@ const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
         const ym = window.ym;
         if (typeof ym === 'function') {
           document.addEventListener('click', (e) => {
+            // Цель считает намерение записаться, а не любой клик по кнопке:
+            // «Программы и цены», «Смотреть видео» и прочие .btn конверсией не являются
+            // и раньше раздували статистику в разы.
             const btn = e.target.closest && e.target.closest('.btn');
-            if (btn) ym(id, 'reachGoal', 'button_click');
+            if (btn && (btn.getAttribute('href') || '').includes('#booking')) {
+              ym(id, 'reachGoal', 'button_click');
+            }
 
             const link = e.target.closest && e.target.closest('a[href]');
             if (!link) return;
