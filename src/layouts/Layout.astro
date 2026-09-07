@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import PageMotion from '../components/PageMotion.astro';
 import { yandexMetrikaId, phone, location as loc, yandexMapsUrl, telegramHref, maxHref } from '../data/content';
 
 export interface Props {
@@ -47,7 +48,7 @@ const organizationSchema = {
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     {/* Порядок ссылок здесь значим: фавиконочный робот Яндекса берёт первую
         подходящую, поэтому наверху стоят ровно те два файла, которые он умеет
         читать — однослойный ico 32×32 с явным type и PNG 120×120 (его Яндекс
@@ -87,7 +88,7 @@ const organizationSchema = {
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" href={`${import.meta.env.BASE_URL}img/hero.jpg`} as="image" fetchpriority="high" />
+    <link rel="preload" href={image} as="image" fetchpriority="high" />
     <link
       rel="preload"
       as="style"
@@ -123,6 +124,7 @@ const organizationSchema = {
   <body>
     <a href="#main-content" class="skip-link">Перейти к содержимому</a>
     <slot />
+    <PageMotion />
 
     {metrikaEnabled && (
       <script is:inline define:vars={{ id: yandexMetrikaId }}>
@@ -142,11 +144,11 @@ const organizationSchema = {
 
             const link = e.target.closest && e.target.closest('a[href]');
             if (!link) return;
-            // Явная цель на ссылке важнее домена: телеграм из формы и телеграм
-            // плавающей кнопкой — разные двери, и сравнивать их надо порознь.
+            // Сохраняем событие места клика и общую цель канала обращения.
             if (link.dataset && link.dataset.goal) {
               ym(id, 'reachGoal', link.dataset.goal);
-            } else if (link.href.startsWith('tel:')) {
+            }
+            if (link.href.startsWith('tel:')) {
               ym(id, 'reachGoal', 'phone_click');
             } else if (link.href.includes('t.me/')) {
               ym(id, 'reachGoal', 'telegram_click');
@@ -157,7 +159,7 @@ const organizationSchema = {
             }
           });
 
-          const pricesEl = document.getElementById('prices');
+          const pricesEl = document.querySelector('#prices h2') || document.getElementById('prices');
           if (pricesEl && 'IntersectionObserver' in window) {
             const observer = new IntersectionObserver((entries, obs) => {
               entries.forEach((entry) => {
@@ -166,7 +168,7 @@ const organizationSchema = {
                   obs.disconnect();
                 }
               });
-            }, { threshold: 0.3 });
+            }, { threshold: 0.1 });
             observer.observe(pricesEl);
           }
 

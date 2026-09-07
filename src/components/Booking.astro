@@ -20,7 +20,7 @@ import Icon from './Icon.astro';
       </div>
 
       <div class="booking-copy-detail">
-        <p>Пробное занятие бесплатное. Оставьте имя и телефон — перезвоним в течение 15 минут, расскажем о программах и подберём время под ваш график.</p>
+        <p id="booking-explanation">Пробное занятие бесплатное. Оставьте имя и телефон — свяжемся в часы работы студии, расскажем о программах и подберём время под ваш график.</p>
 
         <ol class="booking-steps">
           {bookingSteps.map((s) => (
@@ -45,7 +45,7 @@ import Icon from './Icon.astro';
       <svg class="booking-blob" viewBox="0 0 300 300" aria-hidden="true" focusable="false">
         <path d="M245,45 C280,85 285,150 260,205 C235,260 170,290 115,270 C60,250 20,195 30,140 C40,85 95,45 150,35 C190,28 220,15 245,45 Z" />
       </svg>
-      <h3>Пробное занятие в студии <span class="form-free">{trialOffer.badge}</span></h3>
+      <h3><span id="booking-form-heading">Пробное занятие в студии</span> <span class="form-free">{trialOffer.badge}</span></h3>
 
       {/* Спрашиваем имя родителя, а не ребёнка: перезваниваем именно взрослому,
           и во всех проверенных детских центрах Москвы в лид-форме стоит имя
@@ -114,7 +114,7 @@ import Icon from './Icon.astro';
           <Icon name="svc-telegram" class="msg-icon" />Телеграм
         </a>
       </div>
-      <p class="form-error" id="form-error" hidden>Не получилось отправить заявку. Позвоните нам: <a href={phoneHref}>{phone}</a></p>
+      <p class="form-error" id="form-error" role="alert" tabindex="-1" hidden>Не получилось отправить заявку. Позвоните нам: <a href={phoneHref}>{phone}</a></p>
     </form>
   </div>
 
@@ -123,7 +123,7 @@ import Icon from './Icon.astro';
   <div class="booking-success" id="booking-success" role="status" tabindex="-1">
     <span class="booking-success-mark"><Icon name="svc-check" /></span>
     <h2>Заявка отправлена</h2>
-    <p>Спасибо! Перезвоним в течение 15 минут — расскажем о программах и подберём время пробного занятия.</p>
+    <p>Спасибо. Свяжемся с вами с 8:30 до 19:30, расскажем о программе и согласуем время встречи.</p>
     <p class="booking-success-alt">Не дождались звонка? Наберите сами: <a href={phoneHref}>{phone}</a></p>
     <button type="button" class="btn btn-primary" id="booking-success-close">Хорошо</button>
   </div>
@@ -190,6 +190,7 @@ import Icon from './Icon.astro';
   .booking-copy-head, .booking-copy-detail { display: flex; flex-direction: column; }
 
   .booking-steps { margin: var(--space-6) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-4); }
+  .booking-steps[hidden] { display: none; }
   .booking-steps li { display: flex; gap: var(--space-4); align-items: flex-start; }
 
   .booking-steps .step-n {
@@ -504,7 +505,7 @@ import Icon from './Icon.astro';
     const value = params.get(key);
     if (value) attribution[key] = value;
   });
-  sessionStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(attribution));
+  try { sessionStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(attribution)); } catch { /* Запись доступна и при заблокированном хранилище. */ }
 
   attributionFields.forEach((key) => {
     const input = form?.querySelector<HTMLInputElement>(`[name="${key}"]`);
@@ -516,8 +517,11 @@ import Icon from './Icon.astro';
   const LANDING_URL_STORAGE_KEY = 'landing_url';
   const landingUrlInput = form?.querySelector<HTMLInputElement>('[name="landing_url"]');
   if (landingUrlInput) {
-    const landingUrl = sessionStorage.getItem(LANDING_URL_STORAGE_KEY) || location.href;
-    sessionStorage.setItem(LANDING_URL_STORAGE_KEY, landingUrl);
+    let landingUrl = location.href;
+    try {
+      landingUrl = sessionStorage.getItem(LANDING_URL_STORAGE_KEY) || location.href;
+      sessionStorage.setItem(LANDING_URL_STORAGE_KEY, landingUrl);
+    } catch { /* Используем текущую страницу. */ }
     landingUrlInput.value = landingUrl;
   }
 
@@ -555,6 +559,7 @@ import Icon from './Icon.astro';
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (form.classList.contains('is-submitting')) return;
     error?.setAttribute('hidden', 'true');
 
     // Важно: сначала читаем FormData, потом блокируем поля — disabled-инпуты
@@ -565,6 +570,8 @@ import Icon from './Icon.astro';
     form.classList.add('is-submitting');
     form.querySelectorAll('input, select, textarea, button').forEach((el) => el.setAttribute('disabled', 'true'));
 
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
     try {
       if (!endpoint || endpoint.includes('REPLACE-ME')) {
         throw new Error('Booking endpoint is not configured');
@@ -573,6 +580,7 @@ import Icon from './Icon.astro';
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+        signal: controller.signal,
       });
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
@@ -590,6 +598,10 @@ import Icon from './Icon.astro';
       form.classList.remove('is-submitting');
       form.querySelectorAll('input, select, textarea, button').forEach((el) => el.removeAttribute('disabled'));
       error?.removeAttribute('hidden');
+      error?.focus();
+      error?.scrollIntoView({ block: 'center' });
+    } finally {
+      window.clearTimeout(timeout);
     }
   });
 
@@ -602,6 +614,24 @@ import Icon from './Icon.astro';
     if (select && match) select.value = programValue;
   }
 
+  // Диагностика — платная услуга, даже когда её выбирают в общей форме.
+  const updateBookingCopy = () => {
+    const diagnostic = form?.querySelector<HTMLSelectElement>('[name="program"]')?.value === 'Диагностика ребёнка и подростка';
+    const copy: Record<string, string> = {
+      'booking-modal-title': diagnostic ? 'Запишитесь на диагностику' : 'Запишитесь на пробное занятие',
+      'booking-form-heading': diagnostic ? 'Диагностика · 45 минут' : 'Пробное занятие в студии',
+      'booking-explanation': diagnostic ? 'Диагностика стоит 3 500 ₽ и включает заключение с рекомендациями. Оставьте имя и телефон — уточним запрос и согласуем время встречи.' : 'Пробное занятие бесплатное. Оставьте имя и телефон — свяжемся в часы работы студии и согласуем время.',
+    };
+    Object.entries(copy).forEach(([id, text]) => { const el = document.getElementById(id); if (el) el.textContent = text; });
+    const price = form?.querySelector('.form-free');
+    if (price) price.textContent = diagnostic ? '3 500 ₽' : 'Бесплатно';
+    const submit = form?.querySelector('.form-submit');
+    if (submit) submit.textContent = diagnostic ? 'Обсудить диагностику' : 'Записаться на пробное';
+    const steps = document.querySelector<HTMLElement>('.booking-steps');
+    if (steps) steps.hidden = diagnostic;
+  };
+  form?.querySelector('[name="program"]')?.addEventListener('change', updateBookingCopy);
+
   // Попап вместо перехода: клиент попросил, чтобы все CTA-кнопки сайта
   // (их около полутора десятков, во всех секциях) открывали форму записи
   // окном поверх страницы, а не скроллили вниз. Вместо правки каждой кнопки
@@ -613,6 +643,7 @@ import Icon from './Icon.astro';
   const openBookingModal = (programValue: string | null = null) => {
     resetAfterSend();
     applyProgramParam(programValue);
+    updateBookingCopy();
     if (dialog && !dialog.open) {
       dialog.showModal();
       document.body.style.overflow = 'hidden';
@@ -625,7 +656,7 @@ import Icon from './Icon.astro';
     if (!trigger) return;
     e.preventDefault();
     const url = new URL(trigger.href, location.href);
-    openBookingModal(url.searchParams.get('program'));
+    openBookingModal(url.searchParams.get('program') || document.querySelector<HTMLElement>('[data-booking-program]')?.dataset.bookingProgram || null);
   });
 
   closeBtn?.addEventListener('click', () => dialog?.close());

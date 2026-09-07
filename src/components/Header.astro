@@ -6,7 +6,7 @@ import Icon from './Icon.astro';
 
 <header class="header" id="site-header">
   <div class="container header-inner">
-    <a href="#top" class="logo">
+    <a href="/" class="logo">
       <span class="logo-mark"><FigmaAsset src="logo/logo-sign.svg" /></span>
       <span class="logo-text">
         СЕНЗИТИВНОСТЬ
@@ -16,7 +16,7 @@ import Icon from './Icon.astro';
 
     <nav class="nav-desktop">
       {nav.map((item) => (
-        <a href={`#${item.id}`}>{item.label}</a>
+        <a href={`${Astro.url.pathname === "/" ? "" : "/"}#${item.id}`}>{item.label}</a>
       ))}
     </nav>
 
@@ -36,7 +36,7 @@ import Icon from './Icon.astro';
   </button>
   <nav class="mobile-menu-nav">
     {nav.map((item) => (
-      <a href={`#${item.id}`} class="mobile-menu-link">{item.label}</a>
+      <a href={`${Astro.url.pathname === "/" ? "" : "/"}#${item.id}`} class="mobile-menu-link">{item.label}</a>
     ))}
   </nav>
   <div class="mobile-menu-footer">

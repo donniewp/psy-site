@@ -16,7 +16,7 @@ import Icon from './Icon.astro';
 
     <nav class="footer-col footer-nav">
       <span class="footer-heading">Разделы</span>
-      {nav.map((item) => <a href={`#${item.id}`}>{item.label}</a>)}
+      {nav.map((item) => <a href={`${Astro.url.pathname === "/" ? "" : "/"}#${item.id}`}>{item.label}</a>)}
     </nav>
 
     <div class="footer-col footer-contact">

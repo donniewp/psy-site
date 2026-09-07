@@ -6,9 +6,6 @@ import Icon from './Icon.astro';
 <section class="hero" id="top">
   <div class="hero-blob" aria-hidden="true"></div>
   <div class="container hero-inner">
-    {/* Текст разбит на заголовочную часть и остальное ради телефона: там фото
-        встаёт между ними, сразу под h1, а не за экраном текста внизу.
-        На десктопе обе части идут подряд обычным потоком, как и раньше. */}
     <div class="hero-copy">
       <div class="hero-copy-head">
         <div class="hero-locations">
@@ -16,28 +13,26 @@ import Icon from './Icon.astro';
           <span class="loc-pill"><Icon name="svc-metro" class="loc-icon" />{location.metro}</span>
         </div>
 
-        <h1>Детская студия развития «Сензитивность»</h1>
+        <h1>Развиваемся играя.<br />Готовимся к школе.</h1>
       </div>
 
       <div class="hero-copy-rest">
         <p class="hero-sub">
-          Занятия для детей и подростков: раннее развитие, подготовка к школе,
-          нейропсихология и песочная терапия. Мини-группы, бережный подход,
-          педагог-психолог с опытом более 20 лет.
+          Студия «Сензитивность» на Войковской. Занятия с 1,5 лет:
+          речь, внимание, мышление и первые учебные навыки.
         </p>
 
         <div class="hero-tags">
-          <span class="tag">Группы до 6 детей</span>
-          <span class="tag">Психолог · нейропсихолог</span>
+          <span class="tag">Педагог с опытом 20+ лет</span>
           <span class="tag tag-offer">{trialOffer.tag}</span>
         </div>
 
         <div class="hero-ctas">
-          <a href="#booking" class="btn btn-primary">Записаться на пробное занятие</a>
-          <a href="#prices" class="btn btn-secondary">Программы и цены</a>
+          <a href="#booking" class="btn btn-primary">Записаться бесплатно</a>
+          <a href="#programs" class="btn btn-secondary">Выбрать программу</a>
         </div>
 
-        <p class="hero-microcopy">{trialOffer.short} · {trialOffer.timing} · ответим за 15 минут</p>
+        <p class="hero-microcopy">Познакомьтесь с педагогом и форматом занятий.<br />{trialOffer.timing}.</p>
 
         <a href="#video" class="hero-video-link">
           <span class="hero-video-link-icon" aria-hidden="true">
@@ -50,7 +45,7 @@ import Icon from './Icon.astro';
 
     <div class="hero-media" data-reveal>
       <div class="hero-img-wrap">
-        <img src={`${import.meta.env.BASE_URL}img/hero.jpg`} alt="Занятие в студии «Сензитивность»" class="hero-img" fetchpriority="high" />
+        <img src={`${import.meta.env.BASE_URL}img/hero.jpg`} width="1537" height="1023" alt="Татьяна Петрова занимается с детьми в студии «Сензитивность»" class="hero-img" fetchpriority="high" />
         {heroBadges.map((b, i) => (
           <div class:list={['floating-badge', i === 0 ? 'fb-1' : 'fb-2']}>
             <Icon name={b.icon} class="badge-icon" />
@@ -197,17 +192,19 @@ import Icon from './Icon.astro';
   .fb-2 { bottom: 14px; left: 14px; max-width: 160px; animation: floatY2 6s ease-in-out infinite; }
 
   @media (max-width: 900px) {
-    .hero-inner { grid-template-columns: 1fr; gap: var(--space-6); }
-
-    /* Фото сразу под заголовком. display:contents поднимает обе половины
-       .hero-copy на уровень сетки, и тогда картинку можно вставить между ними
-       через order — она уезжает с 1224px на ~500px, то есть на первый экран. */
-    .hero-copy { display: contents; }
-    .hero-copy-head { order: 1; }
-    .hero-media { order: 2; }
-    .hero-copy-rest { order: 3; }
-
-    /* Отступ до лида теперь задаёт gap сетки, собственный margin только удваивал бы его. */
-    .hero-sub { margin-top: 0; }
+    .hero { padding: 20px 0 32px; }
+    .hero-inner { grid-template-columns: 1fr; gap: 24px; }
+    .hero-locations { margin-bottom: 16px; gap: 6px; }
+    .loc-pill { padding: 4px 0; background: transparent; font-size: 13px; }
+    .hero h1 { font-size: clamp(30px, 7.8vw, 44px); line-height: 1.15; }
+    .hero-sub { margin-top: 16px; font-size: 17px; line-height: 1.5; }
+    .hero-tags { margin-top: 16px; gap: 6px; }
+    .tag { font-size: 12px; padding: 7px 10px; }
+    .hero-ctas { margin-top: 20px; gap: 10px; }
+    .hero-ctas .btn { flex: 1 1 200px; padding: 13px 18px; }
+    .hero-microcopy { margin-top: 12px; font-size: 13px; }
+    .hero-video-link { margin-top: 12px; }
+    .hero-img { aspect-ratio: 16 / 9; height: auto; animation: none; }
+    .floating-badge { display: none; }
   }
 </style>

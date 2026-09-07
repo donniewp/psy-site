@@ -49,7 +49,7 @@ export const stats = [
 
 export const heroBadges = [
   { icon: 'svc-check', text: 'Эксперт московского образования' },
-  { icon: 'svc-clock', text: 'Ответим в течение 15 минут' },
+  { icon: 'svc-clock', text: 'Пробное занятие бесплатно' },
 ];
 
 // Тексты — дословно со старого сайта (razvitie-i-garmonia.ru), кроме destructive-beliefs
@@ -151,7 +151,7 @@ export type ProgramTabKey = 'all' | ProgramGroup;
 export const programGroups: { key: ProgramTabKey; param: string; icon: string; label: string; ageLabel: string }[] = [
   { key: 'all', param: 'all', icon: 'svc-check', label: 'Все программы', ageLabel: '1,5–21 года' },
   { key: 'malyshi', param: '1,5-4', icon: 'age-toddlers', label: 'Малыши', ageLabel: '1,5–4 года' },
-  { key: 'doshkolniki', param: '4-6', icon: 'age-preschool', label: 'Дошкольники', ageLabel: '4–6 лет' },
+  { key: 'doshkolniki', param: '4-6', icon: 'age-preschool', label: 'Дошкольники', ageLabel: '4–7 лет' },
   { key: 'shkolniki', param: '7-10', icon: 'age-school', label: 'Школьники', ageLabel: '7–12 лет' },
   { key: 'individualno', param: 'individualno', icon: 'age-individual', label: 'Индивидуально', ageLabel: 'диагностика и занятия' },
 ];
@@ -320,7 +320,7 @@ export const featureTabs = [
     icon: 'icons/tabs/small-groups.svg',
     illustration: 'illustrations/tabs/small-group.svg',
     label: 'Небольшие группы',
-    description: 'До 6 детей в группе: педагог видит каждого, держит комфортный темп и успевает уделить внимание всем.',
+    description: 'Небольшие группы: педагог видит каждого и подбирает комфортный темп занятия.',
     tags: ['Внимание каждому', 'Комфортный темп'],
   },
   {
@@ -461,7 +461,7 @@ export const videoAccentPhoto = { src: '/img/prog-start.jpg', alt: 'Педаго
 export const videoBadge = 'Настоящее занятие, без постановки';
 
 export const videoFeatures = [
-  'До 6 детей в группе',
+  'Небольшие группы',
   'Живой темп занятия',
   'Внимание каждому ребёнку',
 ];
@@ -471,14 +471,14 @@ export const faq = [
   { q: 'Сколько стоит первое занятие?', a: 'Нисколько — пробное занятие бесплатное на всех программах. Вы ничего не платите за знакомство и ничего не должны студии после него.' },
   { q: 'Как проходит первое занятие?', a: 'Это знакомство: педагог наблюдает за ребёнком, показывает пространство студии и формат занятий, а после рассказывает родителям, какая программа подойдёт. Записаться можно через форму на сайте, написав нам в телеграм или позвонив.' },
   { q: 'Когда проходят занятия?', a: 'Жёсткого расписания нет — мы собираем группы под графики семей, а не наоборот. Скажите, когда вам удобно, и мы подберём или соберём группу под это время.' },
-  { q: 'Сколько детей в группе?', a: 'До 6 человек — небольшие группы, в которых педагог успевает уделить внимание каждому ребёнку.' },
+  { q: 'Сколько детей в группе?', a: 'Размер зависит от программы: до 6 детей на «Песок и глина», до 8 в старшей группе раннего развития, 8–10 на «Старт» и «Развивай-ке». Состав и свободные места уточним при записи.' },
   { q: 'Нужна ли диагностика перед занятиями?', a: 'Не обязательна, но она помогает точно понять сильные стороны и трудности ребёнка. Диагностика длится 45 минут, стоит 3 500 ₽ и заканчивается заключением с рекомендациями.' },
   { q: 'Можно ли заниматься индивидуально?', a: 'Да. Есть индивидуальная подготовка к школе (45 минут — 2 300 ₽) и индивидуальное консультирование подростков (45 минут — 3 500 ₽, 60 минут — 4 000 ₽).' },
   { q: 'Где вы находитесь?', a: 'Ленинградское шоссе, д. 8, к. 3 — три минуты пешком от метро Войковская. Работаем с 8:30 до 19:30 без выходных.' },
 ];
 
 export const bookingSteps = [
-  { n: '1', title: 'Оставьте заявку', text: 'Перезвоним в течение 15 минут и ответим на вопросы' },
+  { n: '1', title: 'Оставьте заявку', text: 'Свяжемся в часы работы студии и ответим на вопросы' },
   { n: '2', title: 'Подберём программу', text: 'По возрасту ребёнка и вашему запросу' },
   { n: '3', title: 'Придёте на пробное', text: 'Бесплатно: познакомитесь с педагогом и студией' },
 ];
@@ -493,3 +493,20 @@ export const bookingOptions = [
   'Индивидуальные занятия',
   'Пока не определились — нужна консультация',
 ];
+
+// Единое соответствие карточки программы и выбора в форме записи.
+export const programBooking: Record<string, string> = {
+  'early-sensory': bookingOptions[0], 'early-senior': bookingOptions[0],
+  razvivayka: bookingOptions[1], start: bookingOptions[2],
+  'school-navigator': bookingOptions[3], sand: bookingOptions[4],
+  diagnostics: bookingOptions[5], psychocorrection: bookingOptions[6],
+  'individual-school-prep': bookingOptions[6],
+};
+
+export const programPaths: Record<string, string> = {
+  'early-sensory': 'rannee-razvitie', 'early-senior': 'rannee-razvitie-2-5-4',
+  razvivayka: 'razvivayka', start: 'podgotovka-k-shkole',
+  'school-navigator': 'shkolnyy-navigator', sand: 'pesok-i-glina',
+  diagnostics: 'diagnostika', psychocorrection: 'konsultaciya-podrostkov',
+  'individual-school-prep': 'individualnaya-podgotovka',
+};

@@ -1,5 +1,5 @@
 ---
-import { programGroups, programs, programDirectionLabels } from '../data/content';
+import { programGroups, programs, programDirectionLabels, programBooking, programPaths } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -7,19 +7,19 @@ import Icon from './Icon.astro';
   <div class="container">
     <div class="section-head center" data-reveal>
       <span class="eyebrow">Программы</span>
-      <h2>Программы студии — для детей и подростков</h2>
+      <h2>Сколько лет вашему ребёнку?</h2>
       <p>Выберите возраст ребёнка — покажем подходящие программы и стоимость.</p>
     </div>
 
-    <div class="prog-tabs" data-reveal role="tablist">
+    <div class="prog-tabs" data-reveal role="group" aria-label="Возраст ребёнка">
       {programGroups.map((g, i) => (
         <button
           class="prog-tab"
           class:list={[{ active: i === 0 }]}
           data-group={g.key}
           data-param={g.param}
-          role="tab"
-          aria-selected={i === 0 ? 'true' : 'false'}
+          type="button"
+          aria-pressed={i === 0 ? 'true' : 'false'}
         >
           <Icon name={g.icon} class="prog-tab-icon" />
           <span class="prog-tab-text">
@@ -39,6 +39,7 @@ import Icon from './Icon.astro';
             { 'program-card--clay': p.direction === 'psychological' },
             { 'program-card--neuro': p.direction === 'neuropsychological' },
           ]}
+          id={p.slug}
           data-groups={p.groups.join(',')}
         >
           {p.img ? (
@@ -54,7 +55,7 @@ import Icon from './Icon.astro';
               {p.ageLabel && <span class="program-age">{p.ageLabel}</span>}
               <span class="program-direction" data-direction={p.direction}>{programDirectionLabels[p.direction]}</span>
             </div>
-            <h3>{p.title}</h3>
+            <h3><a href={`/${programPaths[p.slug]}/`}>{p.title}</a></h3>
             <p class="program-desc">{p.desc}</p>
             {p.bullets && (
               <ul class="program-bullets">
@@ -67,7 +68,8 @@ import Icon from './Icon.astro';
               <span class="program-price">{p.price}</span>
             </div>
             <div class="program-actions">
-              <a href="#booking" class="btn btn-dark program-btn">Записаться на пробное</a>
+              <a class="program-details" href={`/${programPaths[p.slug]}/`}>Подробнее о занятиях →</a>
+              <a href={`?program=${encodeURIComponent(programBooking[p.slug])}#booking`} class="btn btn-dark program-btn">Записаться на пробное</a>
             </div>
           </div>
         </article>
@@ -203,11 +205,22 @@ import Icon from './Icon.astro';
   .program-schedule { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
   .program-price { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
 
+  .program-details { display: block; padding: 10px 0; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
   .program-actions { margin-top: var(--space-4); }
   .program-btn { width: 100%; padding: var(--space-3); font-size: 14.5px; }
 
   @media (max-width: 1024px) { .programs-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .programs-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .programs-grid { grid-template-columns: 1fr; }
+    .prog-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .prog-tab { padding: 12px; min-height: 60px; gap: 8px; }
+    .prog-tab:first-child { grid-column: 1 / -1; justify-content: center; }
+    .prog-tab :global(.prog-tab-icon) { width: 20px; height: 20px; }
+    .program-card img { aspect-ratio: 2 / 1; }
+    .program-body { padding: 20px; }
+    .program-desc { font-size: 15px; }
+    .program-top-row { flex-wrap: wrap; }
+  }
 </style>
 
 <script>
@@ -220,7 +233,7 @@ import Icon from './Icon.astro';
     tabs.forEach((t) => {
       const isActive = t.getAttribute('data-group') === group;
       t.classList.toggle('active', isActive);
-      t.setAttribute('aria-selected', String(isActive));
+      t.setAttribute('aria-pressed', String(isActive));
     });
 
     const shouldShow = (card: HTMLElement) => {

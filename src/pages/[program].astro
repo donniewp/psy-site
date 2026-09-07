@@ -1,0 +1,126 @@
+---
+// THESIS: одна программа, понятная стоимость и запись на знакомство.
+// OWN-WORLD: существующие Lora/Golos, зелёный и бумажный фон, реальные фото студии.
+// STORY: возраст → содержание → цена → педагог → пробное → маршрут.
+// FIRST VIEWPORT: название, возраст, цена и CTA до фото на телефоне.
+// FORM: подробная карточка существующей программы; общие навигация и форма.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Contacts from '../components/Contacts.astro';
+import Booking from '../components/Booking.astro';
+import StickyMobileCTA from '../components/StickyMobileCTA.astro';
+import { programs, programPaths, programBooking, location, specialist, phoneHref, yandexMapsUrl } from '../data/content';
+
+export function getStaticPaths() {
+  return programs.map((program) => ({ params: { program: programPaths[program.slug] }, props: { program } }));
+}
+const { program: p } = Astro.props;
+const booking = programBooking[p.slug];
+const cta = `?program=${encodeURIComponent(booking)}#booking`;
+const diagnostic = p.slug === 'diagnostics';
+const younger = p.slug === 'early-sensory';
+---
+
+<Layout title={`${p.title} у м. Войковская — Сензитивность`} description={`${p.ageLabel}. ${p.desc} ${p.price}. ${location.metro}. Запись в студию.`} path={`/${programPaths[p.slug]}/`} image={p.img || '/img/hero.jpg'}>
+  <Header />
+  <main id="main-content" data-booking-program={booking}>
+    <section class="program-intro container">
+      <div class="intro-copy">
+        <a href="/#programs" class="back-link">← Все программы студии</a>
+        <p class="eyebrow">{location.metro}</p>
+        <h1>{p.title}</h1>
+        <p class="age">{p.ageLabel || 'Индивидуальная встреча'}</p>
+        <p class="intro-description">{p.desc}</p>
+        <p class="price">{p.price}</p>
+        <p class="format">{p.sessionInfo}{p.schedule ? ` · ${p.schedule}` : ''}</p>
+        <a href={cta} class="btn btn-primary">{diagnostic ? 'Обсудить диагностику' : 'Записаться на бесплатное пробное'}</a>
+        <p class="trial-note">{diagnostic ? 'Диагностика — платная встреча с заключением. Знакомство со студией и пробное занятие — бесплатно.' : 'Познакомьтесь с педагогом и форматом занятий до покупки абонемента.'}</p>
+      </div>
+      <figure class="intro-photo">
+        <img src={p.img || '/img/hero.jpg'} alt={`${p.title}: занятие в студии «Сензитивность»`} width="1200" height="800" fetchpriority="high" />
+        <figcaption>Студия «Сензитивность» · Ленинградское шоссе, 8, к. 3</figcaption>
+      </figure>
+    </section>
+
+    <section class="container program-details" id="prices">
+      <div>
+        <span class="eyebrow">Формат занятий</span>
+        <h2>{diagnostic ? 'Разобраться в запросе и следующих шагах' : 'Знакомство начинается с ребёнка'}</h2>
+        <p>{diagnostic ? 'На встрече педагог изучает особенности развития ребёнка. По итогам вы получите заключение и рекомендации по дальнейшим занятиям.' : 'На пробном педагог знакомится с ребёнком, показывает пространство и формат занятий. После встречи обсудим, подходит ли программа, и согласуем время.'}</p>
+        {younger && <p>Для малышей 1,5–2,5 года занятия проходят вместе с мамой. Если ребёнку уже 2,5–4 года, посмотрите <a href="/rannee-razvitie-2-5-4/">старшую группу раннего развития</a>.</p>}
+        {p.bullets && <ul>{p.bullets.map((b) => <li>{b}</li>)}</ul>}
+      </div>
+      <dl class="details-list">
+        <div><dt>Продолжительность и группа</dt><dd>{p.sessionInfo}</dd></div>
+        <div><dt>Стоимость</dt><dd>{p.price}</dd></div>
+        <div><dt>Когда можно прийти</dt><dd>{p.schedule ? `${p.schedule}. Время пробного согласуем при записи.` : 'Подберём время при записи. Студия открыта с 8:30 до 19:30 без выходных.'}</dd></div>
+        <div><dt>Первый шаг</dt><dd>{diagnostic ? 'Оставьте заявку — уточним запрос и формат встречи.' : 'Бесплатное пробное занятие, без обязательства покупать абонемент.'}</dd></div>
+      </dl>
+    </section>
+
+    <section class="container program-teacher" id="teacher">
+      <img src="/img/portrait.jpg" alt="Татьяна Петрова" width="500" height="600" loading="lazy" />
+      <div>
+        <span class="eyebrow">Ваш педагог</span>
+        <h2>{specialist.fullName}</h2>
+        <p>Педагог, психолог и нейропсихолог. Более 20 лет опыта и 4 профильных образования.</p>
+        <p>Работа строится с учётом возраста, темпа и особенностей ребёнка. На первой встрече можно задать вопросы о занятиях и обсудить ваш запрос.</p>
+        <div class="teacher-links"><a href="/#teacher">Образование и опыт →</a><a href={yandexMapsUrl} target="_blank" rel="noopener">Отзывы на Яндекс Картах →</a></div>
+      </div>
+    </section>
+
+    <section class="container program-invite">
+      <h2>{diagnostic ? 'Обсудим ваш запрос' : 'Приходите познакомиться'}</h2>
+      <p>Оставьте имя и телефон. Свяжемся в часы работы студии и согласуем время встречи.</p>
+      <div><a href={cta} class="btn btn-primary">{diagnostic ? 'Оставить заявку' : 'Записаться бесплатно'}</a><a href={phoneHref} class="btn btn-secondary">Позвонить в студию</a></div>
+    </section>
+    <Contacts />
+    <Booking />
+  </main>
+  <Footer />
+  <StickyMobileCTA diagnostic={diagnostic} />
+</Layout>
+
+<style>
+  .program-intro { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-top: 32px; padding-bottom: 64px; }
+  .back-link { display: inline-block; margin-bottom: 24px; font-size: 14px; }
+  h1 { font: var(--text-display); font-size: clamp(32px, 3.4vw, 48px); line-height: 1.15; margin: 12px 0; }
+  .age { color: var(--color-moss); font-weight: 700; font-size: 19px; }
+  .intro-description { margin: 16px 0; font-size: 18px; line-height: 1.55; }
+  .price { font-size: 21px; font-weight: 700; }
+  .format { font-size: 14px; margin: 8px 0 24px; color: var(--color-ink-soft); }
+  .trial-note { font-size: 13px; color: var(--color-ink-soft); margin-top: 12px; max-width: 48ch; }
+  .intro-photo { margin: 0; }
+  .intro-photo img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-lg); }
+  figcaption { font-size: 12px; margin-top: 12px; color: var(--color-ink-soft); }
+  h2 { font: var(--text-h2); margin: 12px 0 20px; }
+  .program-details { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; padding-top: 48px; padding-bottom: 64px; border-top: 1px solid var(--color-mist); }
+  .program-details p, .program-teacher p { font-size: 17px; line-height: 1.65; margin-bottom: 16px; }
+  .program-details a, .teacher-links a { text-decoration: underline; text-underline-offset: 4px; }
+  .program-details ul { display: flex; flex-wrap: wrap; gap: 8px 28px; padding-left: 20px; margin-top: 20px; }
+  .details-list { margin: 0; }
+  .details-list div { padding: 16px 0; border-bottom: 1px solid var(--color-mist); }
+  dt { font-size: 13px; color: var(--color-ink-soft); margin-bottom: 6px; }
+  dd { margin: 0; font-size: 17px; }
+  .program-teacher { display: grid; grid-template-columns: 220px 1fr; gap: 40px; padding-top: 32px; padding-bottom: 64px; align-items: center; }
+  .program-teacher img { width: 220px; height: 260px; object-fit: cover; border-radius: var(--radius-md); }
+  .teacher-links { display: flex; flex-wrap: wrap; gap: 12px 24px; font-size: 14px; }
+  .program-invite { padding-top: 40px; padding-bottom: 48px; border-top: 1px solid var(--color-mist); }
+  .program-invite p { margin-bottom: 24px; }
+  .program-invite > div { display: flex; gap: 12px; flex-wrap: wrap; }
+  @media (max-width: 760px) {
+    .program-intro { grid-template-columns: 1fr; gap: 24px; padding-top: 20px; padding-bottom: 32px; }
+    .back-link { margin-bottom: 16px; }
+    .intro-description { font-size: 16px; margin: 12px 0; }
+    .price { font-size: 18px; }
+    .format { margin-bottom: 18px; }
+    .intro-copy > .btn { width: 100%; padding: 14px 12px; font-size: 14px; }
+    .intro-photo img { aspect-ratio: 16 / 9; }
+    .program-details { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; padding-bottom: 40px; }
+    .program-teacher { grid-template-columns: 1fr; gap: 24px; padding-bottom: 40px; }
+    .program-teacher img { width: 140px; height: 170px; }
+    h2 { font-size: 28px; }
+    .program-invite .btn { width: 100%; }
+  }
+</style>
