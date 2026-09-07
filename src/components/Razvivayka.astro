@@ -230,9 +230,14 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
 
   /* ===== Reveal со стаггером ===== */
   [data-raz-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: opacity .55s cubic-bezier(.22, 1, .36, 1), transform .55s cubic-bezier(.22, 1, .36, 1);
+  }
+
+  .raz-reveal-ready [data-raz-reveal]:not(.is-shown) {
     opacity: 0;
     transform: translateY(22px);
-    transition: opacity .55s cubic-bezier(.22, 1, .36, 1), transform .55s cubic-bezier(.22, 1, .36, 1);
   }
 
   [data-raz-reveal].is-shown { opacity: 1; transform: translateY(0); }
@@ -571,7 +576,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
 </style>
 
 <script>
-  const section = document.getElementById('razvivayka') as HTMLElement | null;
+  const section = document.querySelector<HTMLElement>('section#razvivayka');
   const route = document.getElementById('raz-route') as HTMLElement | null;
   const bg = document.getElementById('raz-bg');
   if (!section || !route) throw new Error('razvivayka section missing');
@@ -601,7 +606,9 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
   }
 
   stops.forEach((el, i) => {
-    el.addEventListener('mouseenter', () => setActive(i));
+    el.addEventListener('mouseenter', () => {
+      if (window.matchMedia('(min-width: 901px) and (hover: hover)').matches) setActive(i);
+    });
     el.addEventListener('focusin', () => setActive(i));
     el.addEventListener('click', () => setActive(i));
 
@@ -619,23 +626,14 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
     });
   });
 
-  // Не нужно ничего кликать, чтобы увидеть все 5 станций — переключение
-  // привязано напрямую к скроллу.
-  //
-  // Десктоп: .raz-route-pin «прилипает» под хедером, пока .raz-route (у которого
-  // JS выставляет большую высоту — по одному «шагу» на станцию) прокручивается
-  // мимо. Прогресс скролла внутри этого шага и выбирает активную станцию —
-  // ровно как просил пользователь: «экран на месте, пока скролишь — открываются».
-  //
-  // Мобила: там станции и так идут одна под другой (обычный вертикальный
-  // список), поэтому вместо pin — каждая раскрывается сама, когда доезжает до
-  // средней трети экрана.
+  // На компьютере станции переключаются при прокрутке закреплённого блока.
+  // На телефоне раскрытие меняет высоту списка: выбор по текущей геометрии
+  // запускал повторные переключения. Здесь станцию выбирает только посетитель.
   if (!reduceMotion) {
     const pin = document.getElementById('raz-route-pin') as HTMLElement | null;
     const desktopMql = window.matchMedia('(min-width: 901px)');
     const PIN_OFFSET = 100; // должен совпадать с top в CSS у .raz-route-pin
     const STEP_VH_RATIO = 0.62; // «протяжённость» одной станции в долях высоты экрана
-    const MOBILE_FOCUS_RATIO = 0.4; // линия во вьюпорте, к которой «магнитится» ближайшая станция
 
     let mode: 'desktop' | 'mobile' | null = null;
     let raf = 0;
@@ -656,33 +654,11 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       setActive(Math.min(stops.length - 1, Math.floor(progress * stops.length)));
     }
 
-    // Раньше тут был IntersectionObserver по каждой кнопке — но при обычном
-    // быстром свайпе несколько станций пересекают его зону почти одновременно
-    // одним пакетом событий, и «побеждала» не та, что реально в фокусе, а
-    // последняя по DOM-порядку — отсюда хаотичное поведение на телефоне.
-    // Вместо этого на каждый скролл просто берём одну станцию, чья кнопка
-    // ближе всего к «линии фокуса» — детерминированно, без гонки состояний.
-    function updateMobile() {
-      const line = window.innerHeight * MOBILE_FOCUS_RATIO;
-      let bestIndex = 0;
-      let bestDist = Infinity;
-      stops.forEach((el, i) => {
-        const r = el.getBoundingClientRect();
-        const dist = Math.abs(r.top + r.height / 2 - line);
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestIndex = i;
-        }
-      });
-      setActive(bestIndex);
-    }
-
     function onScroll() {
-      if (raf) return;
+      if (raf || mode !== 'desktop') return;
       raf = requestAnimationFrame(() => {
         raf = 0;
         if (mode === 'desktop') updateDesktop();
-        else if (mode === 'mobile') updateMobile();
       });
     }
 
@@ -697,7 +673,6 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
       mode = 'mobile';
       window.removeEventListener('resize', layoutDesktopTrack);
       route!.style.height = '';
-      updateMobile();
     }
 
     function applyMode() {
@@ -721,7 +696,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
         }
       });
     },
-    { threshold: 0.4 }
+    { threshold: 0 }
   );
   lineObserver.observe(route);
 
@@ -737,8 +712,9 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
         revealObserver.unobserve(el);
       });
     },
-    { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    { threshold: 0, rootMargin: '0px 0px -40px 0px' }
   );
+  section.classList.add('raz-reveal-ready');
   revealEls.forEach((el) => revealObserver.observe(el));
 
   // Лёгкий параллакс фона по курсору — только десктоп

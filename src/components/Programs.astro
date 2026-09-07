@@ -39,7 +39,7 @@ import Icon from './Icon.astro';
             { 'program-card--clay': p.direction === 'psychological' },
             { 'program-card--neuro': p.direction === 'neuropsychological' },
           ]}
-          id={p.slug}
+          id={`program-${p.slug}`}
           data-groups={p.groups.join(',')}
         >
           {p.img ? (
