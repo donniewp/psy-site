@@ -485,6 +485,24 @@ import Icon from './Icon.astro';
   const endpoint = form?.dataset.endpoint;
   const metrikaId = form?.dataset.metrikaId;
 
+  // Только технические события: личные данные и содержимое полей в Метрику
+  // не передаём. Ошибка счётчика не должна прерывать запись.
+  const trackBooking = (goal: string, details: Record<string, string> = {}) => {
+    try {
+      const ym = (window as unknown as { ym?: (...args: unknown[]) => void }).ym;
+      if (typeof ym === 'function' && metrikaId && metrikaId !== 'REPLACE-ME') {
+        ym(Number(metrikaId), 'reachGoal', goal, { page: location.pathname, ...details });
+      }
+    } catch { /* Запись работает независимо от аналитики. */ }
+  };
+  let fillingStarted = false;
+  form?.addEventListener('input', (e) => {
+    const field = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    if (fillingStarted || !['name', 'phone', 'program', 'comment'].includes(field.name) || !field.value) return;
+    fillingStarted = true;
+    trackBooking('booking_start');
+  });
+
   // Атрибуция заявки: utm-метки и yclid берём из URL, а если человек зашёл на
   // сайт по рекламной ссылке и потом просто прокрутил страницу до формы (без
   // повторного визита с теми же метками), подставляем то, что сохранили при
@@ -531,9 +549,11 @@ import Icon from './Icon.astro';
   const clientIdInput = form?.querySelector<HTMLInputElement>('[name="ym_client_id"]');
   const ymQueue = (window as unknown as { ym?: (...args: unknown[]) => void }).ym;
   if (clientIdInput && typeof ymQueue === 'function' && metrikaId && metrikaId !== 'REPLACE-ME') {
-    ymQueue(Number(metrikaId), 'getClientID', (clientID: string) => {
-      clientIdInput.value = clientID;
-    });
+    try {
+      ymQueue(Number(metrikaId), 'getClientID', (clientID: string) => {
+        clientIdInput.value = clientID;
+      });
+    } catch { /* Отсутствие идентификатора Метрики не блокирует запись. */ }
   }
 
   // На телефоне кнопка отправки липнет к низу окна и может оказаться поверх
@@ -549,6 +569,7 @@ import Icon from './Icon.astro';
     if (invalidHandled) return;
     invalidHandled = true;
     const field = e.target as HTMLElement;
+    trackBooking('booking_validation');
     // Кадром позже и без smooth: браузер сам подводит невалидное поле к краю
     // окна уже после события invalid и отменил бы плавную прокрутку на полпути.
     requestAnimationFrame(() => {
@@ -561,6 +582,7 @@ import Icon from './Icon.astro';
     e.preventDefault();
     if (form.classList.contains('is-submitting')) return;
     error?.setAttribute('hidden', 'true');
+    trackBooking('booking_attempt');
 
     // Важно: сначала читаем FormData, потом блокируем поля — disabled-инпуты
     // исключаются из FormData спецификацией HTML, так что в обратном порядке
@@ -572,8 +594,10 @@ import Icon from './Icon.astro';
 
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 15000);
+    let failureKind = 'network';
     try {
       if (!endpoint || endpoint.includes('REPLACE-ME')) {
+        failureKind = 'configuration';
         throw new Error('Booking endpoint is not configured');
       }
       const res = await fetch(endpoint, {
@@ -582,18 +606,19 @@ import Icon from './Icon.astro';
         body: JSON.stringify(data),
         signal: controller.signal,
       });
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      if (!res.ok) {
+        failureKind = `http_${res.status}`;
+        throw new Error(`Request failed: ${res.status}`);
+      }
 
       dialog?.classList.add('is-sent');
       // Форма могла быть прокручена — иначе подтверждение окажется вне вида.
       dialogScroll?.scrollTo({ top: 0 });
       successPanel?.focus();
 
-      const ym = (window as unknown as { ym?: (...args: unknown[]) => void }).ym;
-      if (typeof ym === 'function' && metrikaId && metrikaId !== 'REPLACE-ME') {
-        ym(Number(metrikaId), 'reachGoal', 'form_submit');
-      }
+      trackBooking('form_submit');
     } catch (err) {
+      trackBooking('booking_error', { kind: controller.signal.aborted ? 'timeout' : failureKind });
       console.error('Booking form submit failed', err);
       form.classList.remove('is-submitting');
       form.querySelectorAll('input, select, textarea, button').forEach((el) => el.removeAttribute('disabled'));
@@ -642,11 +667,12 @@ import Icon from './Icon.astro';
 
   const openBookingModal = (programValue: string | null = null) => {
     resetAfterSend();
-    applyProgramParam(programValue);
+    applyProgramParam(programValue || document.querySelector<HTMLElement>('[data-booking-program]')?.dataset.bookingProgram || null);
     updateBookingCopy();
     if (dialog && !dialog.open) {
       dialog.showModal();
       document.body.style.overflow = 'hidden';
+      trackBooking('booking_open');
     }
   };
 
@@ -678,6 +704,7 @@ import Icon from './Icon.astro';
   const resetAfterSend = () => {
     if (!dialog?.classList.contains('is-sent')) return;
     dialog.classList.remove('is-sent');
+    fillingStarted = false;
     form?.classList.remove('is-submitting');
     form?.querySelectorAll('input, select, textarea, button').forEach((el) => el.removeAttribute('disabled'));
     error?.setAttribute('hidden', 'true');
