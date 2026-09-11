@@ -129,7 +129,7 @@ const organizationSchema = {
     {metrikaEnabled && (
       <script is:inline define:vars={{ id: yandexMetrikaId }}>
         // Цели: клик по кнопке/телефону/мессенджеру — по всему сайту через
-        // делегирование, скролл до цен — как только секция #prices появляется
+        // делегирование, скролл до цен — как только цена появляется
         // в зоне видимости.
         const ym = window.ym;
         if (typeof ym === 'function') {
@@ -159,7 +159,9 @@ const organizationSchema = {
             }
           });
 
-          const pricesEl = document.querySelector('#prices h2') || document.getElementById('prices');
+          const pricesEl = document.querySelector('#prices h2')
+            || document.getElementById('prices')
+            || document.querySelector('.program-price');
           if (pricesEl && 'IntersectionObserver' in window) {
             const observer = new IntersectionObserver((entries, obs) => {
               entries.forEach((entry) => {
