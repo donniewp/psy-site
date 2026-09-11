@@ -1,62 +1,66 @@
 ---
-import { prices, trialOffer } from '../data/content';
+/*
+  Прайс стоит сразу под карточками программ и собирается из того же массива
+  `programs` — ни одной цены, написанной здесь руками. Раньше это был второй
+  рукописный список тех же услуг, и он молча разъезжался с карточками: у
+  «Песка и глины» в таблице стоял возраст 4–7, а на карточке 6–8.
+
+  Форма намеренно противоположна карточкам: там фотографии и воздух, здесь
+  плотная типографика и колонка цифр, выровненная по правому краю, — по такой
+  колонке цену находят взглядом за секунду, по восьми карточкам с фото нет.
+*/
+import { programs, prices, trialOffer } from '../data/content';
 import Icon from './Icon.astro';
+
+const groupPrograms = programs.filter((p) => !p.groups.includes('individualno'));
+const individualPrograms = programs.filter((p) => p.groups.includes('individualno'));
 ---
 
-<section class="prices section" id="prices">
+<section class="pricelist section-tight" id="prices">
   <div class="container">
-    <div class="section-head center" data-reveal>
+    <div class="pricelist-head" data-reveal>
       <span class="eyebrow">Цены</span>
-      <h2>Прайс студии «Сензитивность»</h2>
-      <p>Прозрачные цены без скрытых платежей · оплата абонементом.<br /><strong>{trialOffer.short}</strong> — знакомство ничего не стоит.</p>
+      <h2>Сколько стоит заниматься</h2>
+      <p>Оплата абонементом, без скрытых платежей и вступительных взносов.</p>
     </div>
 
-    <div class="prices-grid" data-reveal>
-      <div class="price-block">
-        <span class="block-label">Групповые программы</span>
-        <div class="price-cards">
-          {prices.group.map((item) => (
-            <div class="price-card" class:list={[{ 'price-card--clay': item.icon === 'price-sand' }]}>
-              <Icon name={item.icon} class="price-icon" />
-              <h3>{item.title}</h3>
-              <span class="price-age">{item.ageLabel}</span>
-              <div class="price-tiers">
-                {item.tiers.map((t) => (
-                  <div class="price-tier">
-                    <span class="tier-price">{t.price}</span>
-                    <span class="tier-note">{t.note}</span>
-                  </div>
-                ))}
-              </div>
-              {item.schedule && <span class="price-schedule">{item.schedule}</span>}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div class="price-block">
-        <span class="block-label">Индивидуально</span>
-        <div class="price-table">
-          {prices.individual.map((item) => (
-            <div class="price-row">
-              <div>
-                <h3>{item.title}</h3>
-                <span class="price-age">{item.ageLabel}</span>
-              </div>
-              <span class="row-price">{item.price}</span>
-            </div>
-          ))}
-        </div>
-
-        <div class="diagnostics-card">
-          <h3>{prices.diagnostics.title}</h3>
-          <p>{prices.diagnostics.sub}</p>
-          <div class="diagnostics-price">
-            <span class="row-price">{prices.diagnostics.price}</span>
-            <span class="price-age">{prices.diagnostics.note}</span>
+    <div class="pricelist-panel" data-reveal>
+      <span class="pricelist-label">Занятия в группе</span>
+      {groupPrograms.map((p) => (
+        <div class="pricelist-row">
+          <div class="pricelist-what">
+            <span class="pricelist-name">{p.title}</span>
+            <span class="pricelist-format">{p.subtitle}</span>
+            <span class="pricelist-meta">{p.ageLabel} · {p.sessionInfo}{p.schedule ? ` · ${p.schedule}` : ''}</span>
           </div>
-          <a href="#booking" class="btn btn-primary">Записаться на диагностику</a>
+          <div class="pricelist-cost">
+            <span class="pricelist-price">{p.price}</span>
+            {p.individual && <span class="pricelist-extra">{p.individual}</span>}
+          </div>
         </div>
+      ))}
+
+      <span class="pricelist-label">Индивидуально</span>
+      {individualPrograms.map((p) => (
+        <div class="pricelist-row">
+          <div class="pricelist-what">
+            <span class="pricelist-name">{p.title}</span>
+            <span class="pricelist-format">{p.subtitle}</span>
+            <span class="pricelist-meta">{p.ageLabel} · {p.sessionInfo}</span>
+          </div>
+          <div class="pricelist-cost">
+            <span class="pricelist-price">{p.price}</span>
+          </div>
+        </div>
+      ))}
+
+      <div class="pricelist-trial">
+        <span class="pricelist-trial-badge">
+          <Icon name="svc-check" class="pricelist-trial-icon" />
+          {trialOffer.short}
+        </span>
+        <span class="pricelist-trial-note">Знакомство со студией и педагогом ничего не стоит и ни к чему не обязывает.</span>
+        <a href="#booking" class="btn btn-primary pricelist-trial-cta">Записаться на пробное</a>
       </div>
     </div>
 
@@ -68,81 +72,116 @@ import Icon from './Icon.astro';
 </section>
 
 <style>
-  .prices-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--space-6); align-items: start; }
+  .pricelist-head { max-width: 640px; margin: 0 auto var(--space-5); text-align: center; }
+  .pricelist-head .eyebrow { justify-content: center; }
+  .pricelist-head h2 { margin-top: var(--space-3); font: var(--text-h2); letter-spacing: var(--tracking-display); }
+  .pricelist-head p { margin-top: var(--space-3); font: var(--text-body); color: var(--color-ink-soft); }
 
-  .block-label { display: block; font: var(--text-label); letter-spacing: var(--tracking-label); color: var(--color-ink-soft); margin-bottom: var(--space-4); }
-
-  .price-cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
-
-  .price-card {
-    background: var(--color-surface);
-    border-radius: var(--radius-md);
-    padding: var(--space-5);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .price-card :global(.price-icon) { color: var(--color-moss); }
-  .price-card h3 { font: var(--text-lead); font-size: 16.5px; margin-top: var(--space-2); }
-  .price-age { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
-
-  /* Единственная карточка про песок и глину — тёплый нейтральный акцент вместо холодной зелени */
-  .price-card--clay { background: color-mix(in srgb, var(--color-clay) 7%, var(--color-surface)); }
-  .price-card--clay :global(.price-icon) { color: var(--color-clay); }
-
-  .price-tiers { margin-top: var(--space-3); display: flex; gap: var(--space-4); }
-  .price-tier { display: flex; flex-direction: column; }
-  .tier-price { font: var(--text-h3); font-size: 20px; color: var(--color-ink); }
-  .tier-note { font: var(--text-meta); font-size: 12.5px; color: var(--color-ink-soft); }
-  .price-schedule { margin-top: var(--space-2); font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
-
-  .price-table {
+  .pricelist-panel {
+    max-width: 860px;
+    margin: 0 auto;
     background: var(--color-surface);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    overflow: hidden;
+    padding: var(--space-5) var(--space-6) var(--space-6);
   }
 
-  .price-row {
+  .pricelist-label {
+    display: block;
+    margin: var(--space-5) 0 var(--space-2);
+    font: var(--text-label);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-label);
+    color: var(--color-ink-soft);
+  }
+
+  .pricelist-label:first-child { margin-top: 0; }
+
+  .pricelist-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-5);
+    align-items: baseline;
+    padding: var(--space-4) 0;
+    border-top: var(--stroke-hairline) solid color-mix(in srgb, var(--color-mist) 40%, transparent);
+  }
+
+  .pricelist-what { display: flex; flex-direction: column; gap: 2px; }
+
+  .pricelist-name { font: var(--text-lead); font-size: 17px; color: var(--color-ink); }
+  .pricelist-format { font: var(--text-meta); font-size: 13.5px; font-weight: 600; color: var(--color-moss); }
+  .pricelist-meta { margin-top: 2px; font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
+
+  .pricelist-cost { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+
+  /* Цифры моноширинные по ширине знака: иначе колонка цен «пляшет» и перестаёт
+     читаться сверху вниз одним взглядом — ради этого таблица и существует. */
+  .pricelist-price {
+    font: var(--text-meta);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .pricelist-extra {
+    font: var(--text-meta);
+    font-size: 12.5px;
+    color: var(--color-ink-soft);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Пробное — последняя строка денежного разговора, поэтому она внизу и на
+     единственном акцентном цвете сайта. */
+  .pricelist-trial {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid var(--color-mist);
-  }
-
-  .price-row:last-child { border-bottom: none; }
-  .price-row h3 { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
-  .row-price { flex-shrink: 0; font: var(--text-lead); font-weight: 700; color: var(--color-moss); }
-
-  .diagnostics-card {
+    gap: var(--space-3) var(--space-4);
     margin-top: var(--space-5);
-    background: var(--color-moss);
-    color: #fff;
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: var(--stroke-thin) solid color-mix(in srgb, var(--color-moss) 25%, transparent);
   }
 
-  .diagnostics-card h3 { color: #fff; font: var(--text-lead); font-size: 16px; }
-  .diagnostics-card p { margin-top: var(--space-2); font: var(--text-meta); color: rgba(255,255,255,.75); }
-  .diagnostics-card .price-age { color: rgba(255,255,255,.75); }
-  .diagnostics-price { margin-top: var(--space-4); display: flex; align-items: baseline; gap: var(--space-3); }
-  .diagnostics-price .row-price { color: var(--color-lime); }
-  .diagnostics-card .btn { margin-top: var(--space-5); background: #fff; color: var(--color-ink); }
-  .diagnostics-card .btn:hover { background: var(--color-lime); }
+  .pricelist-trial-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--color-lime);
+    font: var(--text-meta);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
 
-  .prices-tagline { margin: var(--space-8) auto 0; max-width: 640px; text-align: center; }
+  .pricelist-trial-badge :global(.pricelist-trial-icon) { width: 15px; height: 15px; flex-shrink: 0; }
+
+  .pricelist-trial-note { flex: 1; min-width: 220px; font: var(--text-meta); color: var(--color-ink-soft); }
+  .pricelist-trial-cta { flex-shrink: 0; }
+
+  .prices-tagline {
+    max-width: 640px;
+    margin: var(--space-6) auto 0;
+    text-align: center;
+    font-family: var(--font-display);
+  }
+
   .prices-tagline p { font: var(--text-h3); font-style: italic; color: var(--color-ink); }
-  .prices-tagline cite { display: block; margin-top: var(--space-3); font-style: normal; font: var(--text-meta); color: var(--color-ink-soft); }
+  .prices-tagline cite { display: block; margin-top: var(--space-3); font: var(--text-meta); font-style: normal; color: var(--color-ink-soft); }
 
-  @media (max-width: 900px) {
-    .prices-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 620px) {
+    .pricelist-panel { padding: var(--space-4) var(--space-4) var(--space-5); }
 
-  @media (max-width: 560px) {
-    .price-cards { grid-template-columns: 1fr; }
+    /* На телефоне цена уходит под название: в две колонки строка ужимается до
+       трёх слов на строку и перестаёт читаться. */
+    .pricelist-row { grid-template-columns: 1fr; gap: var(--space-2); }
+    .pricelist-cost { align-items: flex-start; }
+    .pricelist-price, .pricelist-extra { text-align: left; white-space: normal; }
+    .pricelist-trial-cta { width: 100%; }
   }
 </style>

@@ -1,5 +1,12 @@
 ---
-import { bookingSteps, bookingOptions, location, phone, phoneHref, telegramHref, maxHref, trialOffer, bookingEndpoint, yandexMetrikaId } from '../data/content';
+import { bookingSteps, bookingOptions, programs, programBooking, location, phone, phoneHref, telegramHref, maxHref, trialOffer, bookingEndpoint, yandexMetrikaId } from '../data/content';
+
+// Диагностику попап узнаёт по названию программы, а название задаётся данными:
+// строка, вписанная сюда руками, молча перестала совпадать после переименования
+// программ, и особый текст для диагностики просто не показывался. Цену тоже
+// берём из карточки программы, а не дублируем в скрипте.
+const diagnosticsOption = programBooking.diagnostics;
+const diagnosticsPrice = programs.find((p) => p.slug === 'diagnostics')?.price ?? '';
 import Icon from './Icon.astro';
 ---
 
@@ -41,7 +48,7 @@ import Icon from './Icon.astro';
       </div>
     </div>
 
-    <form class="booking-form" id="booking-form" data-endpoint={bookingEndpoint} data-metrika-id={yandexMetrikaId}>
+    <form class="booking-form" id="booking-form" data-endpoint={bookingEndpoint} data-metrika-id={yandexMetrikaId} data-diagnostic-option={diagnosticsOption} data-diagnostic-price={diagnosticsPrice}>
       <svg class="booking-blob" viewBox="0 0 300 300" aria-hidden="true" focusable="false">
         <path d="M245,45 C280,85 285,150 260,205 C235,260 170,290 115,270 C60,250 20,195 30,140 C40,85 95,45 150,35 C190,28 220,15 245,45 Z" />
       </svg>
@@ -641,15 +648,18 @@ import Icon from './Icon.astro';
 
   // Диагностика — платная услуга, даже когда её выбирают в общей форме.
   const updateBookingCopy = () => {
-    const diagnostic = form?.querySelector<HTMLSelectElement>('[name="program"]')?.value === 'Диагностика ребёнка и подростка';
+    const diagnosticOption = form?.dataset.diagnosticOption || '';
+    const diagnosticPrice = form?.dataset.diagnosticPrice || '';
+    const diagnostic = !!diagnosticOption
+      && form?.querySelector<HTMLSelectElement>('[name="program"]')?.value === diagnosticOption;
     const copy: Record<string, string> = {
       'booking-modal-title': diagnostic ? 'Запишитесь на диагностику' : 'Запишитесь на пробное занятие',
       'booking-form-heading': diagnostic ? 'Диагностика · 45 минут' : 'Пробное занятие в студии',
-      'booking-explanation': diagnostic ? 'Диагностика стоит 3 500 ₽ и включает заключение с рекомендациями. Оставьте имя и телефон — уточним запрос и согласуем время встречи.' : 'Пробное занятие бесплатное. Оставьте имя и телефон — свяжемся в часы работы студии и согласуем время.',
+      'booking-explanation': diagnostic ? `Диагностика стоит ${diagnosticPrice} и включает заключение с рекомендациями. Оставьте имя и телефон — уточним запрос и согласуем время встречи.` : 'Пробное занятие бесплатное. Оставьте имя и телефон — свяжемся в часы работы студии и согласуем время.',
     };
     Object.entries(copy).forEach(([id, text]) => { const el = document.getElementById(id); if (el) el.textContent = text; });
     const price = form?.querySelector('.form-free');
-    if (price) price.textContent = diagnostic ? '3 500 ₽' : 'Бесплатно';
+    if (price) price.textContent = diagnostic ? diagnosticPrice : 'Бесплатно';
     const submit = form?.querySelector('.form-submit');
     if (submit) submit.textContent = diagnostic ? 'Обсудить диагностику' : 'Записаться на пробное';
     const steps = document.querySelector<HTMLElement>('.booking-steps');

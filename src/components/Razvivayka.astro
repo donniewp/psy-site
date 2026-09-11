@@ -1,5 +1,9 @@
 ---
-import { razvivaykaBlocks, razvivaykaBenefits } from '../data/content';
+import { razvivaykaBlocks, razvivaykaBenefits, programs } from '../data/content';
+
+// Цена — из карточки программы, крупной цифрой показываем только сумму:
+// вписанная сюда вторая копия так же тихо устареет, как устарел прайс.
+const razvivaykaPrice = (programs.find((p) => p.slug === 'razvivayka')?.price ?? '').split(' / ')[0];
 import Icon from './Icon.astro';
 import FigmaAsset from './FigmaAsset.astro';
 
@@ -176,7 +180,7 @@ const blocks = razvivaykaBlocks.map((b, i) => ({
 
       <div class="duration-card">
         <span class="eyebrow">Стоимость</span>
-        <div class="duration-value">1 900 ₽</div>
+        <div class="duration-value">{razvivaykaPrice}</div>
         <p>За одно занятие · мини-группа до 8–10 детей · утром</p>
         <a href="#booking" class="btn btn-primary">Узнать расписание и стоимость</a>
       </div>
