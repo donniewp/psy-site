@@ -1,0 +1,67 @@
+---
+/*
+  Воскресный день студии. Это не программа и не услуга — у него нет цены,
+  возраста и записи, поэтому он и не встал карточкой в сетку программ.
+  Тихая полоса между отзывами и видео: студия здесь говорит не о занятиях,
+  а о том, чем живёт.
+*/
+import Icon from './Icon.astro';
+---
+
+<section class="sunday section-tight" id="sunday">
+  <div class="container sunday-inner" data-reveal>
+    <span class="eyebrow">Жизнь студии</span>
+    <h2>Воскресенье — особенный день нашей студии</h2>
+    <p>Встречаемся, разговариваем, творим, слушаем музыку и находим новые смыслы.</p>
+    <p class="sunday-note">
+      <Icon name="svc-check" class="sunday-icon" />
+      Все анонсы — в закрытой рассылке «Сензитивности»
+    </p>
+  </div>
+</section>
+
+<style>
+  .sunday-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .sunday h2 {
+    margin-top: var(--space-3);
+    font: var(--text-h3);
+    color: var(--color-ink);
+  }
+
+  .sunday p {
+    margin-top: var(--space-3);
+    font: var(--text-body);
+    color: var(--color-ink-soft);
+  }
+
+  /* Анонсы — отдельной строкой-пилюлей: это не продолжение абзаца, а способ
+     не пропустить встречу. */
+  .sunday-note {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    font: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .sunday-note :global(.sunday-icon) {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--color-moss);
+  }
+</style>

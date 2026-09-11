@@ -22,7 +22,7 @@ const diagnostic = p.slug === 'diagnostics';
 const younger = p.slug === 'early-sensory';
 ---
 
-<Layout title={`${p.title} у м. Войковская — Сензитивность`} description={`${p.ageLabel}. ${p.desc} ${p.price}. ${location.metro}. Запись в студию.`} path={`/${programPaths[p.slug]}/`} image={p.img || '/img/hero.jpg'}>
+<Layout title={`${p.searchName} у м. Войковская — Сензитивность`} description={`${p.ageLabel}. ${p.desc} ${p.price}. ${location.metro}. Запись в студию.`} path={`/${programPaths[p.slug]}/`} image={p.img || '/img/hero.jpg'}>
   <Header />
   <main id="main-content" data-booking-program={booking}>
     <section class="program-intro container">
@@ -30,10 +30,12 @@ const younger = p.slug === 'early-sensory';
         <a href="/#programs" class="back-link">← Все программы студии</a>
         <p class="eyebrow">{location.metro}</p>
         <h1>{p.title}</h1>
+        <p class="program-format">{p.subtitle}</p>
         <p class="age">{p.ageLabel || 'Индивидуальная встреча'}</p>
         <p class="intro-description">{p.desc}</p>
         <p class="price">{p.price}</p>
         <p class="format">{p.sessionInfo}{p.schedule ? ` · ${p.schedule}` : ''}</p>
+        {p.individual && <p class="format">{p.individual}</p>}
         <a href={cta} class="btn btn-primary">{diagnostic ? 'Обсудить диагностику' : 'Записаться на бесплатное пробное'}</a>
         <p class="trial-note">{diagnostic ? 'Диагностика — платная встреча с заключением. Знакомство со студией и пробное занятие — бесплатно.' : 'Познакомьтесь с педагогом и форматом занятий до покупки абонемента.'}</p>
       </div>
@@ -86,6 +88,9 @@ const younger = p.slug === 'early-sensory';
   .program-intro { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-top: 32px; padding-bottom: 64px; }
   .back-link { display: inline-block; margin-bottom: 24px; font-size: 14px; }
   h1 { font: var(--text-display); font-size: clamp(32px, 3.4vw, 48px); line-height: 1.15; margin: 12px 0; }
+  /* Формат программы под названием: по нему родитель узнаёт занятие, которое
+     искал, — само название карточки говорит от лица ребёнка. */
+  .program-format { margin-top: var(--space-2); font: var(--text-lead); color: var(--color-ink); }
   .age { color: var(--color-moss); font-weight: 700; font-size: 19px; }
   .intro-description { margin: 16px 0; font-size: 18px; line-height: 1.55; }
   .price { font-size: 21px; font-weight: 700; }

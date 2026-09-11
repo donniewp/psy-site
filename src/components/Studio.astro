@@ -1,0 +1,184 @@
+---
+/*
+  Фотоэкскурсия по студии. Стоит перед контактами намеренно: человек сначала
+  видит место, потом читает адрес и карту.
+
+  Фотография входа вынесена из общей сетки и стоит рядом с заголовком — это не
+  «ещё один интерьер», а единственный снимок с прикладной задачей: по нему
+  находят дверь в незнакомом дворе.
+*/
+import { studioPhotos, studioEntrance, location } from '../data/content';
+import Icon from './Icon.astro';
+---
+
+<section class="studio section" id="studio">
+  <div class="container">
+    <div class="studio-intro" data-reveal>
+      <div class="studio-intro-copy">
+        <span class="eyebrow">Студия</span>
+        <h2>Место, куда вы придёте</h2>
+        <p>
+          Небольшое пространство на первом этаже: прихожая, зона ожидания для родителей
+          и отдельные кабинеты под занятия. Без ресепшена, очередей и запаха поликлиники.
+        </p>
+        <p class="studio-address">
+          <Icon name="svc-pin" class="studio-address-icon" />
+          {location.address} · {location.metro}
+        </p>
+      </div>
+
+      <figure class="studio-entrance">
+        <img
+          src={`${import.meta.env.BASE_URL}${studioEntrance.src.replace(/^\//, '')}`}
+          alt={studioEntrance.alt}
+          width="825"
+          height="1100"
+          loading="lazy"
+        />
+        <figcaption>{studioEntrance.caption}</figcaption>
+      </figure>
+    </div>
+
+    <div class="studio-grid" data-reveal>
+      {studioPhotos.map((photo) => (
+        <figure class="studio-shot">
+          <img
+            src={`${import.meta.env.BASE_URL}${photo.src.replace(/^\//, '')}`}
+            alt={photo.alt}
+            width="825"
+            height="1100"
+            loading="lazy"
+          />
+          <figcaption>{photo.caption}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .studio-intro {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: var(--space-7);
+    align-items: center;
+    margin-bottom: var(--space-6);
+  }
+
+  .studio-intro-copy h2 {
+    margin-top: var(--space-3);
+    font: var(--text-h2);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .studio-intro-copy p {
+    margin-top: var(--space-4);
+    font: var(--text-body);
+    color: var(--color-ink-soft);
+    max-width: 52ch;
+  }
+
+  .studio-address {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .studio-address :global(.studio-address-icon) {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--color-moss);
+  }
+
+  figure { margin: 0; }
+
+  /* Снимки в одной рамке: крупный радиус у карточки, изображение внутри — на
+     ступень меньше, как и везде на сайте. */
+  .studio-entrance img,
+  .studio-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background: var(--color-mist);
+  }
+
+  .studio-entrance img {
+    aspect-ratio: 3 / 4;
+    box-shadow: var(--shadow-md);
+  }
+
+  figcaption {
+    margin-top: var(--space-3);
+    font: var(--text-meta);
+    font-size: 13.5px;
+    color: var(--color-ink-soft);
+  }
+
+  .studio-entrance figcaption {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .studio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5) var(--space-4);
+    /* Кадры не растягиваем по высоте строки: у всех своя подпись, и высоту
+       карточки должно задавать изображение, а не самый высокий сосед. */
+    align-items: start;
+  }
+
+  .studio-shot img {
+    aspect-ratio: 3 / 4;
+    box-shadow: var(--shadow-sm);
+    transition: transform .3s ease-out, box-shadow .3s ease-out;
+  }
+
+  /* Второй столбец опущен: одинаковая линия у шести портретных кадров подряд
+     читается как каталог, смещение — как разворот в журнале. */
+  .studio-shot:nth-child(3n + 2) { margin-top: var(--space-6); }
+
+  .studio-shot:hover img {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  @media (max-width: 900px) {
+    .studio-intro { grid-template-columns: 1fr; gap: var(--space-5); }
+    .studio-entrance img { aspect-ratio: 4 / 3; }
+    .studio-grid { grid-template-columns: repeat(2, 1fr); }
+    .studio-shot:nth-child(3n + 2) { margin-top: 0; }
+    .studio-shot:nth-child(2n) { margin-top: var(--space-5); }
+  }
+
+  /* Телефон: шесть портретных кадров в столбик — это полтора экрана пролистывания
+     мимо цели. Горизонтальная лента показывает край следующего кадра, и сразу
+     понятно, что её можно листать. */
+  @media (max-width: 620px) {
+    .studio-grid {
+      display: flex;
+      gap: var(--space-4);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      /* Вылет за поля контейнера: лента должна уходить под край экрана. */
+      margin: 0 calc(var(--space-5) * -1);
+      padding: 0 var(--space-5) var(--space-3);
+      scrollbar-width: none;
+    }
+
+    .studio-grid::-webkit-scrollbar { display: none; }
+
+    .studio-shot {
+      flex: 0 0 72%;
+      scroll-snap-align: start;
+    }
+
+    .studio-shot:nth-child(2n) { margin-top: 0; }
+  }
+</style>

@@ -7,8 +7,8 @@ import Icon from './Icon.astro';
   <div class="container">
     <div class="section-head center" data-reveal>
       <span class="eyebrow">Программы</span>
-      <h2>Сколько лет вашему ребёнку?</h2>
-      <p>Выберите возраст ребёнка — покажем подходящие программы и стоимость.</p>
+      <h2>Каждый возраст ставит перед ребёнком свои задачи</h2>
+      <p>Мы помогаем подобрать именно тот формат поддержки, который нужен ребёнку сейчас.</p>
     </div>
 
     <div class="prog-tabs" data-reveal role="group" aria-label="Возраст ребёнка">
@@ -56,6 +56,7 @@ import Icon from './Icon.astro';
               <span class="program-direction" data-direction={p.direction}>{programDirectionLabels[p.direction]}</span>
             </div>
             <h3><a href={`/${programPaths[p.slug]}/`}>{p.title}</a></h3>
+            <p class="program-subtitle">{p.subtitle}</p>
             <p class="program-desc">{p.desc}</p>
             {p.bullets && (
               <ul class="program-bullets">
@@ -66,10 +67,13 @@ import Icon from './Icon.astro';
               <span class="program-session">{p.sessionInfo}</span>
               {p.schedule && <span class="program-schedule">{p.schedule}</span>}
               <span class="program-price">{p.price}</span>
+              {p.individual && <span class="program-individual">{p.individual}</span>}
             </div>
             <div class="program-actions">
-              <a class="program-details" href={`/${programPaths[p.slug]}/`}>Подробнее о занятиях →</a>
-              <a href={`?program=${encodeURIComponent(programBooking[p.slug])}#booking`} class="btn btn-dark program-btn">Записаться на пробное</a>
+              <a class="program-details" href={`/${programPaths[p.slug]}/`}>
+                Подробнее о занятии<span class="program-details-arrow" aria-hidden="true">→</span>
+              </a>
+              <a href={`?program=${encodeURIComponent(programBooking[p.slug])}#booking`} class="btn btn-dark program-btn">{p.cta ?? 'Записаться на пробное занятие'}</a>
             </div>
           </div>
         </article>
@@ -185,6 +189,14 @@ import Icon from './Icon.astro';
   .program-card--neuro .program-age { color: var(--color-ink); }
 
   .program-body h3 { font: var(--text-lead); font-size: 17px; margin-top: 2px; }
+  .program-subtitle {
+    margin-top: 2px;
+    font: var(--text-meta);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--color-moss);
+  }
+
   .program-desc { font: var(--text-meta); color: var(--color-ink-soft); }
 
   .program-bullets { margin: var(--space-2) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
@@ -204,8 +216,39 @@ import Icon from './Icon.astro';
   .program-session { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
   .program-schedule { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
   .program-price { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+  /* Индивидуальный формат — та же программа, но дороже за занятие: держим его
+     ниже основной цены и тоньше, чтобы не читался как альтернативный прайс. */
+  .program-individual { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
 
-  .program-details { display: block; padding: 10px 0; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
+  /* Ссылка была цвета обычного текста и без подписи о том, что это переход, —
+     родители её просто не замечали. Теперь это цвет интерактива, крупнее и с
+     собственной подложкой: на карточке она читается как вторая кнопка, но не
+     спорит с основной тёмной. Высота 44px — минимальная цель для пальца. */
+  .program-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    margin-bottom: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    box-shadow: inset 0 0 0 var(--stroke-hairline) color-mix(in srgb, var(--color-moss) 35%, transparent);
+    font: var(--text-meta);
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--color-moss);
+    transition: background .2s ease-out, box-shadow .2s ease-out;
+  }
+
+  .program-details:hover {
+    background: color-mix(in srgb, var(--color-lime) 30%, transparent);
+    box-shadow: inset 0 0 0 var(--stroke-thin) var(--color-moss);
+  }
+
+  .program-details-arrow { transition: transform .2s ease-out; }
+  .program-details:hover .program-details-arrow { transform: translateX(3px); }
+
   .program-actions { margin-top: var(--space-4); }
   .program-btn { width: 100%; padding: var(--space-3); font-size: 14.5px; }
 
