@@ -13,14 +13,17 @@ import Icon from './Icon.astro';
           <span class="loc-pill"><Icon name="svc-metro" class="loc-icon" />{location.metro}</span>
         </div>
 
-        <h1>Раннее развитие и подготовка к школе</h1>
+        <h1>Студия нейропедагогики и&nbsp;психологии</h1>
+        <p class="hero-motto">Развиваем. Поддерживаем. Готовим к&nbsp;жизни.</p>
       </div>
 
       <div class="hero-copy-rest">
         <p class="hero-sub">
-          Занятия для детей от 1,5 лет, мини-группы и помощь психолога
-          в студии Татьяны Петровой.
+          Развивающие занятия и психологическая поддержка для детей и подростков
+          2–18&nbsp;лет. Бережно, системно, с опорой на науку и уважение к&nbsp;ребёнку.
         </p>
+
+        <p class="hero-approach"><strong>Педагог. Психолог. Нейропсихолог.</strong><br />Три подхода — один результат.</p>
 
         <div class="hero-tags">
           <span class="tag">Татьяна Петрова · 20+ лет опыта</span>
@@ -110,6 +113,11 @@ import Icon from './Icon.astro';
   }
 
   .hero-sub { margin-top: var(--space-5); font: var(--text-lead); font-size: 21px; font-weight: 400; color: var(--color-ink-soft); max-width: 560px; }
+
+  .hero h1 { text-wrap: balance; }
+  .hero-motto { margin-top: var(--space-4); font: var(--text-lead); color: var(--color-moss); text-wrap: balance; }
+  .hero-approach { margin-top: var(--space-4); font: var(--text-meta); line-height: 1.6; color: var(--color-ink-soft); }
+  .hero-approach strong { font-weight: 600; color: var(--color-ink); }
 
   .hero-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-6); }
 
@@ -210,6 +218,7 @@ import Icon from './Icon.astro';
     .loc-pill { padding: 4px 0; background: transparent; font-size: 13px; }
     .hero h1 { font-size: clamp(30px, 7.8vw, 44px); line-height: 1.15; }
     .hero-sub { margin-top: 16px; font-size: 17px; line-height: 1.5; }
+    .hero-motto { font-size: 18px; line-height: 1.45; }
     .hero-tags { margin-top: 16px; gap: 6px; }
     .tag { font-size: 12px; padding: 7px 10px; }
     .hero-ctas { margin-top: 20px; gap: 10px; }
