@@ -46,7 +46,9 @@ export const buildFeed = () => {
       const description = `${p.ageLabel}. ${p.desc} Стоимость за ${pack.unit}. ${p.sessionInfo}. ${
         p.slug === 'diagnostics'
           ? 'Встреча с заключением и рекомендациями.'
-          : 'Пробное занятие бесплатно. Время согласуем при записи.'
+          : p.slug === 'psychocorrection'
+            ? 'Индивидуальная консультация. Время и формат согласуем при записи.'
+            : 'Пробное в группе бесплатно. Время согласуем при записи.'
       }`;
       return `    <offer id="${xml(p.slug)}" available="true">
       <name>${xml(`${p.searchName}${p.ageLabel ? `, ${p.ageLabel}` : ''} — ${pack.unit}`)}</name>

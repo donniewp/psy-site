@@ -15,14 +15,14 @@ import Icon from './Icon.astro';
     <div class="faq-list" data-reveal>
       {faq.map((item, i) => (
         <div class="faq-item" data-open={i === 0 ? 'true' : 'false'}>
-          <button class="faq-question" aria-expanded={i === 0 ? 'true' : 'false'}>
+          <button class="faq-question" id={`faq-question-${i}`} aria-controls={`faq-answer-${i}`} aria-expanded={i === 0 ? 'true' : 'false'}>
             <span>{item.q}</span>
             <span class="faq-icon-wrap">
               <Icon name="svc-plus" class="icon-plus" />
               <Icon name="svc-minus" class="icon-minus" />
             </span>
           </button>
-          <div class="faq-answer"><p>{item.a}</p></div>
+          <div class="faq-answer" id={`faq-answer-${i}`} role="region" aria-labelledby={`faq-question-${i}`}><p>{item.a}</p></div>
         </div>
       ))}
     </div>

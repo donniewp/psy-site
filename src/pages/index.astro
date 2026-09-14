@@ -2,49 +2,44 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
-import Problems from '../components/Problems.astro';
-import Programs from '../components/Programs.astro';
-import Razvivayka from '../components/Razvivayka.astro';
 import Teacher from '../components/Teacher.astro';
-import WhyUs from '../components/WhyUs.astro';
-import Timeline from '../components/Timeline.astro';
+import Programs from '../components/Programs.astro';
+import FirstVisit from '../components/FirstVisit.astro';
 import Reviews from '../components/Reviews.astro';
-import VideoGallery from '../components/VideoGallery.astro';
-import Sunday from '../components/Sunday.astro';
 import FAQ from '../components/FAQ.astro';
 import Booking from '../components/Booking.astro';
-import Studio from '../components/Studio.astro';
 import Contacts from '../components/Contacts.astro';
 import Footer from '../components/Footer.astro';
-import ChatButtons from '../components/ChatButtons.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
+import Problems from '../components/Problems.astro';
+import Razvivayka from '../components/Razvivayka.astro';
+import WhyUs from '../components/WhyUs.astro';
+import Timeline from '../components/Timeline.astro';
+import Sunday from '../components/Sunday.astro';
+import VideoGallery from '../components/VideoGallery.astro';
+import Studio from '../components/Studio.astro';
 ---
-
-<Layout
-  title="Детская студия развития, м. Войковская. Сензитивность"
-  description="Занятия для детей и подростков у м. Войковская, 3 минуты пешком: подготовка к школе, нейропсихология, раннее развитие, песочная терапия. Мини-группы, педагог с опытом более 20 лет."
-  localBusiness
->
+<Layout title="Детская студия развития, м. Войковская. Сензитивность" description="Занятия для детей у м. Войковская: раннее развитие, подготовка к школе, помощь психолога. Татьяна Петрова, более 20 лет опыта. Пробное в группе бесплатно." localBusiness>
   <div id="page">
     <Header />
     <main id="main-content">
       <Hero />
+      <Teacher />
       <Programs />
+      <FirstVisit />
+      <VideoGallery />
+      <Reviews />
+      <WhyUs />
       <Problems />
       <Razvivayka />
-      <Teacher />
-      <WhyUs />
       <Timeline />
-      <Reviews />
       <Sunday />
-      <VideoGallery />
       <FAQ />
       <Studio />
-      <Booking />
       <Contacts />
+      <Booking />
     </main>
     <Footer />
-    <ChatButtons />
     <StickyMobileCTA />
   </div>
 </Layout>

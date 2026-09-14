@@ -1,5 +1,5 @@
 ---
-import { location, heroBadges, trialOffer } from '../data/content';
+import { location, heroBadges, reviews, yandexMapsUrl } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -13,26 +13,26 @@ import Icon from './Icon.astro';
           <span class="loc-pill"><Icon name="svc-metro" class="loc-icon" />{location.metro}</span>
         </div>
 
-        <h1>Развитие, обучение и психологическая поддержка ребёнка</h1>
+        <h1>Раннее развитие и подготовка к школе</h1>
       </div>
 
       <div class="hero-copy-rest">
         <p class="hero-sub">
-          От первых развивающих занятий до уверенного школьника и подростка.
-          Педагогика · психология · нейропсихология.
+          Занятия для детей от 1,5 лет, мини-группы и помощь психолога
+          в студии Татьяны Петровой.
         </p>
 
         <div class="hero-tags">
-          <span class="tag">Педагог с опытом 20+ лет</span>
-          <span class="tag tag-offer">{trialOffer.tag}</span>
+          <span class="tag">Татьяна Петрова · 20+ лет опыта</span>
+          <span class="tag tag-offer">Пробное в группе бесплатно</span>
         </div>
 
         <div class="hero-ctas">
-          <a href="#booking" class="btn btn-primary">Записаться бесплатно</a>
-          <a href="#programs" class="btn btn-secondary">Выбрать программу</a>
+          <a href="#programs" class="btn btn-primary">Выбрать занятие</a>
+          <a href="#booking" class="btn btn-secondary">Записаться на пробное</a>
         </div>
 
-        <p class="hero-microcopy">Познакомьтесь с педагогом и форматом занятий.<br />{trialOffer.timing}.</p>
+        <p class="hero-microcopy">Познакомьтесь с педагогом и форматом занятий.<br /><a href="#first-visit">Как проходит первый визит →</a></p>
 
         <a href="#video" class="hero-video-link">
           <span class="hero-video-link-icon" aria-hidden="true">
@@ -53,11 +53,17 @@ import Icon from './Icon.astro';
           </div>
         ))}
       </div>
+      <blockquote class="hero-review"><p>«{reviews[2].text}»</p><cite>{reviews[2].name} · <a href={yandexMapsUrl} target="_blank" rel="noopener">Яндекс Карты ↗</a></cite></blockquote>
     </div>
   </div>
 </section>
 
 <style>
+  .hero-review { margin: var(--space-5) 0 0; padding: 0 var(--space-3); }
+  .hero-review p { font: 400 18px/1.5 var(--font-display); color: var(--color-ink); }
+  .hero-review cite { display: block; margin-top: var(--space-2); font: var(--text-meta); font-size: 12px; }
+  .hero-review a, .hero-microcopy a { text-decoration: underline; text-underline-offset: 3px; }
+
   .hero { position: relative; overflow: hidden; padding: var(--space-6) 0 var(--space-6); }
 
   .hero-blob {
@@ -194,6 +200,12 @@ import Icon from './Icon.astro';
   @media (max-width: 900px) {
     .hero { padding: 20px 0 32px; }
     .hero-inner { grid-template-columns: 1fr; gap: 24px; }
+    .hero-copy { display: contents; }
+    .hero-copy-head { grid-row: 1; }
+    .hero-media { grid-row: 2; }
+    .hero-copy-rest { grid-row: 3; }
+    .hero-review { margin-top: var(--space-4); }
+    .hero-review p { font-size: 17px; }
     .hero-locations { margin-bottom: 16px; gap: 6px; }
     .loc-pill { padding: 4px 0; background: transparent; font-size: 13px; }
     .hero h1 { font-size: clamp(30px, 7.8vw, 44px); line-height: 1.15; }

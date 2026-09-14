@@ -32,19 +32,29 @@ export default {
       return new Response('Bad request', { status: 400, headers: corsHeaders });
     }
 
-    // Honeypot: настоящие посетители это поле не видят и не заполняют.
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      return new Response('Bad request', { status: 400, headers: corsHeaders });
+    }
+
+    // Honeypot: не подтверждаем доставку запроса, который не отправляли.
     if (data.hp_check) {
       console.log('Honeypot triggered, submission dropped');
-      return new Response('OK', { status: 200, headers: corsHeaders });
+      return new Response('Bad request', { status: 400, headers: corsHeaders });
     }
 
     const name = (data.name || '').toString().trim().slice(0, 200);
-    const phone = (data.phone || '').toString().trim().slice(0, 50);
+    const rawPhone = (data.phone || '').toString().trim();
+    const phoneDigits = rawPhone.replace(/\D/g, '');
+    const validPhone = /^\+?[\d\s().-]+$/.test(rawPhone) && phoneDigits.length >= 10 && phoneDigits.length <= 15;
+    let normalizedDigits = phoneDigits;
+    if (phoneDigits.length === 10) normalizedDigits = `7${phoneDigits}`;
+    else if (phoneDigits.length === 11 && phoneDigits.startsWith('8')) normalizedDigits = `7${phoneDigits.slice(1)}`;
+    const phone = `+${normalizedDigits}`;
     const program = (data.program || '').toString().trim().slice(0, 200) || 'не указана';
     // Необязательное поле: возраст ребёнка, удобное время звонка, суть запроса.
     const comment = (data.comment || '').toString().trim().slice(0, 1000);
 
-    if (!name || !phone) {
+    if (!name || !validPhone) {
       return new Response('Missing fields', { status: 400, headers: corsHeaders });
     }
 
@@ -75,18 +85,26 @@ export default {
       landingUrl && `Страница входа: ${landingUrl}`,
     ].filter(Boolean).join('\n');
 
-    const tgResponse = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text }),
-    });
-
-    if (!tgResponse.ok) {
-      console.error('Telegram send failed', tgResponse.status, await tgResponse.text());
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    try {
+      const tgResponse = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text }),
+        signal: controller.signal,
+      });
+      const result = await tgResponse.json();
+      if (!tgResponse.ok || result?.ok !== true) {
+        return new Response('Failed to send', { status: 502, headers: corsHeaders });
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } catch {
       return new Response('Failed to send', { status: 502, headers: corsHeaders });
+    } finally {
+      clearTimeout(timeout);
     }
-
-    console.log('Telegram message sent');
-    return new Response('OK', { status: 200, headers: corsHeaders });
   },
 };

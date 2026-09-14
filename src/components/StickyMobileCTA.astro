@@ -1,50 +1,42 @@
 ---
-import { phoneHref } from '../data/content';
-import Icon from './Icon.astro';
-const { diagnostic = false } = Astro.props;
+import { phone, phoneHref, telegramHref, maxHref, location } from '../data/content';
+const { diagnostic = false, consultation = false } = Astro.props;
 ---
-
-<div class="sticky-cta">
-  <a href={phoneHref} class="sticky-call" aria-label="Позвонить">
-    <Icon name="svc-phone" class="sticky-icon" />
-    Позвонить
-  </a>
-  <a href="#booking" class="btn btn-primary sticky-book">{diagnostic ? 'Запись на диагностику' : 'Пробное бесплатно'}</a>
+<div class="contact-rail">
+  <details class="contact-choices" id="contact-choices">
+    <summary><span class="contact-dot" aria-hidden="true"></span><span>Связаться</span></summary>
+    <div class="contact-panel">
+      <p>Как вам удобнее?</p>
+      <a href={telegramHref} target="_blank" rel="noopener">Написать в Telegram <span aria-hidden="true">↗</span></a>
+      <a href={maxHref} target="_blank" rel="noopener">Написать в MAX <span aria-hidden="true">↗</span></a>
+      <a href={phoneHref}>Позвонить: {phone}</a>
+      <small>Студия открыта {location.hours}</small>
+    </div>
+  </details>
+  <a href="#booking" class="btn btn-primary sticky-book">{diagnostic ? 'На диагностику' : consultation ? 'Обсудить встречу' : 'Записаться'}</a>
 </div>
-
 <style>
-  .sticky-cta {
-    display: none;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 95;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-md);
-    padding: var(--space-3) var(--space-4);
-    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
-    gap: var(--space-3);
-  }
-
-  .sticky-call {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: 0 10px;
-    border-radius: var(--radius-pill);
-    box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-mist);
-    font: var(--text-meta);
-    font-weight: 600;
-    color: var(--color-ink);
-  }
-
-  .sticky-call :global(.sticky-icon) { width: 16px; height: 16px; color: var(--color-moss); }
-
-  .sticky-book { flex: 1; padding: 13px 8px; font-size: 14px; }
-
+  .contact-rail { position: fixed; right: var(--space-5); bottom: var(--space-5); z-index: 95; }
+  .contact-choices { position: relative; }
+  summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 48px; padding: var(--space-3) var(--space-5); color: var(--color-ink); background: var(--color-surface); border: 1px solid var(--color-mist); border-radius: var(--radius-pill); font: var(--text-meta); }
+  summary::-webkit-details-marker { display: none; }
+  .contact-dot { width: 8px; height: 8px; border: 1px solid var(--color-moss); border-radius: 50%; }
+  .contact-choices[open] summary { background: var(--color-paper); }
+  .contact-panel { position: absolute; bottom: calc(100% + 12px); right: 0; width: 300px; background: var(--color-surface); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); padding: var(--space-5); }
+  .contact-panel p { color: var(--color-ink); font-weight: 600; margin-bottom: var(--space-2); }
+  .contact-panel a { display: flex; align-items: center; justify-content: space-between; min-height: 48px; border-bottom: 1px solid var(--color-divider); font-size: 14px; color: var(--color-moss); }
+  .contact-panel a:hover { text-decoration: underline; }
+  small { display: block; font-size: 12px; line-height: 1.5; margin-top: var(--space-3); }
+  .sticky-book { display: none; }
   @media (max-width: 720px) {
-    .sticky-cta { display: flex; }
+    .contact-rail { left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-3); padding: var(--space-3) var(--space-4); padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--color-divider); background: var(--color-surface); }
+    .sticky-book { display: inline-flex; padding: var(--space-3); font-size: 14px; }
+    summary { padding: var(--space-3); font-size: 14px; }
+    .contact-panel { left: 0; right: auto; width: min(320px, calc(100vw - 32px)); }
   }
 </style>
+<script>
+  const contacts = document.getElementById('contact-choices') as HTMLDetailsElement | null;
+  document.addEventListener('click', e => { if (contacts?.open && !contacts.contains(e.target as Node)) contacts.open = false; });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && contacts?.open) { contacts.open = false; contacts.querySelector('summary')?.focus(); } });
+</script>

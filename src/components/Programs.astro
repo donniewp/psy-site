@@ -1,14 +1,15 @@
 ---
 import { programGroups, programs, programDirectionLabels, programBooking, programPaths } from '../data/content';
 import Icon from './Icon.astro';
+import { familyBooking, programPhotos } from '../data/visits';
 ---
 
 <section class="programs section" id="programs">
   <div class="container">
     <div class="section-head center" data-reveal>
       <span class="eyebrow">Программы</span>
-      <h2>Каждый возраст ставит перед ребёнком свои задачи</h2>
-      <p>Мы помогаем подобрать именно тот формат поддержки, который нужен ребёнку сейчас.</p>
+      <h2>Занятия для каждого возраста</h2>
+      <p>Выберите возраст — покажем подходящие программы, формат и стоимость.</p>
     </div>
 
     <div class="prog-tabs" data-reveal role="group" aria-label="Возраст ребёнка">
@@ -43,7 +44,7 @@ import Icon from './Icon.astro';
           data-groups={p.groups.join(',')}
         >
           {p.img ? (
-            <img src={`${import.meta.env.BASE_URL}${p.img.replace(/^\//, '')}`} alt={p.title} loading="lazy" />
+            <img src={`${import.meta.env.BASE_URL}${p.img.replace(/^\//, '')}`} alt={programPhotos(p).alt} loading="lazy" />
           ) : (
             <div class="program-photo-pending">
               <Icon name="svc-clock" class="pending-icon" />
@@ -55,8 +56,8 @@ import Icon from './Icon.astro';
               {p.ageLabel && <span class="program-age">{p.ageLabel}</span>}
               <span class="program-direction" data-direction={p.direction}>{programDirectionLabels[p.direction]}</span>
             </div>
-            <h3><a href={`/${programPaths[p.slug]}/`}>{p.title}</a></h3>
-            <p class="program-subtitle">{p.subtitle}</p>
+            <h3><a href={`/${programPaths[p.slug]}/`}>{p.searchName}</a></h3>
+            <p class="program-subtitle">«{p.title}» · {p.subtitle}</p>
             <p class="program-desc">{p.desc}</p>
             {p.bullets && (
               <ul class="program-bullets">
@@ -73,16 +74,23 @@ import Icon from './Icon.astro';
               <a class="program-details" href={`/${programPaths[p.slug]}/`}>
                 Подробнее о занятии<span class="program-details-arrow" aria-hidden="true">→</span>
               </a>
-              <a href={`?program=${encodeURIComponent(programBooking[p.slug])}#booking`} class="btn btn-dark program-btn">{p.cta ?? 'Записаться на пробное занятие'}</a>
+              <a href={`?program=${encodeURIComponent(programBooking[p.slug])}#booking`} class="btn btn-dark program-btn">{p.cta ?? 'Записаться на пробное'}</a>
             </div>
           </div>
         </article>
       ))}
     </div>
+    <div class="family-note" id="family"><div><h3>Нужна помощь родителю или семье?</h3><p>Обсудим отношения с ребёнком и семейный запрос. Формат и стоимость согласуем до встречи.</p></div><a class="btn btn-secondary" href={`?program=${encodeURIComponent(familyBooking)}#booking`}>Обсудить с психологом</a></div>
   </div>
 </section>
 
 <style>
+  .family-note { margin-top: var(--space-7); padding: var(--space-6); display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+  .family-note h3 { font: var(--text-h3); font-size: 24px; }
+  .family-note p { font: var(--text-meta); margin-top: var(--space-3); max-width: 58ch; }
+  .family-note > a { flex-shrink: 0; }
+  @media (max-width: 900px) { .family-note { flex-direction: column; align-items: start; } }
+
   .prog-tabs { display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-6); }
 
   .prog-tab {

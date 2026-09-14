@@ -18,6 +18,8 @@
   --color-clay:       #9C5B2E; /* единственный тёплый нейтральный акцент — только карточка «Песок и глина»,
                                    4.92:1 на paper / 5.32:1 на surface — AA. Не расширять на другие секции. */
 
+  --color-divider: color-mix(in srgb, var(--color-mist) 40%, transparent);
+
   /* ===== Типографика ===== */
   --font-display: 'Lora', serif;         /* заголовки, кириллица подтверждена */
   --font-text:    'Golos Text', sans-serif; /* текст интерфейса, кириллица подтверждена */

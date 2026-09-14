@@ -1,0 +1,38 @@
+<section class="first-visit section" id="first-visit">
+  <div class="container first-visit-inner">
+    <div>
+      <span class="eyebrow">Первый визит</span>
+      <h2>Сначала — познакомиться</h2>
+      <p class="visit-lead">Пробное в группе бесплатно. Можно понять, подходит ли ребёнку педагог и формат, до покупки абонемента.</p>
+      <ol>
+        <li><strong>Согласуем визит</strong><p>Уточним возраст, ваш запрос, время и длительность пробного. Заранее обсудим, остаётся ли родитель.</p></li>
+        <li><strong>Познакомимся в студии</strong><p>Педагог познакомится с ребёнком, покажет пространство и формат занятий.</p></li>
+        <li><strong>Обсудим следующий шаг</strong><p>Расскажем, какая программа может подойти. Покупать абонемент после знакомства не обязательно.</p></li>
+      </ol>
+      <p class="visit-note">Диагностика с заключением и индивидуальная консультация — отдельные платные встречи. Их условия указаны на страницах программ.</p>
+      <a class="btn btn-primary" href="#booking">Подобрать первое занятие</a>
+    </div>
+    <figure class="visit-photo">
+      <img src="/img/prog-diagnostics.jpg" width="1200" height="800" alt="Татьяна Петрова общается с ребёнком в студии" loading="lazy" />
+      <figcaption class="photo-caption">Знакомство с Татьяной Петровой в студии</figcaption>
+      <a class="visit-video-link" href="#video">Смотреть, как проходят занятия →</a>
+    </figure>
+  </div>
+</section>
+<style>
+  .first-visit { background: var(--color-surface); overflow: hidden; }
+  .first-visit-inner { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); align-items: center; }
+  h2 { font: var(--text-h2); }
+  .visit-lead { font-size: 18px; line-height: 1.6; margin-top: var(--space-4); }
+  ol { list-style: none; counter-reset: visit; display: grid; gap: var(--space-5); padding: 0; margin: var(--space-6) 0; }
+  li { counter-increment: visit; position: relative; padding-left: var(--space-7); }
+  li::before { content: counter(visit); position: absolute; left: 0; top: 0; color: #fff; background: var(--color-moss); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: var(--text-meta); }
+  li strong { color: var(--color-ink); font-size: 17px; }
+  li p { font-size: 15px; margin-top: var(--space-1); }
+  .visit-note { font-size: 13px; margin-bottom: var(--space-5); }
+  .visit-photo { margin: 0; position: relative; }
+  .visit-photo > img { width: 100%; height: auto; aspect-ratio: 4 / 3.4; object-fit: cover; border-radius: 6px var(--radius-lg) var(--radius-lg) var(--radius-lg); box-shadow: var(--shadow-md); }
+  .visit-photo::before { content: ''; position: absolute; width: 140px; height: 140px; right: -40px; top: -40px; border-radius: 50%; background: var(--color-lime); opacity: .35; z-index: -1; }
+  .visit-video-link { display: inline-flex; min-height: 44px; align-items: center; margin-top: var(--space-3); color: var(--color-moss); font: var(--text-meta); font-weight: 600; }
+  @media (max-width: 760px) { .first-visit-inner { grid-template-columns: 1fr; gap: var(--space-6); } h2 { font-size: 30px; } .visit-lead { font-size: 16px; } ol { gap: var(--space-4); margin: var(--space-5) 0; } }
+</style>

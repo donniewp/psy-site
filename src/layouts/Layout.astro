@@ -16,7 +16,7 @@ export interface Props {
 const { title, description, path = '/', image = `${import.meta.env.BASE_URL}img/hero.jpg`, localBusiness = false } = Astro.props;
 const canonicalURL = new URL(path.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
 const ogImageURL = new URL(image.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
-const metrikaEnabled = yandexMetrikaId !== 'REPLACE-ME';
+const metrikaEnabled = !import.meta.env.DEV && yandexMetrikaId !== 'REPLACE-ME';
 
 /* Часы работы одни и те же все семь дней — студия без выходных. */
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];

@@ -1,5 +1,5 @@
 ---
-import { location, phone, phoneHref, yandexMapsUrl } from '../data/content';
+import { location, phone, phoneHref, yandexMapsUrl, telegramHref, maxHref } from '../data/content';
 import Icon from './Icon.astro';
 ---
 
@@ -39,13 +39,17 @@ import Icon from './Icon.astro';
         <a href={phoneHref} class="phone">{phone}</a>
       </div>
 
-      <a href="#booking" class="btn btn-dark">Записаться на консультацию</a>
+      <div class="contact-messengers"><a href={telegramHref} target="_blank" rel="noopener">Telegram ↗</a><a href={maxHref} target="_blank" rel="noopener">MAX ↗</a></div>
+      <a href="#booking" class="btn btn-dark">Договориться о встрече</a>
       <a href={yandexMapsUrl} target="_blank" rel="noopener" class="yandex-org-link">Страница студии на Яндекс Картах</a>
     </div>
   </div>
 </section>
 
 <style>
+  .contact-messengers { display: flex; gap: var(--space-5); font: var(--text-meta); color: var(--color-moss); }
+  .contact-messengers a { min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; text-underline-offset: 4px; }
+
   .contacts-inner { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--space-6); align-items: stretch; }
 
   .map-wrap { position: relative; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }

@@ -1,12 +1,11 @@
 <script>
   const revealTargets = document.querySelectorAll('[data-reveal]');
 
-  // Показать всё разом — страховка на случай, когда наблюдатель недоступен.
-  // Блоки в CSS стоят с opacity:0, так что без этой ветки старый браузер
-  // (или упавший скрипт) оставил бы половину страницы пустой навсегда.
+  // По умолчанию контент виден. Плавное появление включаем только для
+  // блоков ниже экрана, когда браузер и настройки движения это допускают.
   const revealAll = () => revealTargets.forEach((el) => el.setAttribute('data-reveal', 'shown'));
 
-  if (!('IntersectionObserver' in window)) {
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     revealAll();
   } else {
     // threshold:0, а не доля площади. Порог считается от размера самого блока,
@@ -27,10 +26,14 @@
       },
       { threshold: 0, rootMargin: '0px 0px -60px 0px' }
     );
-    revealTargets.forEach((el) => revealObserver.observe(el));
+    revealTargets.forEach((el) => {
+      el.setAttribute('data-reveal', el.getBoundingClientRect().top >= window.innerHeight ? 'pending' : 'shown');
+      revealObserver.observe(el);
+    });
   }
 
   const countTargets = document.querySelectorAll('[data-countup]');
+  if ('IntersectionObserver' in window) {
   const countObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -53,4 +56,5 @@
     { threshold: 0.5 }
   );
   countTargets.forEach((el) => countObserver.observe(el));
+  }
 </script>
