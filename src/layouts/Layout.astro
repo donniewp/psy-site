@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import PageMotion from '../components/PageMotion.astro';
+import { heroImage } from '../data/heroImage';
 import { yandexMetrikaId, phone, location as loc, yandexMapsUrl, telegramHref, maxHref } from '../data/content';
 
 export interface Props {
@@ -8,12 +9,13 @@ export interface Props {
   description: string;
   path?: string;
   image?: string;
+  preloadHero?: boolean;
   /* Разметка организации нужна только на главной: это карточка студии,
      а не описание каждой страницы сайта. */
   localBusiness?: boolean;
 }
 
-const { title, description, path = '/', image = `${import.meta.env.BASE_URL}img/hero.jpg`, localBusiness = false } = Astro.props;
+const { title, description, path = '/', image = `${import.meta.env.BASE_URL}img/hero.jpg`, localBusiness = false, preloadHero = false } = Astro.props;
 const canonicalURL = new URL(path.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
 const ogImageURL = new URL(image.replace(/^\//, import.meta.env.BASE_URL), Astro.site);
 const metrikaEnabled = !import.meta.env.DEV && yandexMetrikaId !== 'REPLACE-ME';
@@ -88,7 +90,9 @@ const organizationSchema = {
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" href={image} as="image" fetchpriority="high" />
+    {preloadHero
+      ? <link rel="preload" href={heroImage.src} imagesrcset={heroImage.srcset} imagesizes={heroImage.sizes} type="image/webp" as="image" fetchpriority="high" />
+      : <link rel="preload" href={image} as="image" fetchpriority="high" />}
     <link
       rel="preload"
       as="style"
