@@ -5,68 +5,34 @@ import Footer from '../components/Footer.astro';
 import Contacts from '../components/Contacts.astro';
 import Booking from '../components/Booking.astro';
 import StickyMobileCTA from '../components/StickyMobileCTA.astro';
-import { programs, programPaths, specialist, telegramHref, maxHref, yandexMapsUrl, reviews, razvivaykaBlocks } from '../data/content';
-import { visitFor, individualVisitFor, programPhotos, programQuestions } from '../data/visits';
+import ProgramHero from '../components/ProgramHero.astro';
+import ProgramStory from '../components/ProgramStory.astro';
+import ProgramBookingBar from '../components/ProgramBookingBar.astro';
+import { programs, programPaths } from '../data/content';
+import { programPages } from '../data/programPages';
+import { visitFor, individualVisitFor } from '../data/visits';
 export function getStaticPaths() { return programs.map(program => ({ params: { program: programPaths[program.slug] }, props: { program } })); }
 const { program: p } = Astro.props;
+const page = programPages[p.slug];
 const visit = visitFor(p);
 const individualVisit = individualVisitFor(p);
 const diagnostic = p.slug === 'diagnostics';
 const consultation = p.slug === 'psychocorrection';
-const paid = diagnostic || consultation;
-const photo = programPhotos(p);
 const cta = `?program=${encodeURIComponent(visit.value)}#booking`;
+const groupAction = page.action ?? (page.paid ? visit.action : 'Записаться на бесплатное пробное');
 ---
 <Layout title={`${p.searchName} у м. Войковская — Сензитивность`} description={`${p.ageLabel}. ${p.desc} ${p.price}. Татьяна Петрова, более 20 лет опыта. Запись в студию на Войковской.`} path={`/${programPaths[p.slug]}/`} image={p.img || '/img/hero.jpg'}>
-  <Header bookingLabel={paid ? 'Обсудить встречу' : 'Записаться'} />
+  <Header bookingLabel={page.paid ? 'Обсудить встречу' : 'Записаться'} />
   <main id="main-content" data-booking-program={visit.value}>
-    <section class="program-intro container">
-      <div class="intro-copy">
-        <a href="/#programs" class="back-link">← Занятия и цены</a>
-        <p class="program-location">Войковская · 3 минуты от метро</p>
-        <h1>{p.searchName}</h1>
-        <p class="program-age">{p.ageLabel}</p>
-        <p class="program-name">Программа «{p.title}»</p>
-        <p class="intro-description">{p.desc}</p>
-        <a class="teacher-mini" href="#teacher"><img src="/img/portrait.jpg" alt="" width="48" height="56" /><span><strong>Татьяна Петрова</strong><span>Педагог и психолог · 20+ лет опыта</span></span></a>
-        {p.individual && <fieldset class="format-switch"><legend>Формат занятия</legend><label><input type="radio" name="lesson-format" value="group" checked />В мини-группе</label><label><input type="radio" name="lesson-format" value="individual" />Индивидуально</label></fieldset>}
-        <div class="offer" id="prices">
-          <div data-group-offer><p class="price">{p.price}</p><p class="format">{p.sessionInfo}</p></div>
-          {p.individual && <div data-individual-offer hidden><p class="price">2 300 ₽ / занятие</p><p class="format">Индивидуально · длительность уточним при записи</p></div>}
-          <a href={cta} class="btn btn-primary" data-program-cta>{visit.action}</a>
-          <p class="trial-note" data-group-offer>{paid ? 'Стоимость встречи указана выше. Бесплатное знакомство со студией можно обсудить отдельно.' : 'Пробное в группе — бесплатно, без покупки абонемента.'}</p>
-          {p.individual && <p class="trial-note" data-individual-offer hidden>Условия бесплатного знакомства согласуем при записи.</p>}
-        </div>
-        <div class="ask-links"><span>Сначала задать вопрос:</span><a href={telegramHref} target="_blank" rel="noopener">Telegram ↗</a><a href={maxHref} target="_blank" rel="noopener">MAX ↗</a></div>
-      </div>
-      <figure class="intro-photo"><img src={p.img || '/img/hero.jpg'} alt={photo.alt} width="1200" height="800" fetchpriority="high" /><figcaption>{photo.caption}</figcaption>
-        <blockquote><p>«{reviews[2].text}»</p><cite>{reviews[2].name} · <a href={yandexMapsUrl} target="_blank" rel="noopener">Яндекс Карты ↗</a></cite></blockquote>
-      </figure>
-    </section>
-    <section class="program-details section" id="first-visit">
-      <div class="container details-inner">
-        <div>
-          <h2>{diagnostic ? 'Что вы получите после диагностики' : consultation ? 'Сначала обсудим ваш запрос' : 'Как пройдёт первое знакомство'}</h2>
-          <p>{diagnostic ? 'На встрече изучим особенности развития ребёнка и ваш запрос. По итогам вы получите заключение и рекомендации по дальнейшим занятиям.' : consultation ? 'До встречи уточним, что вас волнует, кто будет участвовать и сколько времени понадобится. Стоимость зависит от продолжительности: 45 или 60 минут.' : 'Педагог познакомится с ребёнком, покажет студию и формат занятий. После обсудим, подходит ли программа, и согласуем следующие шаги.'}</p>
-          {!paid && <p>Время, продолжительность пробного и участие родителя уточним до визита. Если группа ещё собирается, сообщим об этом при записи.</p>}
-          {p.slug === 'early-sensory' && <p>Занятия для малышей 1,5–2,5 года проходят вместе с мамой. Для детей постарше есть <a href="/rannee-razvitie-2-5-4/">группа 2,5–4 года</a>.</p>}
-          {p.bullets && <div class="program-skills"><h3>Чем занимаемся</h3><ul>{p.bullets.map(b => <li>{b}</li>)}</ul></div>}
-          {p.slug === 'razvivayka' && <details class="stations" id="razvivayka"><summary>Пять блоков по 30 минут</summary><dl>{razvivaykaBlocks.map(b => <div><dt>{b.title}</dt><dd>{b.text}</dd></div>)}</dl></details>}
-        </div>
-        <div class="practical-questions"><h3>Перед записью</h3>{programQuestions(p).map(q => <details><summary>{q.q}</summary><p>{q.a}</p></details>)}</div>
-      </div>
-    </section>
-    <section class="container program-teacher section-tight" id="teacher">
-      <img src="/img/portrait.jpg" alt={specialist.fullName} width="500" height="600" loading="lazy" />
-      <div><p class="teacher-label">Ваш педагог</p><h2>{specialist.fullName}</h2><p>{specialist.credentials}</p><p>Работаю с учётом возраста, темпа и особенностей ребёнка — индивидуально и в мини-группах.</p><a class="text-link" href="/#teacher">Образование и квалификация →</a></div>
-    </section>
-    <section class="container program-invite"><h2>{paid ? 'Обсудим удобное время?' : 'Приходите познакомиться'}</h2><p>Оставьте имя и телефон. Свяжемся в часы работы студии и согласуем встречу.</p><a href={cta} class="btn btn-primary" data-program-cta>{visit.action}</a></section>
+    <ProgramHero program={p} page={page} cta={cta} action={groupAction} />
+    <ProgramStory slug={p.slug} page={page} cta={cta} action={groupAction} />
     <Contacts />
     <Booking />
   </main>
   <Footer />
-  <StickyMobileCTA diagnostic={diagnostic} consultation={consultation} />
-  {p.individual && <script is:inline define:vars={{ groupBooking: visit.value, individualBooking: individualVisit.value, groupAction: visit.action, individualAction: individualVisit.action }}>
+  <StickyMobileCTA diagnostic={diagnostic} consultation={consultation} mobile={false} />
+  <ProgramBookingBar href={cta} action={groupAction} bar={page.bar} />
+  {p.individual && <script is:inline define:vars={{ groupBooking: visit.value, individualBooking: individualVisit.value, groupAction, individualAction: individualVisit.action }}>
     (() => {
       const radios = document.querySelectorAll('input[name="lesson-format"]');
       const update = (individual, updateUrl) => {
@@ -82,84 +48,16 @@ const cta = `?program=${encodeURIComponent(visit.value)}#booking`;
         if (updateUrl) {
           const url = new URL(location.href);
           if (individual) url.searchParams.set('format', 'individual'); else url.searchParams.delete('format');
+          if (url.searchParams.has('program')) url.searchParams.set('program', booking);
           history.replaceState(null, '', url);
         }
       };
       radios.forEach(radio => radio.addEventListener('change', () => update(radio.value === 'individual', true)));
-      const sync = () => update(new URLSearchParams(location.search).get('format') === 'individual', false);
+      const sync = () => {
+        const params = new URLSearchParams(location.search);
+        update(params.has('format') ? params.get('format') === 'individual' : params.get('program') === individualBooking, false);
+      };
       sync(); window.addEventListener('popstate', sync);
     })();
   </script>}
 </Layout>
-<style>
-  .program-intro { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-8); align-items: start; padding-top: var(--space-6); padding-bottom: var(--space-7); }
-  .back-link { display: inline-block; font-size: 14px; min-height: 44px; }
-  .program-location { color: var(--color-moss); font-size: 14px; margin: var(--space-2) 0 var(--space-4); }
-  h1 { font: var(--text-display); font-size: clamp(32px, 3.5vw, 48px); letter-spacing: var(--tracking-display); }
-  .program-age { color: var(--color-moss); font-weight: 600; margin-top: var(--space-3); }
-  .program-name { font-size: 14px; margin-top: var(--space-1); }
-  .intro-description { font-size: 17px; line-height: 1.6; margin-top: var(--space-4); }
-  .teacher-mini { display: flex; gap: var(--space-3); align-items: center; margin: var(--space-5) 0; font-size: 13px; }
-  .teacher-mini img { border-radius: var(--radius-xs); object-fit: cover; width: 44px; height: 52px; }
-  .teacher-mini strong, .teacher-mini span span { display: block; }
-  .teacher-mini strong { color: var(--color-ink); font-size: 15px; }
-  .format-switch { border: 0; padding: 0; margin: 0 0 var(--space-4); display: flex; gap: var(--space-4); flex-wrap: wrap; }
-  legend { font-size: 13px; padding: 0; margin-bottom: var(--space-2); }
-  .format-switch label { display: flex; align-items: center; gap: var(--space-2); color: var(--color-ink); font-size: 15px; min-height: 44px; cursor: pointer; }
-  input { accent-color: var(--color-moss); width: 18px; height: 18px; }
-  .price { font-size: 21px; font-weight: 600; color: var(--color-ink); }
-  .format { font-size: 14px; margin-top: var(--space-2); }
-  .offer .btn { margin-top: var(--space-5); }
-  .trial-note { font-size: 13px; margin-top: var(--space-3); max-width: 50ch; }
-  .ask-links { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; font-size: 13px; margin-top: var(--space-4); }
-  .ask-links a { color: var(--color-moss); text-decoration: underline; text-underline-offset: 4px; min-height: 44px; display: inline-flex; align-items: center; }
-  figure { margin: 44px 0 0; }
-  .intro-photo > img { box-shadow: var(--shadow-md); width: 100%; height: auto; aspect-ratio: 1.15; object-fit: cover; border-radius: var(--radius-md); }
-  figcaption { font-size: 13px; margin-top: var(--space-3); }
-  blockquote { margin: var(--space-6) 0 0; padding-top: var(--space-5); border-top: 1px solid var(--color-divider); }
-  blockquote p { font: 400 22px/1.5 var(--font-display); color: var(--color-ink); }
-  cite { display: block; font: var(--text-meta); font-size: 12px; margin-top: var(--space-3); }
-  cite a { text-decoration: underline; }
-  h2 { font: var(--text-h2); }
-  .program-details { background: var(--color-surface); }
-  .offer { padding: var(--space-5); background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
-  .practical-questions { background: var(--color-paper); border-radius: var(--radius-lg); padding: var(--space-5); box-shadow: var(--shadow-sm); align-self: start; }
-  .program-skills li { padding: var(--space-2) var(--space-3); background: var(--color-paper); border-radius: var(--radius-pill); color: var(--color-moss); }
-  .details-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-8); }
-  .details-inner p { font-size: 16px; line-height: 1.7; margin-top: var(--space-4); }
-  .details-inner p a { text-decoration: underline; text-underline-offset: 4px; }
-  .program-skills { margin-top: var(--space-5); }
-  h3 { font: var(--text-lead); font-size: 18px; }
-  .program-skills ul { list-style: none; padding-left: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); font-size: 15px; }
-  details { border-bottom: 1px solid var(--color-divider); }
-  summary { font-size: 15px; padding: var(--space-4) 0; cursor: pointer; color: var(--color-ink); min-height: 48px; }
-  details p { margin-top: 0 !important; padding-bottom: var(--space-5); }
-  dl { font-size: 15px; } dt { font-weight: 600; color: var(--color-ink); } dd { margin: var(--space-1) 0 var(--space-4); }
-  .program-teacher { display: grid; grid-template-columns: 140px 1fr; gap: var(--space-6); align-items: center; margin-top: var(--space-6); }
-  .program-teacher img { width: 140px; height: 170px; object-fit: cover; border-radius: var(--radius-sm); }
-  .program-teacher h2 { font-size: 28px; }
-  .program-teacher p { margin: var(--space-3) 0; font-size: 16px; }
-  .teacher-label { color: var(--color-moss); }
-  .program-invite { padding-top: var(--space-6); padding-bottom: var(--space-7); border-bottom: 1px solid var(--color-divider); }
-  .program-invite p { margin: var(--space-4) 0 var(--space-5); }
-  @media (max-width: 760px) {
-    .program-intro { grid-template-columns: 1fr; gap: var(--space-5); padding-top: var(--space-4); }
-    h1 { font-size: 34px; } h2 { font-size: 29px; }
-    .program-location { margin-top: 0; }
-    .intro-description { font-size: 16px; }
-    .teacher-mini { margin: var(--space-4) 0; }
-    .price { font-size: 18px; }
-    .offer .btn { width: 100%; padding: var(--space-3); font-size: 14px; }
-    .format-switch { gap: var(--space-3); }
-    .format-switch label { font-size: 14px; }
-    figure { margin: 0; }
-    .intro-photo > img { aspect-ratio: 1.65; }
-    blockquote { margin-top: var(--space-5); }
-    blockquote p { font-size: 20px; }
-    .details-inner { grid-template-columns: 1fr; gap: var(--space-6); }
-    .program-teacher { grid-template-columns: 76px 1fr; gap: var(--space-4); align-items: start; }
-    .program-teacher img { width: 76px; height: 95px; }
-    .program-teacher h2 { font-size: 22px; }
-    .program-teacher p { font-size: 14px; }
-  }
-</style>

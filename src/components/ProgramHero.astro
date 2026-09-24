@@ -1,0 +1,131 @@
+---
+import { telegramHref, maxHref, yandexRating } from '../data/content';
+import { teacherLine, type ProgramPage } from '../data/programPages';
+
+const { program: p, page, cta, action } = Astro.props as { program: { title: string; ageLabel: string; searchName: string }; page: ProgramPage; cta: string; action: string };
+const { hero } = page;
+---
+
+<section class="school-hero" aria-labelledby="hero-title">
+  <figure class="hero-media">
+    <picture>
+      <source type="image/webp" srcset={hero.srcset} sizes="(max-width: 900px) 100vw, 50vw" />
+      <img src={hero.src} alt={hero.alt} width="1200" height="800" fetchpriority="high" style={`--pos: ${hero.position ?? '50% 40%'}; --pos-m: ${hero.mobilePosition ?? hero.position ?? '50% 30%'}`} />
+    </picture>
+    <a class="hero-rating" href="#reviews"><span class="hero-star" aria-hidden="true">★</span><strong>{yandexRating.score}</strong><span>на Яндекс Картах</span></a>
+  </figure>
+
+  <div class="hero-panel">
+    <p class="eyebrow eyebrow-light"><span>{p.ageLabel} · «{p.title}»</span></p>
+    <h1 id="hero-title">{p.searchName}</h1>
+    <p class="hero-lead" set:html={hero.lead.replace(' у м. ', ' у&nbsp;м.&nbsp;').replace(', 3 минуты', ', 3&nbsp;минуты')} />
+    <p class="hero-teacher">{teacherLine}</p>
+
+    {hero.individual && <fieldset class="format-switch">
+      <legend class="visually-hidden">Формат занятий</legend>
+      <label><input type="radio" name="lesson-format" value="group" checked /><span>В мини-группе</span></label>
+      <label><input type="radio" name="lesson-format" value="individual" /><span>Индивидуально</span></label>
+    </fieldset>}
+
+    <div class="hero-offer">
+      <div data-group-offer>
+        <p class="hero-price">{hero.offer.price} <span>{hero.offer.unit}</span></p>
+        <p class="hero-terms">{hero.offer.terms}</p>
+      </div>
+      {hero.individual && <div data-individual-offer hidden>
+        <p class="hero-price">{hero.individual.price} <span>{hero.individual.unit}</span></p>
+        <p class="hero-terms">{hero.individual.terms}</p>
+      </div>}
+      <a class="btn hero-cta" href={cta} data-program-cta data-hero-cta>{action}</a>
+      <p class="hero-note" data-group-offer>{hero.offer.note}</p>
+      {hero.individual && <p class="hero-note" data-individual-offer hidden>{hero.individual.note}</p>}
+    </div>
+
+    <p class="hero-ask">Сначала задать вопрос: <a href={telegramHref} target="_blank" rel="noopener">Telegram ↗</a> <a href={maxHref} target="_blank" rel="noopener">MAX ↗</a></p>
+  </div>
+</section>
+
+<style>
+  .school-hero {
+    --hero-ink: #fff;
+    --hero-soft: color-mix(in srgb, var(--color-paper) 90%, var(--color-moss-deep));
+    --hero-line: color-mix(in srgb, var(--color-paper) 32%, transparent);
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: min(720px, calc(100svh - 72px));
+    background: var(--color-moss-deep);
+    color: var(--hero-soft);
+  }
+  .school-hero :focus-visible { outline-color: var(--color-lime); }
+
+  .hero-media { position: relative; order: 2; margin: 0; min-height: 100%; }
+  .hero-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos); }
+  .hero-rating { position: absolute; left: var(--space-5); bottom: var(--space-5); display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: var(--space-2) var(--space-4); border-radius: var(--radius-pill); background: var(--color-paper); color: var(--color-ink); font: var(--text-meta); box-shadow: var(--shadow-md); }
+  .hero-rating strong { font-weight: 700; }
+  .hero-rating span:last-child { color: var(--color-ink-soft); }
+  .hero-star { color: var(--color-moss); }
+
+  .hero-panel {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--space-8) var(--space-8) var(--space-8) max(var(--space-5), calc((100vw - 1200px) / 2 + var(--space-5)));
+  }
+  .eyebrow { align-items: flex-start; }
+  .eyebrow::before { margin-top: .6em; }
+  h1 { margin-top: var(--space-4); font: 600 clamp(40px, 4.2vw, 60px)/1.05 var(--font-display); letter-spacing: var(--tracking-display); color: var(--hero-ink); }
+  .hero-lead { margin-top: var(--space-4); font: 400 20px/1.45 var(--font-text); color: var(--hero-ink); max-width: 30ch; }
+  .hero-teacher { margin-top: var(--space-3); font: var(--text-meta); font-weight: 400; max-width: 44ch; }
+
+  .format-switch { display: inline-grid; grid-template-columns: 1fr 1fr; align-self: flex-start; margin: var(--space-6) 0 0; padding: var(--space-1); border: var(--stroke-hairline) solid var(--hero-line); border-radius: var(--radius-pill); }
+  .format-switch label { position: relative; cursor: pointer; }
+  .format-switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .format-switch span { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 var(--space-4); border-radius: var(--radius-pill); font: var(--text-meta); color: var(--hero-soft); transition: background .2s ease-out, color .2s ease-out; }
+  .format-switch input:checked + span { background: var(--color-paper); color: var(--color-ink); font-weight: 600; }
+  .format-switch input:focus-visible + span { outline: 2px solid var(--color-lime); outline-offset: 2px; }
+
+  .hero-offer { display: flex; flex-direction: column; align-items: flex-start; margin-top: var(--space-5); }
+  .hero-price { font: 600 34px/1.1 var(--font-display); color: var(--hero-ink); }
+  .hero-price span { font: 400 18px/1.4 var(--font-text); color: var(--hero-soft); }
+  .hero-terms { margin-top: var(--space-2); font: var(--text-meta); font-weight: 400; }
+  .hero-cta { margin-top: var(--space-5); min-height: 56px; padding: var(--space-4) var(--space-7); background: var(--color-lime); color: var(--color-ink); font-size: 16px; box-shadow: 0 12px 26px rgba(8, 44, 38, .35); }
+  .hero-cta:hover { background: color-mix(in srgb, var(--color-lime) 80%, white); transform: translateY(-2px); }
+  .hero-note { margin-top: var(--space-3); font: var(--text-meta); font-weight: 400; }
+  .hero-ask { margin-top: var(--space-6); padding-top: var(--space-4); border-top: var(--stroke-hairline) solid var(--hero-line); font-size: 14px; }
+  .hero-ask a { display: inline-flex; align-items: center; min-height: 44px; margin-left: var(--space-3); color: var(--hero-ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--hero-line); }
+  .hero-ask a:hover { text-decoration-color: currentColor; }
+
+  @media (max-width: 900px) {
+    .school-hero { grid-template-columns: 1fr; min-height: 0; }
+    .hero-media { order: 0; height: clamp(168px, 44vw, 320px); }
+    .hero-media img { object-position: var(--pos-m); }
+    .hero-rating { left: var(--space-4); bottom: var(--space-3); min-height: 36px; padding: var(--space-1) var(--space-3); font-size: 13px; }
+    .hero-panel { padding: var(--space-5) var(--space-5) var(--space-6); }
+    .eyebrow { font-size: 12px; }
+    h1 { margin-top: var(--space-3); font-size: clamp(30px, 8.6vw, 44px); }
+    .hero-lead { margin-top: var(--space-2); font-size: 17px; }
+    .hero-teacher { font-size: 13px; }
+    .format-switch { margin-top: var(--space-4); }
+    .format-switch span { min-height: 44px; font-size: 14px; }
+    .hero-offer { margin-top: var(--space-4); align-items: stretch; }
+    .hero-price { font-size: 28px; }
+    .hero-price span { font-size: 16px; }
+    .hero-terms { margin-top: var(--space-1); font-size: 13px; }
+    .hero-cta { margin-top: var(--space-4); min-height: 52px; padding: var(--space-3) var(--space-4); font-size: 15px; text-align: center; }
+    .hero-note { margin-top: var(--space-2); font-size: 13px; text-align: center; }
+    .hero-ask { margin-top: var(--space-5); }
+  }
+  @media (min-width: 600px) and (max-width: 900px) {
+    .hero-offer { align-items: flex-start; }
+    .hero-cta { padding-inline: var(--space-7); }
+    .hero-note { text-align: left; }
+  }
+  @media (max-width: 900px) and (max-height: 700px) {
+    .hero-media { height: 112px; }
+    .hero-rating { display: none; }
+    .hero-panel { padding-top: var(--space-4); }
+    .hero-offer { margin-top: var(--space-3); }
+  }
+</style>

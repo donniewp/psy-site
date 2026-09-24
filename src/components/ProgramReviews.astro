@@ -1,0 +1,47 @@
+---
+import { programReviews, yandexRating, yandexReviewsUrl } from '../data/content';
+
+const { slug } = Astro.props;
+const specific = programReviews.filter(review => review.programs.includes(slug));
+const general = programReviews.filter(review => review.programs.includes('*') && !specific.includes(review));
+const [featured, ...rest] = [...specific, ...general].slice(0, 3);
+---
+
+{featured && <section class="program-reviews section" aria-labelledby="reviews-title" id="reviews">
+  <div class="container reviews-layout">
+    <div class="reviews-summary">
+      <h2 id="reviews-title">Что пишут родители</h2>
+      <p class="rating"><strong>{yandexRating.score}</strong><span class="stars" aria-hidden="true">★★★★★</span></p>
+      <p class="rating-count">{yandexRating.ratings} и {yandexRating.reviews} на Яндекс Картах</p>
+      <a class="reviews-link" href={yandexReviewsUrl} target="_blank" rel="noopener">Читать все отзывы <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="reviews-quotes">
+      <blockquote class="featured"><p>«{featured.text}»</p><cite>{featured.name} · {featured.date}</cite></blockquote>
+      {rest.map(review => <blockquote><p>«{review.text}»</p><cite>{review.name} · {review.date}</cite></blockquote>)}
+    </div>
+  </div>
+</section>}
+
+<style>
+  .program-reviews { background: var(--color-surface); }
+  .reviews-layout { display: grid; grid-template-columns: 1fr 1.8fr; gap: var(--space-8); align-items: start; }
+  h2 { font: var(--text-h2); letter-spacing: var(--tracking-display); }
+  .rating { display: flex; align-items: baseline; gap: var(--space-3); margin-top: var(--space-5); }
+  .rating strong { font: var(--text-h3); color: var(--color-ink); }
+  .stars { color: var(--color-moss); letter-spacing: 2px; }
+  .rating-count { font: var(--text-meta); font-weight: 400; margin-top: var(--space-2); }
+  .reviews-link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; margin-top: var(--space-3); font: var(--text-meta); color: var(--color-ink); text-decoration: underline; text-underline-offset: 5px; }
+  .reviews-link:hover { color: var(--color-moss); }
+  blockquote { margin: 0; padding: var(--space-5) 0; border-top: var(--stroke-hairline) solid var(--color-divider); }
+  blockquote.featured { padding-top: 0; border-top: 0; }
+  blockquote:last-child { padding-bottom: 0; }
+  blockquote p { font: var(--text-body); color: var(--color-ink); max-width: 65ch; }
+  blockquote.featured p { font: 400 22px/1.5 var(--font-display); }
+  cite { display: block; font: var(--text-meta); font-style: normal; font-weight: 400; margin-top: var(--space-3); }
+  @media (max-width: 760px) {
+    .reviews-layout { grid-template-columns: 1fr; gap: var(--space-6); }
+    h2 { font: var(--text-h3); }
+    blockquote p { font: var(--text-meta); font-weight: 400; }
+    blockquote.featured p { font-size: 19px; }
+  }
+</style>

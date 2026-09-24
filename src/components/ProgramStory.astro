@@ -1,0 +1,311 @@
+---
+/*
+  THESIS: страница программы — это первый визит, пройденный заранее: от заявки до разговора
+  с педагогом, с настоящими фото и видео каждого шага. Отказ от схемы «преимущества → цены → отзывы → форма».
+  OWN-WORLD: фирменный мир студии без изменений — paper, ink/moss, Lora + Golos Text. Поле moss-deep
+  открывает и закрывает страницу; лайм — только главная кнопка на тёмном. Сквозной мотив — линия
+  маршрута со станциями, как у «Развивай-ки»: по ней идут шаги визита.
+  STORY: узнаю запрос (программа, возраст, Войковская, цена) → вижу, как пройдёт визит и где я жду →
+  читаю отзывы, педагога и цены → записываюсь.
+  FIRST VIEWPORT: фото во всю ширину с рейтингом 4,9; ниже поле moss-deep — H1, строка про формат
+  и место, педагог, цена, лаймовая кнопка на всю ширину. Десктоп: поле слева, фото справа.
+  FORM: структура №3 «путь пробного занятия», вертикальный маршрут; seed 4542589c.
+  Содержимое каждой программы — src/data/programPages.ts.
+*/
+import ProgramReviews from './ProgramReviews.astro';
+import Teacher from './Teacher.astro';
+import { location, telegramHref, maxHref } from '../data/content';
+import type { ProgramPage, Media } from '../data/programPages';
+
+const { slug, page, cta, action } = Astro.props as { slug: string; page: ProgramPage; cta: string; action: string };
+const { situations, visit, goals, prices, faq, close } = page;
+const isVideo = (m: Media): m is { kind: 'video' } => m.kind === 'video';
+---
+
+<section class="situations section" aria-labelledby="situations-title" id="situations">
+  <div class="container situations-layout">
+    <div class="section-head">
+      <h2 id="situations-title">{situations.title}</h2>
+      <p>{situations.lead}</p>
+    </div>
+    <ul class="situations-list">
+      {situations.items.map(item => <li><h3>{item.title}</h3><p>{item.text}</p></li>)}
+    </ul>
+    <p class="situations-bridge">{situations.bridge} <a href="#first-visit">Как это проходит <span aria-hidden="true">↓</span></a></p>
+  </div>
+</section>
+
+<section class="visit section" aria-labelledby="visit-title" id="first-visit">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="visit-title">{visit.title}</h2>
+      <p>{visit.lead}</p>
+    </div>
+
+    <ol class="visit-route">
+      {visit.steps.map((step, index) => <li class="visit-step">
+        <span class="step-node" aria-hidden="true">{index + 1}</span>
+        <div class="step-body">
+          <h3>{step.title}</h3>
+          <p>{step.text}</p>
+          {step.individualNote && <p class="individual-note" data-individual-offer hidden>{step.individualNote}</p>}
+          {step.stations && <ol class:list={['lesson-stations', { 'no-time': !step.stations.some(s => s.time) }]} aria-label={step.stationsLabel}>
+            {step.stations.map(item => <li>{item.time && <span class="station-time">{item.time}</span>}<span class="station-title">{item.title}</span><span class="station-text">{item.text}</span></li>)}
+          </ol>}
+        </div>
+        {step.media && <div class:list={['step-media', { 'step-pair': step.media.length === 2 }]}>
+          {step.media.map(media => isVideo(media)
+            ? <figure class="lesson-video">
+                <video muted loop playsinline preload="none" poster="/img/optimized/lesson-loop-poster.webp" width="480" height="854" aria-label="Фрагмент занятия: прописи за партой, движение, работа в группе">
+                  <source src="/videos/lesson-loop.mp4" type="video/mp4" />
+                </video>
+                <button type="button" class="video-toggle" aria-pressed="false"><span class="video-icon" aria-hidden="true"></span><span class="video-label">Смотреть занятие</span></button>
+                <figcaption>Фрагмент настоящего занятия, без постановки</figcaption>
+              </figure>
+            : <figure><img src={media.src} srcset={media.srcset} alt={media.alt} width={media.width} height={media.height} loading="lazy" style={[media.ratio && `aspect-ratio: ${media.ratio}`, media.position && `object-position: ${media.position}`].filter(Boolean).join('; ') || undefined} /><figcaption>{media.caption}</figcaption></figure>)}
+        </div>}
+      </li>)}
+    </ol>
+
+    <div class="visit-cta">
+      <a class="btn btn-primary" href={cta} data-program-cta>{action}</a>
+      <p>Сначала вопрос? Напишите в <a href={telegramHref} target="_blank" rel="noopener">Telegram ↗</a> или <a href={maxHref} target="_blank" rel="noopener">MAX ↗</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="course-goals section" aria-labelledby="goals-title" id="course-goals">
+  <div class:list={['container', 'goals-layout', { 'no-photo': !goals.photo }]}>
+    {goals.photo && goals.photo.kind === 'image' && <figure class="goals-photo">
+      <img src={goals.photo.src} srcset={goals.photo.srcset} sizes="(max-width: 900px) 100vw, 480px" alt={goals.photo.alt} width={goals.photo.width} height={goals.photo.height} loading="lazy" />
+      <figcaption>{goals.photo.caption}</figcaption>
+    </figure>}
+    <div>
+      <div class="section-head">
+        <h2 id="goals-title">{goals.title}</h2>
+        <p>{goals.lead}</p>
+      </div>
+      <dl class="goals-list">
+        {goals.items.map(item => <div><dt>{item.title}</dt>{item.text && <dd>{item.text}</dd>}</div>)}
+      </dl>
+      {goals.note && <p class="goals-note">{goals.note}</p>}
+    </div>
+  </div>
+</section>
+
+<ProgramReviews slug={slug} />
+
+<Teacher />
+
+<section class="prices section" aria-labelledby="prices-title" id="prices">
+  <div class="container prices-layout">
+    <div class="section-head">
+      <h2 id="prices-title">Стоимость</h2>
+      <p>{prices.lead}</p>
+    </div>
+    <div>
+      <dl class="price-list">
+        {prices.items.map(item => <div><dt>{item.label}<span>{item.note}</span></dt><dd>{item.value}</dd></div>)}
+      </dl>
+      <a class="btn btn-primary" href={cta} data-program-cta>{action}</a>
+    </div>
+  </div>
+</section>
+
+<section class="program-faq section" aria-labelledby="faq-title" id="program-faq">
+  <div class="container faq-layout">
+    <div class="section-head"><h2 id="faq-title">Частые вопросы</h2></div>
+    <div class="faq-list">
+      {faq.map((item, index) => <details open={index === 0}>
+        <summary>{item.q}<span class="faq-sign" aria-hidden="true"></span></summary>
+        <p>{item.a}{item.link && <> <a href={item.link.href}>{item.link.label}</a></>}</p>
+      </details>)}
+    </div>
+  </div>
+</section>
+
+<section class="program-close" aria-labelledby="close-title">
+  <div class="container close-layout">
+    <div>
+      <h2 id="close-title">{close.title}</h2>
+      <p>{close.text}</p>
+    </div>
+    <div class="close-action">
+      <a class="btn close-cta" href={cta} data-program-cta>{action}</a>
+      <p>{location.address}<br />{location.metro}</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>('.lesson-video video');
+  const toggle = document.querySelector<HTMLButtonElement>('.video-toggle');
+  if (video && toggle) {
+    const label = toggle.querySelector('.video-label')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let userPaused = reduced;
+    const render = () => {
+      const playing = !video.paused;
+      toggle.setAttribute('aria-pressed', String(playing));
+      toggle.classList.toggle('is-playing', playing);
+      label.textContent = playing ? 'Пауза' : 'Смотреть занятие';
+    };
+    const play = () => { video.preload = 'auto'; video.play().catch(() => {}); };
+    toggle.addEventListener('click', () => {
+      if (video.paused) { userPaused = false; play(); } else { userPaused = true; video.pause(); }
+    });
+    video.addEventListener('play', render);
+    video.addEventListener('pause', render);
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !userPaused) play();
+      else if (!entry.isIntersecting && !video.paused) video.pause();
+    }, { threshold: .5 }).observe(video);
+  }
+</script>
+
+<style>
+  h3 { font: var(--text-lead); color: var(--color-ink); }
+  .section-head h2 { text-wrap: balance; }
+
+  /* Ситуации */
+  .situations-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--space-5) var(--space-8); }
+  .situations-layout .section-head { margin: 0; }
+  .situations-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--space-6); }
+  .situations-list li { padding: var(--space-5) 0; border-top: var(--stroke-hairline) solid var(--color-divider); }
+  .situations-list h3 { font: 600 22px/1.3 var(--font-display); }
+  .situations-list p { margin-top: var(--space-2); font: var(--text-body); }
+  .situations-bridge { grid-column: 2; font: var(--text-meta); color: var(--color-ink); }
+  .situations-bridge a { color: var(--color-moss); text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; }
+
+  /* Путь пробного */
+  .visit { background: var(--color-surface); }
+  .visit-route { --node: 48px; list-style: none; margin: var(--space-7) 0 0; padding: 0; position: relative; }
+  .visit-route::before, .visit-route::after { content: ''; position: absolute; top: calc(var(--node) / 2); bottom: calc(var(--node) / 2); left: calc(var(--node) / 2 - var(--stroke-bold) / 2); width: var(--stroke-bold); border-radius: var(--radius-pill); }
+  .visit-route::before { background: var(--color-divider); }
+  .visit-route::after { background: var(--color-moss); transform-origin: top; transform: scaleY(1); }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .visit-route::after { animation: route-fill linear both; animation-timeline: view(); animation-range: entry 20% exit 60%; }
+    }
+  }
+  @keyframes route-fill { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  .visit-step { position: relative; z-index: 1; display: grid; grid-template-columns: var(--node) minmax(0, 1fr) minmax(0, 1.15fr); gap: var(--space-5) var(--space-6); align-items: start; padding-bottom: var(--space-8); }
+  .visit-step:last-child { padding-bottom: 0; }
+  .step-node { display: flex; align-items: center; justify-content: center; width: var(--node); height: var(--node); border-radius: var(--radius-circle); background: var(--color-surface); border: var(--stroke-thin) solid var(--color-moss); color: var(--color-moss); font: 600 20px/1 var(--font-display); }
+  .step-body { padding-top: var(--space-2); }
+  .step-body h3 { font: var(--text-h3); }
+  .step-body > p { margin-top: var(--space-3); font: var(--text-body); max-width: 46ch; }
+  .step-body .individual-note { font: var(--text-meta); font-weight: 400; color: var(--color-ink); }
+  .step-media figure { margin: 0; }
+  .step-media img, .step-media video { width: 100%; height: auto; border-radius: var(--radius-md); object-fit: cover; background: var(--color-paper); }
+  .step-media img { aspect-ratio: 3 / 2; }
+  .step-media .landscape-crop { aspect-ratio: 3 / 2; object-position: 50% 72%; }
+  .step-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .step-pair img { aspect-ratio: 3 / 4; }
+  figcaption { margin-top: var(--space-2); font: var(--text-meta); font-weight: 400; font-size: 13px; }
+
+  .lesson-stations { list-style: none; margin: var(--space-5) 0 0; padding: 0; max-width: 46ch; }
+  .lesson-stations li { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); column-gap: var(--space-3); padding: var(--space-3) 0; border-top: var(--stroke-hairline) solid var(--color-divider); }
+  .station-time { grid-row: span 2; font: var(--text-meta); font-variant-numeric: tabular-nums; color: var(--color-moss); }
+  .station-title { font: var(--text-meta); font-weight: 600; color: var(--color-ink); }
+  .station-text { font: var(--text-meta); font-weight: 400; font-size: 14px; }
+
+  .lesson-video { position: relative; max-width: 380px; }
+  .lesson-video video { display: block; aspect-ratio: 4 / 5; }
+  .video-toggle { position: absolute; left: var(--space-3); top: var(--space-3); display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3); border-radius: var(--radius-pill); background: var(--color-paper); color: var(--color-ink); font: var(--text-meta); font-weight: 600; font-size: 14px; box-shadow: var(--shadow-sm); }
+  .video-icon { width: 0; height: 0; border-style: solid; border-width: 6px 0 6px 10px; border-color: transparent transparent transparent currentColor; }
+  .video-toggle.is-playing .video-icon { width: 10px; height: 12px; border: 0; border-left: 3px solid currentColor; border-right: 3px solid currentColor; }
+
+  .visit-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); margin-top: var(--space-8); padding-top: var(--space-6); border-top: var(--stroke-hairline) solid var(--color-divider); }
+  .visit-cta .btn { min-height: 52px; padding-inline: var(--space-7); }
+  .visit-cta p { font: var(--text-meta); font-weight: 400; }
+  .visit-cta p a { color: var(--color-moss); text-decoration: underline; text-underline-offset: 4px; }
+
+  /* Цели */
+  .goals-layout { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: var(--space-8); align-items: start; }
+  .goals-photo { margin: 0; position: sticky; top: 104px; }
+  .goals-photo img { width: 100%; height: auto; aspect-ratio: 5 / 4; object-fit: cover; border-radius: var(--radius-lg); }
+  .goals-list { margin: 0; }
+  .goals-list > div { border-top: var(--stroke-hairline) solid var(--color-divider); padding: var(--space-5) 0; }
+  .goals-list dt { font: var(--text-lead); color: var(--color-ink); }
+  .goals-list dd { font: var(--text-body); margin: var(--space-2) 0 0; }
+  .goals-note { font: var(--text-meta); font-weight: 400; padding-top: var(--space-5); border-top: var(--stroke-hairline) solid var(--color-divider); }
+
+  .lesson-stations.no-time li { grid-template-columns: minmax(0, 1fr); }
+  .lesson-stations.no-time .station-title { grid-row: auto; }
+  .goals-layout.no-photo { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); }
+  .goals-layout.no-photo > div { display: contents; }
+  .goals-layout.no-photo .section-head { margin: 0; }
+  .goals-layout.no-photo .goals-list, .goals-layout.no-photo .goals-note { grid-column: 2; }
+
+  /* Цены */
+  .prices { background: var(--color-surface); }
+  .prices-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: var(--space-8); align-items: start; }
+  .prices-layout .section-head { margin: 0; }
+  .price-list { margin: 0 0 var(--space-6); }
+  .price-list > div { display: flex; align-items: baseline; gap: var(--space-4); padding: var(--space-4) 0; border-top: var(--stroke-hairline) solid var(--color-divider); }
+  .price-list > div:last-child { border-bottom: var(--stroke-hairline) solid var(--color-divider); }
+  .price-list dt { flex: 1; font: var(--text-lead); color: var(--color-ink); }
+  .price-list dt span { display: block; margin-top: var(--space-1); font: var(--text-meta); font-weight: 400; color: var(--color-ink-soft); }
+  .price-list dd { margin: 0; font: 600 26px/1.2 var(--font-display); color: var(--color-ink); white-space: nowrap; }
+  .prices .btn { min-height: 52px; padding-inline: var(--space-7); }
+
+  /* FAQ */
+  .faq-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--space-8); align-items: start; }
+  .faq-layout .section-head { margin: 0; }
+  .faq-list details { border-bottom: var(--stroke-hairline) solid var(--color-divider); }
+  .faq-list details:first-child { border-top: var(--stroke-hairline) solid var(--color-divider); }
+  .faq-list summary { display: flex; justify-content: space-between; align-items: center; gap: var(--space-5); min-height: 56px; padding: var(--space-4) 0; font: var(--text-lead); font-size: 18px; color: var(--color-ink); cursor: pointer; list-style: none; }
+  .faq-list summary::-webkit-details-marker { display: none; }
+  .faq-list summary:hover { color: var(--color-moss); }
+  .faq-sign { width: var(--space-4); height: var(--space-4); position: relative; flex-shrink: 0; }
+  .faq-sign::before, .faq-sign::after { content: ''; position: absolute; background: currentColor; }
+  .faq-sign::before { top: 50%; left: 0; width: 100%; height: var(--stroke-thin); }
+  .faq-sign::after { top: 0; left: 50%; height: 100%; width: var(--stroke-thin); }
+  details[open] .faq-sign::after { display: none; }
+  .faq-list details p { font: var(--text-body); padding-bottom: var(--space-5); max-width: 65ch; }
+  .faq-list details p a { color: var(--color-moss); text-decoration: underline; text-underline-offset: 4px; }
+
+  /* Финал */
+  .program-close { --close-soft: color-mix(in srgb, var(--color-paper) 90%, var(--color-moss-deep)); padding: var(--section-y) 0; background: var(--color-moss-deep); color: var(--close-soft); }
+  .program-close :focus-visible { outline-color: var(--color-lime); }
+  .close-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: var(--space-6) var(--space-8); align-items: end; }
+  .program-close h2 { font: 600 clamp(32px, 4vw, 52px)/1.1 var(--font-display); letter-spacing: var(--tracking-display); color: #fff; }
+  .program-close p { margin-top: var(--space-4); font: var(--text-body); max-width: 48ch; }
+  .close-action { display: flex; flex-direction: column; align-items: flex-start; }
+  .close-action p { font: var(--text-meta); font-weight: 400; }
+  .close-cta { min-height: 56px; padding: var(--space-4) var(--space-7); background: var(--color-lime); color: var(--color-ink); font-size: 16px; box-shadow: 0 12px 26px rgba(8, 44, 38, .35); }
+  .close-cta:hover { background: color-mix(in srgb, var(--color-lime) 80%, white); transform: translateY(-2px); }
+
+  @media (max-width: 900px) {
+    .situations-layout, .goals-layout, .prices-layout, .faq-layout, .close-layout { grid-template-columns: 1fr; gap: var(--space-5); }
+    .situations-bridge { grid-column: auto; }
+    .goals-layout.no-photo { grid-template-columns: 1fr; }
+    .goals-layout.no-photo .goals-list, .goals-layout.no-photo .goals-note { grid-column: auto; }
+    .visit-step { grid-template-columns: var(--node) minmax(0, 1fr); gap: var(--space-4); padding-bottom: var(--space-7); }
+    .step-media { grid-column: 2; }
+    .goals-photo { position: static; }
+    .close-layout { align-items: start; }
+  }
+  @media (max-width: 760px) {
+    .section-head h2 { font: var(--text-h3); }
+    .section-head p { font: var(--text-body); font-size: 16px; }
+    .situations-list { grid-template-columns: 1fr; }
+    .situations-list li { padding: var(--space-4) 0; }
+    .situations-list h3 { font-size: 19px; }
+    .situations-list p, .step-body > p, .goals-list dd, .faq-list details p { font-size: 16px; }
+    .visit-route { --node: 36px; margin-top: var(--space-6); }
+    .step-node { font-size: 16px; }
+    .step-body { padding-top: var(--space-1); }
+    .step-body h3 { font-size: 21px; }
+    .station-text { font-size: 13px; }
+    .lesson-video { max-width: none; }
+    .visit-cta { margin-top: var(--space-7); }
+    .visit-cta .btn, .prices .btn, .close-cta { width: 100%; padding-inline: var(--space-5); text-align: center; }
+    .price-list dt { font-size: 17px; }
+    .price-list dd { font-size: 21px; }
+    .faq-list summary { font-size: 16px; }
+    .close-action { align-items: stretch; }
+    .close-action p { text-align: center; margin-top: var(--space-3); }
+  }
+</style>
