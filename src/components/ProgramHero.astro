@@ -12,7 +12,7 @@ const { hero } = page;
       <source type="image/webp" srcset={hero.srcset} sizes="(max-width: 900px) 100vw, 50vw" />
       <img src={hero.src} alt={hero.alt} width="1200" height="800" fetchpriority="high" style={`--pos: ${hero.position ?? '50% 40%'}; --pos-m: ${hero.mobilePosition ?? hero.position ?? '50% 30%'}`} />
     </picture>
-    <a class="hero-rating" href="#reviews"><span class="hero-star" aria-hidden="true">★</span><strong>{yandexRating.score}</strong><span>на Яндекс Картах</span></a>
+    <a class="hero-rating" href="#reviews" data-mobile-side={hero.mobileRating ?? 'left'}><span class="hero-star" aria-hidden="true">★</span><strong>{yandexRating.score}</strong><span>на Яндекс Картах</span></a>
   </figure>
 
   <div class="hero-panel">
@@ -98,11 +98,31 @@ const { hero } = page;
   .hero-ask a:hover { text-decoration-color: currentColor; }
 
   @media (max-width: 900px) {
-    .school-hero { grid-template-columns: 1fr; min-height: 0; }
-    .hero-media { order: 0; height: clamp(168px, 44vw, 320px); }
+    /* Фото показываем целиком (3:2), а не полоской: низ кадра растворяется
+       в зелёном, и на этом растворе уже стоят надзаголовок и название —
+       высота под фото почти не растёт, кнопка остаётся на первом экране. */
+    .school-hero { --overlap: 56px; grid-template-columns: 1fr; min-height: 0; }
+    .hero-media { order: 0; min-height: 0; height: min(66.667vw, 420px); }
     .hero-media img { object-position: var(--pos-m); }
-    .hero-rating { left: var(--space-4); bottom: var(--space-3); min-height: 36px; padding: var(--space-1) var(--space-3); font-size: 13px; }
-    .hero-panel { padding: var(--space-5) var(--space-5) var(--space-6); }
+    /* Растворяется только нижняя треть кадра (стол, пол), лица остаются
+       чистыми. Под надзаголовком заливка сплошная: лаймовый текст держит
+       контраст AA только на чистом moss-deep. */
+    .hero-media::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0;
+      height: calc(var(--overlap) + 48px);
+      background: linear-gradient(to top,
+        var(--color-moss-deep) 0,
+        var(--color-moss-deep) 56%,
+        color-mix(in srgb, var(--color-moss-deep) 72%, transparent) 70%,
+        color-mix(in srgb, var(--color-moss-deep) 30%, transparent) 86%,
+        transparent);
+      pointer-events: none;
+    }
+    .hero-rating { z-index: 1; left: var(--space-4); top: var(--space-3); bottom: auto; min-height: 36px; padding: var(--space-1) var(--space-3); font-size: 13px; }
+    .hero-rating[data-mobile-side="right"] { left: auto; right: var(--space-4); }
+    .hero-panel { position: relative; margin-top: calc(-1 * var(--overlap)); padding: 0 var(--space-5) var(--space-6); }
     .eyebrow { font-size: 12px; }
     h1 { margin-top: var(--space-3); font-size: clamp(30px, 8.6vw, 44px); }
     .hero-lead { margin-top: var(--space-2); font-size: 17px; }
@@ -123,9 +143,7 @@ const { hero } = page;
     .hero-note { text-align: left; }
   }
   @media (max-width: 900px) and (max-height: 700px) {
-    .hero-media { height: 112px; }
-    .hero-rating { display: none; }
-    .hero-panel { padding-top: var(--space-4); }
+    .hero-media { height: min(66.667vw, 34svh); }
     .hero-offer { margin-top: var(--space-3); }
   }
 </style>
