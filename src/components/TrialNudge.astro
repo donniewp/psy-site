@@ -1,0 +1,135 @@
+---
+import { yandexMetrikaId } from '../data/content';
+// mobile={false} — там, где на телефоне уже есть своя полоса «Записаться на бесплатное пробное»
+const { mobile = true } = Astro.props as { mobile?: boolean };
+---
+<!-- Мягкое напоминание о бесплатном пробном: карточка в углу, а не окно на весь
+     экран. Появляется после 30 секунд, проведённых на странице (фоновая вкладка
+     не считается), не мешает, если человек уже открыл запись, и после закрытия
+     молчит неделю. Места ограничены честно: группы маленькие, счётчик не выдумываем. -->
+<aside class="trial-nudge" id="trial-nudge" aria-labelledby="trial-nudge-title" data-metrika-id={yandexMetrikaId} data-mobile={String(mobile)} hidden>
+  <button type="button" class="nudge-close" aria-label="Закрыть">×</button>
+  <p class="nudge-title" id="trial-nudge-title">Приходите на бесплатное пробное</p>
+  <p class="nudge-text">Группы маленькие, поэтому мест в&nbsp;каждой немного. <span class="nudge-extra">Подберём время под ваш график и&nbsp;познакомим с&nbsp;педагогом.</span></p>
+  <a href="#booking" class="btn btn-primary nudge-cta" data-goal="nudge_click">Записаться на пробное</a>
+</aside>
+
+<style>
+  .trial-nudge {
+    position: fixed;
+    /* Справа над кнопкой «Связаться»: слева на первом экране текст и кнопки записи */
+    right: var(--space-5);
+    bottom: calc(var(--space-5) + 48px + var(--space-3));
+    z-index: 96;
+    width: min(340px, calc(100vw - 2 * var(--space-4)));
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md), inset 0 0 0 1px color-mix(in srgb, var(--color-mist) 60%, transparent);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .3s ease-out, transform .3s ease-out;
+  }
+  .trial-nudge.is-visible { opacity: 1; transform: none; }
+  .trial-nudge[hidden] { display: none; }
+  .nudge-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--color-ink-soft);
+  }
+  .nudge-close:hover { background: var(--color-paper); color: var(--color-ink); }
+  .nudge-title { padding-right: var(--space-6); font: var(--text-lead); font-size: 17px; color: var(--color-ink); }
+  .nudge-text { margin-top: var(--space-2); font: var(--text-meta); font-weight: 400; color: var(--color-ink-soft); }
+  .nudge-cta { margin-top: var(--space-4); width: 100%; justify-content: center; }
+  :global(body:has(dialog[open])) .trial-nudge { display: none; }
+
+  /* На телефоне — компактная плашка над нижними кнопками, а не пол-экрана */
+  @media (max-width: 720px) {
+    .trial-nudge { left: var(--space-3); right: var(--space-3); width: auto; bottom: var(--nudge-bottom, var(--space-3)); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); }
+    .trial-nudge[data-mobile="false"] { display: none; }
+    .nudge-close { top: 2px; right: 2px; }
+    .nudge-title { font-size: 15px; line-height: 1.35; }
+    .nudge-text { margin-top: 2px; font-size: 13px; line-height: 1.4; }
+    .nudge-extra { display: none; }
+    .nudge-cta { margin-top: var(--space-2); min-height: 44px; padding: var(--space-2) var(--space-4); font-size: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trial-nudge { transition: none; transform: none; }
+  }
+</style>
+
+<script>
+  const nudge = document.getElementById('trial-nudge');
+  const KEY = 'trialNudgeClosedAt';
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  const DELAY_SECONDS = 30;
+
+  const read = (store: Storage | undefined, key: string) => { try { return store?.getItem(key) ?? null; } catch { return null; } };
+  const write = (store: Storage | undefined, key: string, value: string) => { try { store?.setItem(key, value); } catch { /* приватный режим — просто не запоминаем */ } };
+  const goal = (name: string) => {
+    const id = Number(nudge?.dataset.metrikaId);
+    const ym = (window as unknown as { ym?: (...args: unknown[]) => void }).ym;
+    if (id && typeof ym === 'function') ym(id, 'reachGoal', name);
+  };
+
+  const closedRecently = Number(read(window.localStorage, KEY)) > Date.now() - WEEK;
+  // Кто уже открывал запись в этой сессии, тому напоминать незачем
+  const bookingSeen = () => read(window.sessionStorage, 'bookingOpened') === '1' || !!document.querySelector('dialog[open]');
+
+  // Нижние закреплённые панели (кнопки «Связаться / Записаться», полоса записи
+  // на страницах программ) на телефоне не должны перекрываться карточкой.
+  const placeAboveBars = () => {
+    if (!nudge || !window.matchMedia('(max-width: 720px)').matches) return;
+    const bars = ['.contact-rail', '#program-booking-bar']
+      .map(sel => document.querySelector<HTMLElement>(sel))
+      .filter((el): el is HTMLElement => !!el && !el.hidden && getComputedStyle(el).display !== 'none' && getComputedStyle(el).position === 'fixed');
+    const height = Math.max(0, ...bars.map(el => window.innerHeight - el.getBoundingClientRect().top));
+    nudge.style.setProperty('--nudge-bottom', `${height + 12}px`);
+  };
+
+  const show = () => {
+    if (!nudge || bookingSeen()) return;
+    placeAboveBars();
+    nudge.hidden = false;
+    requestAnimationFrame(() => nudge.classList.add('is-visible'));
+    window.addEventListener('scroll', placeAboveBars, { passive: true });
+    window.addEventListener('resize', placeAboveBars);
+    goal('nudge_show');
+  };
+
+  const hide = (remember: boolean) => {
+    if (!nudge) return;
+    nudge.classList.remove('is-visible');
+    nudge.hidden = true;
+    window.removeEventListener('scroll', placeAboveBars);
+    window.removeEventListener('resize', placeAboveBars);
+    if (remember) write(window.localStorage, KEY, String(Date.now()));
+  };
+
+  const offOnThisScreen = nudge?.dataset.mobile === 'false' && window.matchMedia('(max-width: 720px)').matches;
+
+  if (nudge && !closedRecently && !offOnThisScreen) {
+    // Считаем только время, когда вкладка на экране
+    let seconds = 0;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState !== 'visible') return;
+      if (bookingSeen()) { window.clearInterval(timer); return; }
+      if (++seconds >= DELAY_SECONDS) { window.clearInterval(timer); show(); }
+    }, 1000);
+
+    nudge.querySelector('.nudge-close')?.addEventListener('click', () => hide(true));
+    nudge.querySelector('.nudge-cta')?.addEventListener('click', () => hide(true));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !nudge.hidden) hide(true); });
+    // Открыли запись любым другим способом — карточка больше не нужна
+    document.addEventListener('click', e => {
+      if ((e.target as Element)?.closest?.('a[href*="#booking"]')) write(window.sessionStorage, 'bookingOpened', '1');
+    });
+  }
+</script>

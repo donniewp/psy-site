@@ -4,7 +4,7 @@ const { diagnostic = false, consultation = false, mobile = true } = Astro.props;
 ---
 <div class:list={['contact-rail', { 'desktop-only': !mobile }]}>
   <details class="contact-choices" id="contact-choices">
-    <summary><span class="contact-dot" aria-hidden="true"></span><span>Связаться</span></summary>
+    <summary><svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6a.5.5 0 0 1-.8-.4V16h0a2.5 2.5 0 0 1-1-2V5.5Z" /><path d="M8 8.5h8M8 11.5h5" /></svg><span>Связаться</span></summary>
     <div class="contact-panel">
       <p>Как вам удобнее?</p>
       <a href={telegramHref} target="_blank" rel="noopener">Написать в Telegram <span aria-hidden="true">↗</span></a>
@@ -20,7 +20,7 @@ const { diagnostic = false, consultation = false, mobile = true } = Astro.props;
   .contact-choices { position: relative; }
   summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 48px; padding: var(--space-3) var(--space-5); color: var(--color-ink); background: var(--color-surface); border: 1px solid var(--color-mist); border-radius: var(--radius-pill); font: var(--text-meta); }
   summary::-webkit-details-marker { display: none; }
-  .contact-dot { width: 8px; height: 8px; border: 1px solid var(--color-moss); border-radius: 50%; }
+  .contact-icon { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: var(--color-moss); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .contact-choices[open] summary { background: var(--color-paper); }
   .contact-panel { position: absolute; bottom: calc(100% + 12px); right: 0; width: 300px; background: var(--color-surface); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); padding: var(--space-5); }
   .contact-panel p { color: var(--color-ink); font-weight: 600; margin-bottom: var(--space-2); }

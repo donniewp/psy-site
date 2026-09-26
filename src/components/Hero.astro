@@ -1,5 +1,5 @@
 ---
-import { location, heroBadges, reviews, yandexMapsUrl, yandexRating, programs } from '../data/content';
+import { location, heroBadges, reviews, yandexMapsUrl, yandexRating, programs, currentFamilies } from '../data/content';
 import Icon from './Icon.astro';
 import { heroImage } from '../data/heroImage';
 
@@ -27,16 +27,21 @@ const cheapest = packs.reduce((a, b) => (b.rub < a.rub ? b : a));
           <p class="offer-meta">
             <span class="line">от {cheapest.text}&nbsp;₽ за {cheapest.lessons}&nbsp;занятия</span><span class="sep" aria-hidden="true"> · </span><a class="line" href="#reviews"><span class="offer-star" aria-hidden="true">★</span>&nbsp;{yandexRating.score} на&nbsp;Яндекс Картах · {yandexRating.ratings}</a>
           </p>
+          <p class="offer-trust">Сейчас с&nbsp;нами {currentFamilies}, многие ходят не&nbsp;первый год</p>
         </div>
       </div>
 
       <div class="hero-copy-rest">
         <p class="hero-sub">
           Развивающие занятия в&nbsp;мини-группах и&nbsp;психологическая поддержка для детей
-          от&nbsp;1,5&nbsp;лет и&nbsp;подростков. Бережно, системно, с&nbsp;опорой на&nbsp;науку и&nbsp;уважение к&nbsp;ребёнку.
+          от&nbsp;1,5&nbsp;лет и&nbsp;подростков.
         </p>
 
-        <p class="hero-approach"><strong>Педагог. Психолог. Нейропсихолог.</strong><br />Три подхода — один результат. Ведёт Татьяна Петрова, 20+&nbsp;лет опыта.</p>
+        <p class="hero-approach">
+          <strong>Внимание нейропсихолога к каждому ребёнку — уже в цене абонемента.</strong><br />
+          Татьяна Петрова (20+&nbsp;лет опыта) сама ведёт группы: видит, что у ребёнка получается и где нужна
+          поддержка, и после каждого занятия рассказывает вам о прогрессе.
+        </p>
 
         <div class="hero-ctas">
           <a href="#programs" class="btn btn-primary">Выбрать занятие</a>
@@ -96,12 +101,17 @@ const cheapest = packs.reduce((a, b) => (b.rub < a.rub ? b : a));
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 1.05fr .95fr;
+    /* Фото — главный аргумент «здесь живые люди и настоящая студия», поэтому
+       ему отдана бóльшая колонка */
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
     gap: var(--space-7);
     align-items: center;
   }
 
   .hero-where { display: flex; align-items: flex-start; gap: var(--space-2); margin-bottom: var(--space-5); font: var(--text-meta); font-weight: 600; color: var(--color-moss); }
+  /* Метро и адрес — каждый своей строкой, чтобы адрес не рвался на «д. / 8, к. 3» */
+  .hero-where .line { display: block; }
+  .hero-where .sep { display: none; }
   .hero-where :global(.loc-icon) { width: 15px; height: 15px; flex-shrink: 0; margin-top: .15em; }
 
   .hero h1 {
@@ -127,6 +137,7 @@ const cheapest = packs.reduce((a, b) => (b.rub < a.rub ? b : a));
   .offer-meta a { color: inherit; text-decoration: underline; text-decoration-color: var(--color-mist); text-underline-offset: 3px; }
   .offer-meta a:hover { text-decoration-color: currentColor; }
   .offer-star { color: var(--color-moss); }
+  .offer-trust { flex-basis: 100%; font: var(--text-meta); font-weight: 400; color: var(--color-ink-soft); }
 
   .hero-microcopy { margin-top: var(--space-4); font: var(--text-meta); color: var(--color-ink-soft); }
 
@@ -167,7 +178,9 @@ const cheapest = packs.reduce((a, b) => (b.rub < a.rub ? b : a));
   .hero-img {
     width: 100%;
     height: 100%;
-    aspect-ratio: 4 / 3.4;
+    /* Кадр горизонтальный (3:2): почти не режем, чтобы в нём оставались
+       вывеска, полки и окно, а не только лица крупным планом */
+    aspect-ratio: 4 / 3.1;
     object-fit: cover;
     animation: kenburns 15s ease-in-out infinite alternate;
   }
@@ -204,14 +217,14 @@ const cheapest = packs.reduce((a, b) => (b.rub < a.rub ? b : a));
     .hero-review p { font-size: 17px; }
     .hero-where { margin-bottom: 16px; font-size: 13px; }
     /* На телефоне части строк идут отдельными строками, а не рвутся посередине фразы */
-    .hero-where .line, .offer-meta .line { display: block; width: fit-content; }
-    .hero-where .sep, .offer-meta .sep { display: none; }
+    .offer-meta .line { display: block; width: fit-content; }
+    .offer-meta .sep { display: none; }
     .hero h1 { font-size: clamp(30px, 7.8vw, 44px); line-height: 1.15; }
     .hero-sub { margin-top: 16px; font-size: 17px; line-height: 1.5; }
     .hero-motto { font-size: 18px; line-height: 1.45; }
     .hero-offer { margin-top: 14px; }
     .offer-pill { font-size: 13px; padding: 6px 12px; }
-    .offer-meta { font-size: 13px; }
+    .offer-meta, .offer-trust { font-size: 13px; }
     .hero-ctas { margin-top: 20px; gap: 10px; }
     .hero-ctas .btn { flex: 1 1 200px; padding: 13px 18px; }
     .hero-microcopy { margin-top: 12px; font-size: 13px; }
