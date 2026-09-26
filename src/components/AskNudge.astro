@@ -1,21 +1,25 @@
 ---
-import { yandexMetrikaId } from '../data/content';
-// mobile={false} — там, где на телефоне уже есть своя полоса «Записаться на бесплатное пробное»
+import { yandexMetrikaId, telegramHref, maxHref } from '../data/content';
+// mobile={false} — там, где на телефоне внизу уже стоит своя полоса записи
 const { mobile = true } = Astro.props as { mobile?: boolean };
 ---
-<!-- Мягкое напоминание о бесплатном пробном: карточка в углу, а не окно на весь
-     экран. Появляется после 30 секунд, проведённых на странице (фоновая вкладка
-     не считается), не мешает, если человек уже открыл запись, и после закрытия
-     молчит неделю. Места ограничены честно: группы маленькие, счётчик не выдумываем. -->
-<aside class="trial-nudge" id="trial-nudge" aria-labelledby="trial-nudge-title" data-metrika-id={yandexMetrikaId} data-mobile={String(mobile)} hidden>
+<!-- Для тех, кто ещё сомневается и не готов записываться: предлагаем не «запишитесь»
+     (это и так видно на первом экране), а новое — задать вопрос самому специалисту.
+     Карточка в углу, а не окно на весь экран. Появляется после 30 секунд, проведённых
+     на странице (фоновая вкладка не считается), не мешает, если человек уже открыл
+     запись, и после закрытия молчит неделю. -->
+<aside class="ask-nudge" id="ask-nudge" aria-labelledby="ask-nudge-title" data-metrika-id={yandexMetrikaId} data-mobile={String(mobile)} hidden>
   <button type="button" class="nudge-close" aria-label="Закрыть">×</button>
-  <p class="nudge-title" id="trial-nudge-title">Приходите на бесплатное пробное</p>
-  <p class="nudge-text">Группы маленькие, поэтому мест в&nbsp;каждой немного. <span class="nudge-extra">Подберём время под ваш график и&nbsp;познакомим с&nbsp;педагогом.</span></p>
-  <a href="#booking" class="btn btn-primary nudge-cta" data-goal="nudge_click">Записаться на пробное</a>
+  <p class="nudge-title" id="ask-nudge-title">Сомневаетесь, с&nbsp;чего начать?</p>
+  <p class="nudge-text">Опишите, что вас волнует, — Татьяна Петрова ответит лично и&nbsp;подскажет, что подойдёт ребёнку.</p>
+  <div class="nudge-actions">
+    <a href={telegramHref} target="_blank" rel="noopener" class="btn btn-primary nudge-link" data-goal="nudge_telegram">Telegram</a>
+    <a href={maxHref} target="_blank" rel="noopener" class="btn btn-secondary nudge-link" data-goal="nudge_max">MAX</a>
+  </div>
 </aside>
 
 <style>
-  .trial-nudge {
+  .ask-nudge {
     position: fixed;
     /* Справа над кнопкой «Связаться»: слева на первом экране текст и кнопки записи */
     right: var(--space-5);
@@ -30,8 +34,8 @@ const { mobile = true } = Astro.props as { mobile?: boolean };
     transform: translateY(12px);
     transition: opacity .3s ease-out, transform .3s ease-out;
   }
-  .trial-nudge.is-visible { opacity: 1; transform: none; }
-  .trial-nudge[hidden] { display: none; }
+  .ask-nudge.is-visible { opacity: 1; transform: none; }
+  .ask-nudge[hidden] { display: none; }
   .nudge-close {
     position: absolute;
     top: 6px;
@@ -46,28 +50,29 @@ const { mobile = true } = Astro.props as { mobile?: boolean };
   .nudge-close:hover { background: var(--color-paper); color: var(--color-ink); }
   .nudge-title { padding-right: var(--space-6); font: var(--text-lead); font-size: 17px; color: var(--color-ink); }
   .nudge-text { margin-top: var(--space-2); font: var(--text-meta); font-weight: 400; color: var(--color-ink-soft); }
-  .nudge-cta { margin-top: var(--space-4); width: 100%; justify-content: center; }
-  :global(body:has(dialog[open])) .trial-nudge { display: none; }
+  .nudge-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-4); }
+  .nudge-link { justify-content: center; min-height: 44px; padding: var(--space-2) var(--space-3); }
+  :global(body:has(dialog[open])) .ask-nudge { display: none; }
 
   /* На телефоне — компактная плашка над нижними кнопками, а не пол-экрана */
   @media (max-width: 720px) {
-    .trial-nudge { left: var(--space-3); right: var(--space-3); width: auto; bottom: var(--nudge-bottom, var(--space-3)); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); }
-    .trial-nudge[data-mobile="false"] { display: none; }
+    .ask-nudge { left: var(--space-3); right: var(--space-3); width: auto; bottom: var(--nudge-bottom, var(--space-3)); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); }
+    .ask-nudge[data-mobile="false"] { display: none; }
     .nudge-close { top: 2px; right: 2px; }
     .nudge-title { font-size: 15px; line-height: 1.35; }
     .nudge-text { margin-top: 2px; font-size: 13px; line-height: 1.4; }
-    .nudge-extra { display: none; }
-    .nudge-cta { margin-top: var(--space-2); min-height: 44px; padding: var(--space-2) var(--space-4); font-size: 14px; }
+    .nudge-actions { margin-top: var(--space-2); }
+    .nudge-link { font-size: 14px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .trial-nudge { transition: none; transform: none; }
+    .ask-nudge { transition: none; transform: none; }
   }
 </style>
 
 <script>
-  const nudge = document.getElementById('trial-nudge');
-  const KEY = 'trialNudgeClosedAt';
+  const nudge = document.getElementById('ask-nudge');
+  const KEY = 'askNudgeClosedAt';
   const WEEK = 7 * 24 * 60 * 60 * 1000;
   const DELAY_SECONDS = 30;
 
@@ -80,11 +85,11 @@ const { mobile = true } = Astro.props as { mobile?: boolean };
   };
 
   const closedRecently = Number(read(window.localStorage, KEY)) > Date.now() - WEEK;
-  // Кто уже открывал запись в этой сессии, тому напоминать незачем
+  // Кто уже открывал запись в этой сессии, тому предлагать вопрос незачем
   const bookingSeen = () => read(window.sessionStorage, 'bookingOpened') === '1' || !!document.querySelector('dialog[open]');
+  const offOnThisScreen = nudge?.dataset.mobile === 'false' && window.matchMedia('(max-width: 720px)').matches;
 
-  // Нижние закреплённые панели (кнопки «Связаться / Записаться», полоса записи
-  // на страницах программ) на телефоне не должны перекрываться карточкой.
+  // Нижние закреплённые панели на телефоне не должны перекрываться карточкой
   const placeAboveBars = () => {
     if (!nudge || !window.matchMedia('(max-width: 720px)').matches) return;
     const bars = ['.contact-rail', '#program-booking-bar']
@@ -113,8 +118,6 @@ const { mobile = true } = Astro.props as { mobile?: boolean };
     if (remember) write(window.localStorage, KEY, String(Date.now()));
   };
 
-  const offOnThisScreen = nudge?.dataset.mobile === 'false' && window.matchMedia('(max-width: 720px)').matches;
-
   if (nudge && !closedRecently && !offOnThisScreen) {
     // Считаем только время, когда вкладка на экране
     let seconds = 0;
@@ -125,9 +128,9 @@ const { mobile = true } = Astro.props as { mobile?: boolean };
     }, 1000);
 
     nudge.querySelector('.nudge-close')?.addEventListener('click', () => hide(true));
-    nudge.querySelector('.nudge-cta')?.addEventListener('click', () => hide(true));
+    nudge.querySelectorAll('.nudge-link').forEach(link => link.addEventListener('click', () => hide(true)));
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !nudge.hidden) hide(true); });
-    // Открыли запись любым другим способом — карточка больше не нужна
+    // Открыли запись любым способом — карточка больше не нужна
     document.addEventListener('click', e => {
       if ((e.target as Element)?.closest?.('a[href*="#booking"]')) write(window.sessionStorage, 'bookingOpened', '1');
     });

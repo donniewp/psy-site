@@ -8,7 +8,7 @@ import StickyMobileCTA from '../components/StickyMobileCTA.astro';
 import ProgramHero from '../components/ProgramHero.astro';
 import ProgramStory from '../components/ProgramStory.astro';
 import ProgramBookingBar from '../components/ProgramBookingBar.astro';
-import TrialNudge from '../components/TrialNudge.astro';
+import AskNudge from '../components/AskNudge.astro';
 import { programs, programPaths } from '../data/content';
 import { programPages } from '../data/programPages';
 import { visitFor, individualVisitFor } from '../data/visits';
@@ -33,7 +33,7 @@ const groupAction = page.action ?? (page.paid ? visit.action : 'Записать
   <Footer />
   <StickyMobileCTA diagnostic={diagnostic} consultation={consultation} mobile={false} />
   <ProgramBookingBar href={cta} action={groupAction} bar={page.bar} />
-  {!page.paid && <TrialNudge mobile={false} />}
+  <AskNudge mobile={false} />
   {p.individual && <script is:inline define:vars={{ groupBooking: visit.value, individualBooking: individualVisit.value, groupAction, individualAction: individualVisit.action }}>
     (() => {
       const radios = document.querySelectorAll('input[name="lesson-format"]');
