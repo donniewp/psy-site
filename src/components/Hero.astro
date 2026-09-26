@@ -1,7 +1,13 @@
 ---
-import { location, heroBadges, reviews, yandexMapsUrl } from '../data/content';
+import { location, heroBadges, reviews, yandexMapsUrl, yandexRating, programs } from '../data/content';
 import Icon from './Icon.astro';
 import { heroImage } from '../data/heroImage';
+
+// Самый дешёвый абонемент берём из карточек программ: вписанная сюда цифра
+// тихо разойдётся с прайсом при первом же изменении цен.
+const packs = programs.flatMap((p) => [...p.price.matchAll(/(\d[\d\s]*)\s₽\s\/\s(\d+)\sзанят/g)]
+  .map((m) => ({ rub: Number(m[1].replace(/\s/g, '')), text: m[1].trim(), lessons: m[2] })));
+const cheapest = packs.reduce((a, b) => (b.rub < a.rub ? b : a));
 ---
 
 <section class="hero" id="top">
@@ -16,19 +22,26 @@ import { heroImage } from '../data/heroImage';
 
         <h1>Студия нейропедагогики и&nbsp;психологии</h1>
         <p class="hero-motto">Развиваем. Поддерживаем. Готовим к&nbsp;жизни.</p>
+
+        <!-- Первый экран отвечает на три вопроса родителя из рекламы: сколько стоит,
+             можно ли сначала попробовать и можно ли доверять. -->
+        <ul class="hero-facts">
+          <li class="fact fact-offer">Пробное — бесплатно</li>
+          <li class="fact">от {cheapest.text}&nbsp;₽ за {cheapest.lessons}&nbsp;занятия</li>
+          <li class="fact"><a href="#reviews" title="Рейтинг на Яндекс Картах" aria-label={`Рейтинг ${yandexRating.score} на Яндекс Картах — к отзывам`}><span class="fact-star" aria-hidden="true">★</span> {yandexRating.score} на&nbsp;Картах</a></li>
+        </ul>
       </div>
 
       <div class="hero-copy-rest">
         <p class="hero-sub">
-          Развивающие занятия и психологическая поддержка для детей и подростков
-          2–18&nbsp;лет. Бережно, системно, с опорой на науку и уважение к&nbsp;ребёнку.
+          Развивающие занятия в&nbsp;мини-группах и&nbsp;психологическая поддержка для детей
+          от&nbsp;1,5&nbsp;лет и&nbsp;подростков. Бережно, системно, с&nbsp;опорой на&nbsp;науку и&nbsp;уважение к&nbsp;ребёнку.
         </p>
 
         <p class="hero-approach"><strong>Педагог. Психолог. Нейропсихолог.</strong><br />Три подхода — один результат.</p>
 
         <div class="hero-tags">
           <span class="tag">Татьяна Петрова · 20+ лет опыта</span>
-          <span class="tag tag-offer">Пробное в группе бесплатно</span>
         </div>
 
         <div class="hero-ctas">
@@ -137,12 +150,23 @@ import { heroImage } from '../data/heroImage';
 
   .hero-ctas { display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-6); }
 
-  .tag-offer {
-    background: var(--color-lime);
-    box-shadow: none;
+  .hero-facts { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-5) 0 0; padding: 0; list-style: none; }
+
+  .fact {
+    font: var(--text-meta);
+    font-weight: 600;
     color: var(--color-ink);
-    font-weight: 700;
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-mist);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
   }
+
+  .fact a { color: inherit; }
+  .fact a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .fact-star { color: var(--color-moss); }
+
+  .fact-offer { background: var(--color-lime); box-shadow: none; font-weight: 700; }
 
   .hero-microcopy { margin-top: var(--space-4); font: var(--text-meta); color: var(--color-ink-soft); }
 
@@ -223,6 +247,8 @@ import { heroImage } from '../data/heroImage';
     .hero h1 { font-size: clamp(30px, 7.8vw, 44px); line-height: 1.15; }
     .hero-sub { margin-top: 16px; font-size: 17px; line-height: 1.5; }
     .hero-motto { font-size: 18px; line-height: 1.45; }
+    .hero-facts { margin-top: 14px; gap: 6px; }
+    .fact { font-size: 13px; padding: 6px 10px; }
     .hero-tags { margin-top: 16px; gap: 6px; }
     .tag { font-size: 12px; padding: 7px 10px; }
     .hero-ctas { margin-top: 20px; gap: 10px; }
