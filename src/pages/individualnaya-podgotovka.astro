@@ -1,0 +1,28 @@
+---
+// Отдельная страница индивидуальной подготовки убрана 11.09.2026: этот формат
+// теперь внутри «Подготовки к школе». Старый адрес остался в объявлениях,
+// закладках и поиске, поэтому ведём на ту же программу сразу в индивидуальном
+// формате и сохраняем метки рекламы (yclid, utm) — иначе Метрика потеряет источник.
+const target = '/podgotovka-k-shkole/?format=individual';
+const canonicalURL = new URL('/podgotovka-k-shkole/', Astro.site);
+---
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonicalURL} />
+    <title>Индивидуальная подготовка к школе — Сензитивность</title>
+    <script is:inline>
+      (() => {
+        const params = new URLSearchParams(location.search);
+        params.set('format', 'individual');
+        location.replace('/podgotovka-k-shkole/?' + params + location.hash);
+      })();
+    </script>
+    <noscript><meta http-equiv="refresh" content={`0; url=${target}`} /></noscript>
+  </head>
+  <body>
+    <p><a href={target}>Индивидуальная подготовка к школе</a></p>
+  </body>
+</html>

@@ -14,8 +14,10 @@ export type Offer = { price: string; unit: string; terms: string; note: string }
 export type ProgramPage = {
   paid: boolean;
   action?: string;
-  // desktopSrcset — отдельный кадр для широкого экрана, где фото почти квадратное
-  hero: { src: string; srcset: string; desktopSrcset?: string; alt: string; position?: string; mobilePosition?: string; lead: string; offer: Offer; individual?: Offer };
+  // desktopSrcset — отдельный кадр для широкого экрана, где фото почти квадратное.
+  // mobileRating — в каком верхнем углу фото на телефоне стоит плашка рейтинга:
+  // в том, где на снимке стена, а не голова; 'none' — если стены нет ни в одном углу.
+  hero: { src: string; srcset: string; desktopSrcset?: string; alt: string; position?: string; mobilePosition?: string; mobileRating?: 'left' | 'right' | 'none'; lead: string; offer: Offer; individual?: Offer };
   bar: { price: string; unit?: string; note: string; individual?: { price: string; note: string } };
   situations: { title: string; lead: string; items: { title: string; text: string }[]; bridge: string };
   visit: { title: string; lead: string; steps: Step[] };
@@ -80,7 +82,7 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-sensory.jpg', srcset: srcset('prog-sensory'), alt: 'Малыши играют на ковре: балансируют на дисках и лежат на подушках-цветах, подняв руки и ноги',
       desktopSrcset: '/img/optimized/sensory-floor-600.webp 600w, /img/optimized/sensory-floor-960.webp 960w',
-      position: '50% 22%', mobilePosition: '50% 4%',
+      position: '50% 22%', mobilePosition: '50% 4%', mobileRating: 'none',
       lead: 'Занятия для малышей вместе с мамой у м. Войковская, 3 минуты от метро',
       offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · вместе с мамой', note: groupNote },
     },
@@ -145,7 +147,7 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-senior.jpg', srcset: srcset('prog-senior'), alt: 'Мальчик идёт по балансировочной дорожке, девочка — по подушкам-цветам',
       desktopSrcset: '/img/optimized/senior-balance-480.webp 480w, /img/optimized/senior-balance-800.webp 800w',
-      position: '50% 0%', mobilePosition: '50% 0%',
+      position: '50% 0%', mobilePosition: '50% 0%', mobileRating: 'none',
       lead: 'Мини-группы до 8 детей у м. Войковская, 3 минуты от метро',
       offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · до 8 детей', note: groupNote },
     },
@@ -271,7 +273,7 @@ export const programPages: Record<string, ProgramPage> = {
   start: {
     paid: false,
     hero: {
-      src: '/img/prog-start.jpg', srcset: srcset('prog-start'), alt: 'Татьяна Петрова занимается с двумя детьми за столом', position: '50% 40%', mobilePosition: '50% 22%',
+      src: '/img/prog-start.jpg', srcset: srcset('prog-start'), alt: 'Татьяна Петрова занимается с двумя детьми за столом', position: '50% 40%', mobilePosition: '50% 22%', mobileRating: 'right',
       lead: 'Мини-группы до 6 детей у м. Войковская, 3 минуты от метро',
       offer: { price: `от ${money(schoolPricing.lesson)} ₽`, unit: 'за занятие', terms: `абонемент на 8 занятий — ${money(schoolPricing.eightLessons)} ₽, на 4 — ${money(schoolPricing.fourLessons)} ₽ · занятие 50 минут`, note: groupNote },
       individual: individualOffer,
@@ -347,7 +349,7 @@ export const programPages: Record<string, ProgramPage> = {
   sand: {
     paid: false,
     hero: {
-      src: '/img/prog-sand.jpg', srcset: srcset('prog-sand'), alt: 'Татьяна Петрова и дети строят композицию в песочнице', position: '50% 40%',
+      src: '/img/prog-sand.jpg', srcset: srcset('prog-sand'), alt: 'Татьяна Петрова и дети строят композицию в песочнице', position: '50% 40%', mobileRating: 'right',
       lead: 'Мини-группы до 6 детей у м. Войковская, по средам в 19:00',
       offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · среда, 19:00', note: groupNote },
       individual: individualOffer,
@@ -417,7 +419,7 @@ export const programPages: Record<string, ProgramPage> = {
   'school-navigator': {
     paid: false,
     hero: {
-      src: '/img/prog-school-navigator.jpg', srcset: srcset('prog-school-navigator'), alt: 'Татьяна Петрова с детьми собирает мозаику на полу', position: '50% 35%',
+      src: '/img/prog-school-navigator.jpg', srcset: srcset('prog-school-navigator'), alt: 'Татьяна Петрова с детьми собирает мозаику на полу', position: '50% 35%', mobileRating: 'right',
       lead: 'Мини-группы до 6 детей у м. Войковская, по субботам',
       offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · по субботам', note: groupNote },
       individual: individualOffer,
@@ -485,7 +487,7 @@ export const programPages: Record<string, ProgramPage> = {
   psychocorrection: {
     paid: true,
     hero: {
-      src: '/img/prog-psychocorrection.jpg', srcset: srcset('prog-psychocorrection'), alt: 'Татьяна Петрова беседует с подростком', position: '60% 35%',
+      src: '/img/prog-psychocorrection.jpg', srcset: srcset('prog-psychocorrection'), alt: 'Татьяна Петрова беседует с подростком', position: '60% 35%', mobileRating: 'right',
       lead: 'Индивидуально у м. Войковская, 3 минуты от метро',
       offer: { price: 'от 3 500 ₽', unit: 'за 45 минут', terms: 'или от 4 000 ₽ за 60 минут', note: 'Бесплатное знакомство со студией можно обсудить отдельно' },
     },
