@@ -14,7 +14,8 @@ export type Offer = { price: string; unit: string; terms: string; note: string }
 export type ProgramPage = {
   paid: boolean;
   action?: string;
-  hero: { src: string; srcset: string; alt: string; position?: string; mobilePosition?: string; lead: string; offer: Offer; individual?: Offer };
+  // desktopSrcset — отдельный кадр для широкого экрана, где фото почти квадратное
+  hero: { src: string; srcset: string; desktopSrcset?: string; alt: string; position?: string; mobilePosition?: string; lead: string; offer: Offer; individual?: Offer };
   bar: { price: string; unit?: string; note: string; individual?: { price: string; note: string } };
   situations: { title: string; lead: string; items: { title: string; text: string }[]; bridge: string };
   visit: { title: string; lead: string; steps: Step[] };
@@ -62,13 +63,13 @@ const stepAfter = (text = 'Татьяна Анатольевна расскаж�
 
 const groupNote = 'Без покупки абонемента — просто приходите познакомиться';
 const trialPrice = { label: 'Пробное занятие в группе', value: 'Бесплатно', note: 'без покупки абонемента' };
-const individualOffer: Offer = { price: `${money(schoolPricing.individual)} ₽`, unit: 'за занятие', terms: 'Длительность уточним при записи', note: 'Условия бесплатного знакомства согласуем при записи' };
-const individualPrice = { label: 'Индивидуальное занятие', value: `${money(schoolPricing.individual)} ₽`, note: 'длительность уточним при записи' };
+const individualOffer: Offer = { price: `от ${money(schoolPricing.individual)} ₽`, unit: 'за занятие', terms: 'Длительность уточним при записи', note: 'Условия бесплатного знакомства согласуем при записи' };
+const individualPrice = { label: 'Индивидуальное занятие', value: `от ${money(schoolPricing.individual)} ₽`, note: 'длительность уточним при записи' };
 
 const faqTired = { q: 'А если ребёнок быстро устаёт?', a: 'Чередуем спокойные задания с движением. На пробном смотрим, как ребёнок включается в работу и переносит нагрузку. После обсудим подходящий темп и формат занятий.' };
 const faqMissed = { q: 'Что будет, если пропустим занятие?', a: 'Если предупредите минимум за 12 часов, предложим одну отработку за 30 дней в подходящей группе при наличии места. Если ребёнок заболел внезапно, сообщите до начала занятия — обсудим перенос отдельно.' };
-const faqIndividual = { q: 'Можно заниматься индивидуально?', a: `Да, индивидуальное занятие стоит ${money(schoolPricing.individual)} ₽. Содержание, темп и длительность согласуем при записи.` };
-const faqDiagnostic = { q: 'Не уверены, что эта программа подходит?', a: 'Начните с диагностики: на индивидуальной встрече разберём ваш запрос и особенности развития ребёнка, по итогам получите заключение и рекомендации. 45 минут, 3 500 ₽.', link: { href: '/diagnostika/', label: 'О диагностике →' } };
+const faqIndividual = { q: 'Можно заниматься индивидуально?', a: `Да, индивидуальное занятие стоит от ${money(schoolPricing.individual)} ₽. Содержание, темп и длительность согласуем при записи.` };
+const faqDiagnostic = { q: 'Не уверены, что эта программа подходит?', a: 'Начните с диагностики: на индивидуальной встрече разберём ваш запрос и особенности развития ребёнка, по итогам получите заключение и рекомендации. 45 минут, от 3 500 ₽.', link: { href: '/diagnostika/', label: 'О диагностике →' } };
 const faqDoctor = { q: 'Когда нужен врач, а не психолог?', a: 'Если речь о лечении, лекарствах или медицинском диагнозе, это вопрос к врачу. Психолог поможет разобраться в ситуации и подскажет, к какому специалисту обратиться.' };
 
 const stepsIntroGroup = 'Пять шагов — от заявки до разговора с педагогом. Покупать абонемент заранее не нужно.';
@@ -77,11 +78,13 @@ export const programPages: Record<string, ProgramPage> = {
   'early-sensory': {
     paid: false,
     hero: {
-      src: '/img/studio/floor-room.jpg', srcset: floorSrcset, alt: 'Комната для занятий на полу: мягкий ковёр и подушки-цветы', position: '50% 55%',
+      src: '/img/prog-sensory.jpg', srcset: srcset('prog-sensory'), alt: 'Малыши играют на ковре: балансируют на дисках и лежат на подушках-цветах, подняв руки и ноги',
+      desktopSrcset: '/img/optimized/sensory-floor-600.webp 600w, /img/optimized/sensory-floor-960.webp 960w',
+      position: '50% 22%', mobilePosition: '50% 4%',
       lead: 'Занятия для малышей вместе с мамой у м. Войковская, 3 минуты от метро',
-      offer: { price: '4 200 ₽', unit: 'за 4 занятия', terms: 'занятие 50 минут · вместе с мамой', note: groupNote },
+      offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · вместе с мамой', note: groupNote },
     },
-    bar: { price: '1 050 ₽', note: 'в абонементе на 4 занятия' },
+    bar: { price: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽' },
     situations: {
       title: 'Узнаёте своего малыша?',
       lead: 'В полтора-два года всё меняется быстро, и хочется поддержать каждый шаг.',
@@ -125,7 +128,7 @@ export const programPages: Record<string, ProgramPage> = {
     },
     prices: {
       lead: 'Занятие 50 минут · вместе с мамой · мини-группа. Время подбираем при записи с учётом режима малыша.',
-      items: [trialPrice, { label: 'Абонемент на 4 занятия', value: '4 200 ₽', note: '1 050 ₽ за занятие' }],
+      items: [trialPrice, { label: 'Занятие в абонементе', value: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽' }],
     },
     faq: [
       { q: 'Нужно ли маме быть рядом?', a: 'Да, занятия для детей 1,5–2,5 года проходят вместе с мамой. Длительность пробного и что взять с собой, уточним при записи.' },
@@ -140,11 +143,13 @@ export const programPages: Record<string, ProgramPage> = {
   'early-senior': {
     paid: false,
     hero: {
-      src: '/img/studio/floor-room.jpg', srcset: floorSrcset, alt: 'Комната для занятий на полу: мягкий ковёр и подушки-цветы', position: '50% 55%',
+      src: '/img/prog-senior.jpg', srcset: srcset('prog-senior'), alt: 'Мальчик идёт по балансировочной дорожке, девочка — по подушкам-цветам',
+      desktopSrcset: '/img/optimized/senior-balance-480.webp 480w, /img/optimized/senior-balance-800.webp 800w',
+      position: '50% 0%', mobilePosition: '50% 0%',
       lead: 'Мини-группы до 8 детей у м. Войковская, 3 минуты от метро',
-      offer: { price: '7 500 ₽', unit: 'за 8 занятий', terms: 'занятие 50 минут · до 8 детей', note: groupNote },
+      offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · до 8 детей', note: groupNote },
     },
-    bar: { price: '937,50 ₽', note: 'в абонементе на 8 занятий' },
+    bar: { price: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽' },
     situations: {
       title: 'Узнаёте своего ребёнка?',
       lead: 'Между двумя и четырьмя годами ребёнок учится быть самостоятельнее и играть в группе.',
@@ -173,6 +178,10 @@ export const programPages: Record<string, ProgramPage> = {
             { title: 'Движение', text: 'координация и ловкость' },
             { title: 'Творчество', text: 'рисуем, лепим, придумываем' },
           ],
+          media: [
+            room('/img/optimized/senior-draw-boy.webp', 'Мальчик раскрашивает рисунок карандашом', 'Рисуем и раскрашиваем'),
+            room('/img/optimized/senior-draw-girl.webp', 'Девочка обводит пальцем линию на листе', 'Ведём линию по контуру'),
+          ],
         },
         { ...stepWait, text: 'В студии есть зона ожидания для родителей. Останетесь ли вы рядом с ребёнком на пробном, решим заранее — по возрасту и настроению малыша.' },
         stepAfter(),
@@ -187,10 +196,11 @@ export const programPages: Record<string, ProgramPage> = {
         { title: 'Удерживать внимание', text: 'Дольше оставаться в одном занятии и возвращаться к нему.' },
         { title: 'Говорить и выражать себя', text: 'Расширять словарь, рассказывать, рисовать и лепить.' },
       ],
+      photo: { kind: 'image', src: '/img/optimized/senior-sandtray-1000.webp', srcset: '/img/optimized/senior-sandtray-600.webp 600w, /img/optimized/senior-sandtray-1000.webp 1000w', alt: 'Две девочки вместе играют в песочнице с игрушками', caption: 'Играем вместе в сенсорной песочнице', width: 1000, height: 800, ratio: '5 / 4' },
     },
     prices: {
       lead: 'Занятие 50 минут · до 8 детей. Время подбираем при записи с учётом режима ребёнка.',
-      items: [trialPrice, { label: 'Абонемент на 8 занятий', value: '7 500 ₽', note: '937,50 ₽ за занятие' }],
+      items: [trialPrice, { label: 'Занятие в абонементе', value: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽' }],
     },
     faq: [
       faqTired,
@@ -207,9 +217,9 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-razvivayka.jpg', srcset: srcset('prog-razvivayka'), alt: 'Татьяна Петрова с двумя детьми выкладывает на столе деревянные буквы', position: '50% 35%',
       lead: 'Пять разных блоков по 30 минут у м. Войковская, 3 минуты от метро',
-      offer: { price: '1 900 ₽', unit: 'за занятие', terms: '2 часа 30 минут · 5 блоков по 30 минут', note: 'Пробное в группе бесплатно — просто приходите познакомиться' },
+      offer: { price: 'от 1 900 ₽', unit: 'за занятие', terms: '2 часа 30 минут · 5 блоков по 30 минут', note: 'Пробное в группе бесплатно — просто приходите познакомиться' },
     },
-    bar: { price: '1 900 ₽', note: 'занятие 2 часа 30 минут' },
+    bar: { price: 'от 1 900 ₽', note: 'занятие 2 часа 30 минут' },
     situations: {
       title: 'Узнаёте своего ребёнка?',
       lead: 'Подготовка не только к школе, а к ситуации, когда нужно слышать инструкцию, думать и общаться.',
@@ -246,7 +256,7 @@ export const programPages: Record<string, ProgramPage> = {
     },
     prices: {
       lead: '2 часа 30 минут · 5 блоков по 30 минут · 4–6 лет. Время подбираем при записи.',
-      items: [trialPrice, { label: 'Занятие', value: '1 900 ₽', note: '2 часа 30 минут' }],
+      items: [trialPrice, { label: 'Занятие', value: 'от 1 900 ₽', note: '2 часа 30 минут' }],
     },
     faq: [
       { q: 'Не тяжело ли ребёнку 2,5 часа?', a: 'Каждые 30 минут меняется блок и вид активности: чтение, движение, песок, рисование, логика. На пробном смотрим, как ребёнок переносит нагрузку, и после обсуждаем.' },
@@ -263,10 +273,10 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-start.jpg', srcset: srcset('prog-start'), alt: 'Татьяна Петрова занимается с двумя детьми за столом', position: '50% 40%', mobilePosition: '50% 22%',
       lead: 'Мини-группы до 6 детей у м. Войковская, 3 минуты от метро',
-      offer: { price: `${money(schoolPricing.eightLessons)} ₽`, unit: 'за 8 занятий', terms: `или ${money(schoolPricing.fourLessons)} ₽ за 4 · занятие 50 минут`, note: groupNote },
+      offer: { price: `от ${money(schoolPricing.lesson)} ₽`, unit: 'за занятие', terms: `абонемент на 8 занятий — ${money(schoolPricing.eightLessons)} ₽, на 4 — ${money(schoolPricing.fourLessons)} ₽ · занятие 50 минут`, note: groupNote },
       individual: individualOffer,
     },
-    bar: { price: `${money(schoolPricing.eightLessons / 8)} ₽`, note: 'в абонементе на 8 занятий', individual: { price: `${money(schoolPricing.individual)} ₽`, note: 'Индивидуальный формат' } },
+    bar: { price: `от ${money(schoolPricing.lesson)} ₽`, note: `абонемент на 8 занятий — ${money(schoolPricing.eightLessons)} ₽`, individual: { price: `от ${money(schoolPricing.individual)} ₽`, note: 'Индивидуальный формат' } },
     situations: {
       title: 'Узнаёте своего ребёнка?',
       lead: 'Перед школой вопросы бывают не только про буквы и цифры.',
@@ -318,8 +328,8 @@ export const programPages: Record<string, ProgramPage> = {
       lead: 'Занятие 50 минут · до 6 детей · группы 4–5, 5–6 и 6–7 лет. Время подбираем при записи с учётом графика семьи.',
       items: [
         trialPrice,
-        { label: 'Абонемент на 8 занятий', value: `${money(schoolPricing.eightLessons)} ₽`, note: `${money(schoolPricing.eightLessons / 8)} ₽ за занятие` },
-        { label: 'Абонемент на 4 занятия', value: `${money(schoolPricing.fourLessons)} ₽`, note: `${money(schoolPricing.fourLessons / 4)} ₽ за занятие` },
+        { label: 'Занятие в абонементе на 8', value: `от ${money(schoolPricing.lesson)} ₽`, note: `абонемент на 8 занятий — ${money(schoolPricing.eightLessons)} ₽` },
+        { label: 'Занятие в абонементе на 4', value: `от ${money(schoolPricing.fourLessons / 4)} ₽`, note: `абонемент на 4 занятия — ${money(schoolPricing.fourLessons)} ₽` },
         individualPrice,
       ],
     },
@@ -339,10 +349,10 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-sand.jpg', srcset: srcset('prog-sand'), alt: 'Татьяна Петрова и дети строят композицию в песочнице', position: '50% 40%',
       lead: 'Мини-группы до 6 детей у м. Войковская, по средам в 19:00',
-      offer: { price: '4 200 ₽', unit: 'за 4 занятия', terms: 'занятие 50 минут · среда, 19:00', note: groupNote },
+      offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · среда, 19:00', note: groupNote },
       individual: individualOffer,
     },
-    bar: { price: '1 050 ₽', note: 'в абонементе на 4 занятия', individual: { price: `${money(schoolPricing.individual)} ₽`, note: 'Индивидуальный формат' } },
+    bar: { price: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽', individual: { price: `от ${money(schoolPricing.individual)} ₽`, note: 'Индивидуальный формат' } },
     situations: {
       title: 'Узнаёте своего ребёнка?',
       lead: 'Сильные чувства бывают у всех, но не каждому ребёнку легко о них рассказать.',
@@ -371,6 +381,10 @@ export const programPages: Record<string, ProgramPage> = {
             { title: 'Уверенность', text: 'пробуем новое без страха ошибиться' },
             { title: 'Саморегуляция', text: 'учимся успокаиваться и переключаться' },
           ],
+          media: [
+            room('/img/optimized/sand-light-girl.webp', 'Девочка рисует пальцами на световом столе с песком', 'Рисуем песком на световом столе'),
+            room('/img/optimized/sand-light-boy.webp', 'Мальчик рисует на световом столе с песком', 'Создаём картину в песке'),
+          ],
         },
         stepWait,
         stepAfter(),
@@ -388,7 +402,7 @@ export const programPages: Record<string, ProgramPage> = {
     },
     prices: {
       lead: 'Занятие 50 минут · до 6 детей · среда, 19:00.',
-      items: [trialPrice, { label: 'Абонемент на 4 занятия', value: '4 200 ₽', note: '1 050 ₽ за занятие' }, individualPrice],
+      items: [trialPrice, { label: 'Занятие в абонементе', value: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽' }, individualPrice],
     },
     faq: [
       { q: 'Когда проходят занятия?', a: 'По средам в 19:00. Если это время не подходит, расскажите при записи — обсудим индивидуальный формат.' },
@@ -405,10 +419,10 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-school-navigator.jpg', srcset: srcset('prog-school-navigator'), alt: 'Татьяна Петрова с детьми собирает мозаику на полу', position: '50% 35%',
       lead: 'Мини-группы до 6 детей у м. Войковская, по субботам',
-      offer: { price: '4 200 ₽', unit: 'за 4 занятия', terms: 'занятие 50 минут · раз в неделю, по субботам', note: groupNote },
+      offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · по субботам', note: groupNote },
       individual: individualOffer,
     },
-    bar: { price: '1 050 ₽', note: 'в абонементе на 4 занятия', individual: { price: `${money(schoolPricing.individual)} ₽`, note: 'Индивидуальный формат' } },
+    bar: { price: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽', individual: { price: `от ${money(schoolPricing.individual)} ₽`, note: 'Индивидуальный формат' } },
     situations: {
       title: 'Узнаёте своего школьника?',
       lead: 'Учиться становится сложнее, и не всегда дело в знаниях.',
@@ -456,7 +470,7 @@ export const programPages: Record<string, ProgramPage> = {
     },
     prices: {
       lead: 'Занятие 50 минут · до 6 детей · раз в неделю, по субботам.',
-      items: [trialPrice, { label: 'Абонемент на 4 занятия', value: '4 200 ₽', note: '1 050 ₽ за занятие' }, individualPrice],
+      items: [trialPrice, { label: 'Занятие в абонементе', value: 'от 1 050 ₽', note: 'абонемент на 4 занятия — 4 200 ₽' }, individualPrice],
     },
     faq: [
       { q: 'Когда проходят занятия?', a: 'По субботам, раз в неделю. Точное время уточним при записи.' },
@@ -473,9 +487,9 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-psychocorrection.jpg', srcset: srcset('prog-psychocorrection'), alt: 'Татьяна Петрова беседует с подростком', position: '60% 35%',
       lead: 'Индивидуально у м. Войковская, 3 минуты от метро',
-      offer: { price: '3 500 ₽', unit: 'за 45 минут', terms: 'или 4 000 ₽ за 60 минут', note: 'Бесплатное знакомство со студией можно обсудить отдельно' },
+      offer: { price: 'от 3 500 ₽', unit: 'за 45 минут', terms: 'или от 4 000 ₽ за 60 минут', note: 'Бесплатное знакомство со студией можно обсудить отдельно' },
     },
-    bar: { price: '3 500 ₽', unit: '/ 45 минут', note: '60 минут — 4 000 ₽' },
+    bar: { price: 'от 3 500 ₽', unit: '/ 45 минут', note: '60 минут — от 4 000 ₽' },
     situations: {
       title: 'Знакомая ситуация?',
       lead: 'Бывает, что ребёнку или подростку трудно, а дома не получается разобраться.',
@@ -513,10 +527,10 @@ export const programPages: Record<string, ProgramPage> = {
     },
     prices: {
       lead: 'Индивидуальная встреча · дети от 5 лет и подростки. Время подбираем при записи.',
-      items: [{ label: 'Консультация 45 минут', value: '3 500 ₽', note: 'индивидуально' }, { label: 'Консультация 60 минут', value: '4 000 ₽', note: 'индивидуально' }],
+      items: [{ label: 'Консультация 45 минут', value: 'от 3 500 ₽', note: 'индивидуально' }, { label: 'Консультация 60 минут', value: 'от 4 000 ₽', note: 'индивидуально' }],
     },
     faq: [
-      { q: 'Кто приходит на консультацию?', a: 'Это зависит от запроса: до встречи обсудим участие ребёнка и родителя. Консультация длится 45 или 60 минут; стоимость — 3 500 ₽ или 4 000 ₽.' },
+      { q: 'Кто приходит на консультацию?', a: 'Это зависит от запроса: до встречи обсудим участие ребёнка и родителя. Консультация длится 45 или 60 минут; стоимость — от 3 500 ₽ или от 4 000 ₽.' },
       { q: 'Сколько понадобится встреч?', a: 'Зависит от ситуации. После первой встречи обсудим, нужны ли следующие и как часто.' },
       { q: 'Можно ли прийти родителю без ребёнка?', a: 'Да, иногда первую встречу удобно провести с родителем. Обсудим это при записи.' },
       faqDoctor,
@@ -530,9 +544,9 @@ export const programPages: Record<string, ProgramPage> = {
     hero: {
       src: '/img/prog-diagnostics.jpg', srcset: srcset('prog-diagnostics'), alt: 'Татьяна Петрова рассматривает карточки с мальчиком', position: '50% 35%',
       lead: 'Индивидуальная встреча у м. Войковская, 3 минуты от метро',
-      offer: { price: '3 500 ₽', unit: 'за встречу', terms: '45 минут · заключение и рекомендации', note: 'По итогам — заключение и рекомендации по занятиям' },
+      offer: { price: 'от 3 500 ₽', unit: 'за встречу', terms: '45 минут · заключение и рекомендации', note: 'По итогам — заключение и рекомендации по занятиям' },
     },
-    bar: { price: '3 500 ₽', unit: '/ встреча', note: '45 минут · заключение и рекомендации' },
+    bar: { price: 'от 3 500 ₽', unit: '/ встреча', note: '45 минут · заключение и рекомендации' },
     situations: {
       title: 'Знакомая ситуация?',
       lead: 'Когда непонятно, откуда трудности, сложно выбрать, как помочь.',
@@ -575,11 +589,11 @@ export const programPages: Record<string, ProgramPage> = {
     },
     prices: {
       lead: 'Индивидуальная встреча · ребёнок от 3 лет, подросток, семья. Время подбираем при записи.',
-      items: [{ label: 'Диагностика', value: '3 500 ₽', note: '45 минут · заключение и рекомендации' }],
+      items: [{ label: 'Диагностика', value: 'от 3 500 ₽', note: '45 минут · заключение и рекомендации' }],
     },
     faq: [
-      { q: 'Что входит в диагностику?', a: 'Встреча длится 45 минут и стоит 3 500 ₽. По итогам вы получите заключение и рекомендации.' },
-      { q: 'Какие бывают виды диагностики?', a: 'Нейропсихологическая, эмоциональной сферы и познавательной сферы, в том числе готовности к школе. Каждая — 45 минут и 3 500 ₽. Какая нужна, подскажем при записи.' },
+      { q: 'Что входит в диагностику?', a: 'Встреча длится 45 минут и стоит от 3 500 ₽. По итогам вы получите заключение и рекомендации.' },
+      { q: 'Какие бывают виды диагностики?', a: 'Нейропсихологическая, эмоциональной сферы и познавательной сферы, в том числе готовности к школе. Каждая — 45 минут, от 3 500 ₽. Какая нужна, подскажем при записи.' },
       { q: 'Нужна ли диагностика перед занятиями в группе?', a: 'Не обязательна. Пробное занятие в группе бесплатное, а диагностика помогает точнее понять сильные стороны и трудности ребёнка.' },
       faqDoctor,
     ],

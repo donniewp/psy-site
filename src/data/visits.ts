@@ -40,7 +40,7 @@ export const defaultVisit: Visit = {
 export const individualVisitFor = (p: Program): Visit => ({
   value: p.slug === 'start' ? individualBooking : `${p.searchName} — индивидуально`,
   label: p.slug === 'start' ? individualBooking : `${p.searchName} — индивидуально`,
-  title: 'Обсудим индивидуальное занятие', price: 'Занятие — 2 300 ₽',
+  title: 'Обсудим индивидуальное занятие', price: 'Занятие — от 2 300 ₽',
   explanation: 'Согласуем время и продолжительность занятия. Условия бесплатного знакомства со студией обсудим при записи.',
   action: 'Обсудить индивидуальное занятие',
 });
@@ -54,9 +54,13 @@ export const visits: Visit[] = [
 ];
 
 export const programPhotos = (p: Program) => {
-  if (p.slug === 'early-sensory' || p.slug === 'early-senior') return {
-    alt: 'Пространство студии для игр и занятий на полу',
-    caption: 'Пространство для занятий в нашей студии',
+  if (p.slug === 'early-sensory') return {
+    alt: 'Трое малышей балансируют на массажных дисках и дорожке',
+    caption: 'Игры на равновесие',
+  };
+  if (p.slug === 'early-senior') return {
+    alt: 'Мальчик идёт по балансировочной дорожке, девочка — по подушкам-цветам',
+    caption: 'Игры на равновесие',
   };
   if (p.slug === 'psychocorrection' || p.slug === 'diagnostics') return {
     alt: 'Татьяна Петрова беседует с посетителем студии',

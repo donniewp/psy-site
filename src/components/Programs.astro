@@ -31,7 +31,7 @@ import { familyBooking, programPhotos } from '../data/visits';
       ))}
     </div>
 
-    <div class="programs-grid" data-reveal>
+    <div class="programs-grid is-collapsed" id="programs-grid" data-reveal>
       {programs.map((p) => (
         <article
           class="program-card card"
@@ -44,7 +44,7 @@ import { familyBooking, programPhotos } from '../data/visits';
           data-groups={p.groups.join(',')}
         >
           {p.img ? (
-            <img src={`${import.meta.env.BASE_URL}${p.img.replace(/^\//, '')}`} alt={programPhotos(p).alt} loading="lazy" />
+            <img src={`${import.meta.env.BASE_URL}${p.img.replace(/^\//, '')}`} alt={programPhotos(p).alt} loading="lazy" style={p.imgPosition && `object-position: ${p.imgPosition}`} />
           ) : (
             <div class="program-photo-pending">
               <Icon name="svc-clock" class="pending-icon" />
@@ -68,6 +68,7 @@ import { familyBooking, programPhotos } from '../data/visits';
               <span class="program-session">{p.sessionInfo}</span>
               {p.schedule && <span class="program-schedule">{p.schedule}</span>}
               <span class="program-price">{p.price}</span>
+              {p.pricePack && <span class="program-pack">{p.pricePack}</span>}
               {p.individual && <span class="program-individual">{p.individual}</span>}
             </div>
             <div class="program-actions">
@@ -80,6 +81,9 @@ import { familyBooking, programPhotos } from '../data/visits';
         </article>
       ))}
     </div>
+    <button type="button" class="btn btn-secondary programs-more" id="programs-more" aria-controls="programs-grid">
+      Показать все программы · ещё {programs.length - 3}
+    </button>
     <div class="family-note" id="family"><div><h3>Нужна помощь родителю или семье?</h3><p>Обсудим отношения с ребёнком и семейный запрос. Формат и стоимость согласуем до встречи.</p></div><a class="btn btn-secondary" href={`?program=${encodeURIComponent(familyBooking)}#booking`}>Обсудить с психологом</a></div>
   </div>
 </section>
@@ -223,7 +227,10 @@ import { familyBooking, programPhotos } from '../data/visits';
 
   .program-session { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
   .program-schedule { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
-  .program-price { font: var(--text-meta); font-weight: 700; color: var(--color-ink); }
+  /* Главная цифра — цена одного визита, абонемент или второй формат мелко под ней:
+     родитель сравнивает «сколько стоит прийти», а не сумму пакета. */
+  .program-price { margin-top: var(--space-1); font: 600 22px/1.2 var(--font-display); color: var(--color-ink); }
+  .program-pack { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
   /* Индивидуальный формат — та же программа, но дороже за занятие: держим его
      ниже основной цены и тоньше, чтобы не читался как альтернативный прайс. */
   .program-individual { font: var(--text-meta); font-size: 13px; color: var(--color-ink-soft); }
@@ -271,7 +278,17 @@ import { familyBooking, programPhotos } from '../data/visits';
     .program-body { padding: 20px; }
     .program-desc { font-size: 15px; }
     .program-top-row { flex-wrap: wrap; }
+    /* Список направлений повторяет описание и есть на странице программы;
+       на телефоне без него восемь карточек короче почти на экран */
+    .program-bullets { display: none; }
+    /* «Все программы» на телефоне — восемь длинных карточек подряд. Показываем
+       три и кнопку; при выборе возраста фильтр и так оставляет 2–4 карточки. */
+    .programs-grid.is-collapsed:not(.is-filtered) .program-card:nth-of-type(n + 4) { display: none; }
+    .programs-more { display: flex; width: 100%; margin-top: var(--space-4); justify-content: center; }
+    .programs-grid:not(.is-collapsed) ~ .programs-more,
+    .programs-grid.is-filtered ~ .programs-more { display: none; }
   }
+  @media (min-width: 561px) { .programs-more { display: none; } }
 </style>
 
 <script>
@@ -318,8 +335,23 @@ import { familyBooking, programPhotos } from '../data/visits';
     }, FADE_MS);
   }
 
+  const grid = document.getElementById('programs-grid');
+  const more = document.getElementById('programs-more');
+  const expand = () => grid?.classList.remove('is-collapsed');
+  more?.addEventListener('click', () => {
+    expand();
+    // фокус на первую из раскрытых карточек, чтобы клавиатура и скринридер не терялись
+    cards[3]?.querySelector<HTMLElement>('h3 a')?.focus({ preventScroll: true });
+  });
+  // Ссылка вида #program-diagnostics должна вести к видимой карточке
+  if (location.hash.startsWith('#program-')) expand();
+
   tabs.forEach((tab) => {
-    tab.addEventListener('click', () => applyGroup(tab.getAttribute('data-group') || 'all'));
+    tab.addEventListener('click', () => {
+      const group = tab.getAttribute('data-group') || 'all';
+      grid?.classList.toggle('is-filtered', group !== 'all');
+      applyGroup(group);
+    });
   });
 
   // Landing links from ads can preselect a group, e.g. ?age=4-6 — falls back to the
@@ -327,6 +359,10 @@ import { familyBooking, programPhotos } from '../data/visits';
   const ageParam = new URLSearchParams(location.search).get('age');
   if (ageParam) {
     const matchedTab = tabs.find((t) => t.getAttribute('data-param') === ageParam);
-    if (matchedTab) applyGroup(matchedTab.getAttribute('data-group') || 'all');
+    if (matchedTab) {
+      const group = matchedTab.getAttribute('data-group') || 'all';
+      grid?.classList.toggle('is-filtered', group !== 'all');
+      applyGroup(group);
+    }
   }
 </script>

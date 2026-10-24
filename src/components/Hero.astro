@@ -211,21 +211,28 @@ import { heroImage } from '../data/heroImage';
 
   @media (max-width: 900px) {
     .hero { padding: 20px 0 32px; }
-    .hero-inner { grid-template-columns: 1fr; gap: 24px; }
-    .hero-copy { display: contents; }
-    .hero-copy-head { grid-row: 1; }
-    .hero-media { grid-row: 2; }
-    .hero-copy-rest { grid-row: 3; }
+    /* На телефоне оффер и кнопки идут сразу под заголовком, до фото:
+       иначе первая кнопка появлялась только на втором экране. */
+    .hero-inner { grid-template-columns: 1fr; gap: 0; }
+    .hero-copy, .hero-copy-rest { display: contents; }
+    .hero-copy-head { order: 1; }
+    .hero-tags { order: 2; }
+    .hero-ctas { order: 3; }
+    .hero-media { order: 4; margin-top: 24px; }
+    .hero-sub { order: 5; }
+    .hero-approach { order: 6; }
+    .hero-microcopy { order: 7; }
+    .hero-video-link { order: 8; justify-self: start; }
     .hero-review { margin-top: var(--space-4); }
     .hero-review p { font-size: 17px; }
     .hero-locations { margin-bottom: 16px; gap: 6px; }
     .loc-pill { padding: 4px 0; background: transparent; font-size: 13px; }
     .hero h1 { font-size: clamp(30px, 7.8vw, 44px); line-height: 1.15; }
-    .hero-sub { margin-top: 16px; font-size: 17px; line-height: 1.5; }
+    .hero-sub { margin-top: 24px; font-size: 17px; line-height: 1.5; }
     .hero-motto { font-size: 18px; line-height: 1.45; }
     .hero-tags { margin-top: 16px; gap: 6px; }
     .tag { font-size: 12px; padding: 7px 10px; }
-    .hero-ctas { margin-top: 20px; gap: 10px; }
+    .hero-ctas { margin-top: 14px; gap: 10px; }
     .hero-ctas .btn { flex: 1 1 200px; padding: 13px 18px; }
     .hero-microcopy { margin-top: 12px; font-size: 13px; }
     .hero-video-link { margin-top: 12px; }

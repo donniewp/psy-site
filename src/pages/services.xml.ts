@@ -14,14 +14,15 @@ import { programs, programPaths, specialist } from '../data/content';
 
 const SITE = 'https://senzitivnost.ru';
 
-// Цена относится к указанному пакету, а не к одному занятию.
-const packages: Record<string, { price: number; unit: string }> = {
-  'early-sensory': { price: 4200, unit: '4 занятия' },
-  'early-senior': { price: 7500, unit: '8 занятий' },
+// В витрине показываем цену одного занятия: сумма за абонемент рядом с другими
+// услугами читалась как цена визита. Для групп это стоимость занятия в абонементе.
+const packages: Record<string, { price: number; unit: string; pack?: string }> = {
+  'early-sensory': { price: 1050, unit: '1 занятие', pack: 'в абонементе на 4 занятия' },
+  'early-senior': { price: 1050, unit: '1 занятие', pack: 'в абонементе на 4 занятия' },
   razvivayka: { price: 1900, unit: '1 занятие, 2,5 часа' },
-  start: { price: 4200, unit: '4 занятия' },
-  sand: { price: 4200, unit: '4 занятия' },
-  'school-navigator': { price: 4200, unit: '4 занятия' },
+  start: { price: 940, unit: '1 занятие', pack: 'в абонементе на 8 занятий' },
+  sand: { price: 1050, unit: '1 занятие', pack: 'в абонементе на 4 занятия' },
+  'school-navigator': { price: 1050, unit: '1 занятие', pack: 'в абонементе на 4 занятия' },
   psychocorrection: { price: 3500, unit: '45 минут' },
   diagnostics: { price: 3500, unit: '45 минут' },
 };
@@ -43,7 +44,7 @@ export const buildFeed = () => {
       const pack = packages[p.slug];
       if (!pack) return '';
       const url = `${SITE}/${programPaths[p.slug]}/?utm_source=yandex_business&utm_medium=organic&utm_campaign=services`;
-      const description = `${p.ageLabel}. ${p.desc} Стоимость за ${pack.unit}. ${p.sessionInfo}. ${
+      const description = `${p.ageLabel}. ${p.desc} Стоимость за ${pack.unit}${pack.pack ? ` ${pack.pack}` : ''}. ${p.sessionInfo}. ${
         p.slug === 'diagnostics'
           ? 'Встреча с заключением и рекомендациями.'
           : p.slug === 'psychocorrection'

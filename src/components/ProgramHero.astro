@@ -9,6 +9,7 @@ const { hero } = page;
 <section class="school-hero" aria-labelledby="hero-title">
   <figure class="hero-media">
     <picture>
+      {hero.desktopSrcset && <source media="(min-width: 901px)" type="image/webp" srcset={hero.desktopSrcset} sizes="50vw" />}
       <source type="image/webp" srcset={hero.srcset} sizes="(max-width: 900px) 100vw, 50vw" />
       <img src={hero.src} alt={hero.alt} width="1200" height="800" fetchpriority="high" style={`--pos: ${hero.position ?? '50% 40%'}; --pos-m: ${hero.mobilePosition ?? hero.position ?? '50% 30%'}`} />
     </picture>
