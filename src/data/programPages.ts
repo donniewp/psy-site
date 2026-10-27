@@ -80,9 +80,9 @@ export const programPages: Record<string, ProgramPage> = {
   'early-sensory': {
     paid: false,
     hero: {
-      src: '/img/prog-sensory.jpg', srcset: srcset('prog-sensory'), alt: 'Малыши играют на ковре: балансируют на дисках и лежат на подушках-цветах, подняв руки и ноги',
-      desktopSrcset: '/img/optimized/sensory-floor-600.webp 600w, /img/optimized/sensory-floor-960.webp 960w',
-      position: '50% 22%', mobilePosition: '50% 4%', mobileRating: 'none',
+      src: '/img/prog-sensory-sand.jpg', srcset: srcset('prog-sensory-sand'), alt: 'Трое малышей рисуют пальцами на световом столе с песком',
+      desktopSrcset: '/img/optimized/sensory-sand-600.webp 600w, /img/optimized/sensory-sand-960.webp 960w',
+      position: '50% 40%', mobilePosition: '50% 20%',
       lead: 'Занятия для малышей вместе с мамой у м. Войковская, 3 минуты от метро',
       offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · вместе с мамой', note: groupNote },
     },
@@ -145,9 +145,9 @@ export const programPages: Record<string, ProgramPage> = {
   'early-senior': {
     paid: false,
     hero: {
-      src: '/img/prog-senior.jpg', srcset: srcset('prog-senior'), alt: 'Мальчик идёт по балансировочной дорожке, девочка — по подушкам-цветам',
-      desktopSrcset: '/img/optimized/senior-balance-480.webp 480w, /img/optimized/senior-balance-800.webp 800w',
-      position: '50% 0%', mobilePosition: '50% 0%', mobileRating: 'none',
+      src: '/img/prog-sensory.jpg', srcset: srcset('prog-sensory'), alt: 'Малыши играют на ковре: балансируют на дисках и лежат на подушках-цветах, подняв руки и ноги',
+      desktopSrcset: '/img/optimized/sensory-floor-600.webp 600w, /img/optimized/sensory-floor-960.webp 960w',
+      position: '50% 22%', mobilePosition: '50% 4%', mobileRating: 'none',
       lead: 'Мини-группы до 8 детей у м. Войковская, 3 минуты от метро',
       offer: { price: 'от 1 050 ₽', unit: 'за занятие', terms: 'абонемент на 4 занятия — 4 200 ₽ · занятие 50 минут · до 8 детей', note: groupNote },
     },

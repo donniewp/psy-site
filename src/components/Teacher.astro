@@ -33,6 +33,12 @@ import FigmaAsset from './FigmaAsset.astro';
             <li class="edu-card">
               <span class="edu-art" aria-hidden="true">
                 {/* Своя двухцветная картинка на каждое направление вместо одинаковых линейных иконок */}
+                {e.icon === 'edu-teacher' && (
+                  <svg viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="20" rx="2.5" class="fill" /><rect x="5" y="7" width="30" height="20" rx="2.5" /><path d="M11 21l2.5-8 2.5 8M12 18.5h3M20.5 13v8h2.5a2 2 0 0 0 0-4h-2.5m0 0h2a2 2 0 0 0 0-4h-2" /><path d="M14 27l-3 7M26 27l3 7" /><path d="M28 13.5h3" /></svg>
+                )}
+                {e.icon === 'edu-psych' && (
+                  <svg viewBox="0 0 40 40"><path d="M23 21.5s-5-3-5-6.2a2.6 2.6 0 0 1 5-1 2.6 2.6 0 0 1 5 1c0 3.2-5 6.2-5 6.2Z" class="fill" /><path d="M23 21.5s-5-3-5-6.2a2.6 2.6 0 0 1 5-1 2.6 2.6 0 0 1 5 1c0 3.2-5 6.2-5 6.2Z" /><path d="M14 35v-5.5c-3-1.6-5-4.8-5-8.5A11 11 0 0 1 20 10" /><path d="M14 35h12v-4h3a2 2 0 0 0 2-2v-3l2.5-.8L31 21" /></svg>
+                )}
                 {e.icon === 'price-cap' && (
                   <svg viewBox="0 0 40 40"><circle cx="20" cy="17" r="7" class="fill" /><path d="M20 4v3M8.5 8.5l2.1 2.1M31.5 8.5l-2.1 2.1M4 17h3M33 17h3" /><path d="M6 33c4-5 9-7 14-7s10 2 14 7" /><path d="M20 26v-6m0 2c-2.5 0-4-1.5-4.5-3.5 2.5 0 4 1 4.5 3.5Zm0 0c2.5 0 4-1.5 4.5-3.5-2.5 0-4 1-4.5 3.5Z" /></svg>
                 )}
@@ -48,7 +54,7 @@ import FigmaAsset from './FigmaAsset.astro';
               </span>
               <div>
                 <strong>{e.program}</strong>
-                <span>{e.institution}</span>
+                {e.institution && <span>{e.institution}</span>}
               </div>
             </li>
           ))}

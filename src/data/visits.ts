@@ -55,11 +55,11 @@ export const visits: Visit[] = [
 
 export const programPhotos = (p: Program) => {
   if (p.slug === 'early-sensory') return {
-    alt: 'Трое малышей балансируют на массажных дисках и дорожке',
-    caption: 'Игры на равновесие',
+    alt: 'Трое малышей рисуют пальцами на световом столе с песком',
+    caption: 'Рисуем на световом столе',
   };
   if (p.slug === 'early-senior') return {
-    alt: 'Мальчик идёт по балансировочной дорожке, девочка — по подушкам-цветам',
+    alt: 'Трое малышей балансируют на массажных дисках и дорожке',
     caption: 'Игры на равновесие',
   };
   if (p.slug === 'psychocorrection' || p.slug === 'diagnostics') return {
